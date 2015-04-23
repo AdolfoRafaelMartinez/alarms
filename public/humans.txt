@@ -1,0 +1,15 @@
+# humanstxt.org/
+# The humans responsible & technology colophon
+
+# TEAM
+
+    Marian Vasile -- oma -- @markvasile
+
+# THANKS
+
+    LiSA, Ryan, Diana, Mom
+
+# TECHNOLOGY COLOPHON
+
+    HTML5, CSS3, AngularJS, Angular Material
+    jQuery, Modernizr
