@@ -1,20 +1,54 @@
 <div flex layout="row" data-ng-controller="HomeController">
 
-        <md-sidenav md-is-locked-open="$mdMedia('gt-sm')" class="md-whiteframe-z2" md-component-id="left">
-          <md-list>
-            <md-item ng-repeat="it in ul.layers">
-                <md-button ng-click="ul.selectLayer(it)" ng-class="{'selected' : it === ul.selected }">
-                  <md-icon md-svg-icon="{{it.icon}}" class="avatar"></md-icon>
-                  {{it.name}}
-                </md-button>
-            </md-item>
-          </md-list>
-        </md-sidenav>
+    <md-sidenav md-is-locked-open="$mdMedia('gt-sm')" class="md-whiteframe-z2" md-component-id="left">
+      <md-list>
+        <md-item ng-repeat="it in ul.layers">
+            <md-button ng-click="ul.selectLayer(it)" ng-class="{'selected' : it === ul.selected }">
+              <md-icon md-svg-icon="{{it.icon}}" class="avatar"></md-icon>
+              {{it.name}}
+            </md-button>
+        </md-item>
+      </md-list>
+    </md-sidenav>
 
-        <md-content flex layout="row" id="content">
-            <div flex layout="row" class="drawingboard">
-                <canvas ng-click="addAP($event)"></canvas>
+    <md-content flex layout="column" id="content">
+        <div flex layout="row" class="drawing">
+            <canvas ng-click="addAP($event)"></canvas>
+        </div>
+
+        <div class="controls">
+            <div layout="row">
+                <div flex="10">
+                    <div>Units:</div>
+                    <md-switch flex ng-model="settings.units" ng-true-value="'m'" ng-false-value="'ft'" ng-change="changeUnits()" aria-label="Units">{{ settings.units }}</md-switch>
+                </div>
+
+                <div>
+                    <div>Signal radius:</div>
+
+                    <div ng-show="settings.units == 'ft'">
+                        <md-slider flex min="{{ UNITS_MIN_FEET }}" max="{{ UNITS_MAX_FEET }}" step="{{ UNITS_STEP_FEET }}" ng-model="settings.signal_radius_feet" aria-label="AP radius" ng-change="updateSignalStrength()" id="signal_radius_feet" class="md-warn"></md-slider>
+                        <div flex="5" layout layout-align="center center">
+                            <input type="number" ng-model="settings.signal_radius_feet" ng-change="updateSignalStrength()" aria-label="AP radius" aria-controls="signal_radius_feet">
+                        </div>
+                    </div>
+                    <div ng-show="settings.units == 'm'">
+                        <md-slider flex min="{{ UNITS_MIN_METERS }}" max="{{ UNITS_MAX_METERS }}" step="{{ UNITS_STEP_METERS }}" ng-model="settings.signal_radius_meters" ng-change="updateSignalStrength()" aria-label="AP radius" id="signal_radius_meters" class="md-warn"></md-slider>
+                        <div flex="5" layout layout-align="center center">
+                            <input type="number" ng-model="settings.signal_radius_meters" ng-change="updateSignalStrength()" aria-label="AP radius" aria-controls="signal_radius_meters">
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <div>Zoom:</div>
+                    <md-slider flex min="0%" max="800%" ng-model="settings.scale" step="10" ng-change="updateScale()" aria-label="scale" id="scale" class="md-warn"></md-slider>
+                    <div flex="5" layout layout-align="center center">
+                        <input type="number" ng-model="settings.scale" ng-change="updateScale()" aria-label="scale" aria-controls="scale"> %
+                    </div>
+                </div>
             </div>
-        </md-content>
+        </div>
+    </md-content>
 
 </div>

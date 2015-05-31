@@ -1,15 +1,54 @@
 'use strict';
 
-
 angular.module('core').controller('HomeController', ['$scope', 'Authentication', 'Drawing', '$timeout',
 	function($scope, Authentication, Drawing, $timeout) {
 
+        $scope.UNITS_STEP_FEET   = 8;
+        $scope.UNITS_STEP_METERS = 3;
+        $scope.UNITS_MIN_METERS  = 3;
+        $scope.UNITS_MIN_FEET    = Number.parseFloat((Math.round($scope.UNITS_MIN_METERS * 3.28084 * 100) / 100).toFixed(0));
+        $scope.UNITS_MAX_METERS  = 30;
+        $scope.UNITS_MAX_FEET    = Number.parseFloat((Math.round($scope.UNITS_MAX_METERS * 3.28084 * 100) / 100).toFixed(0));
+
+
 		// This provides Authentication context.
 		$scope.authentication = Authentication;
-        Drawing.initBoard();
+
+        // Only change this, and the rest will follow
+        $scope.settings = {
+            units          : 'ft',
+            signal_radius  : 22,
+            floor_width    : 250,
+            scale          : 100  // percent
+        };
+
+        if ($scope.settings.units == 'ft') $scope.settings.signal_radius_feet = $scope.settings.signal_radius;
+        if ($scope.settings.units == 'm')  $scope.settings.signal_radius_meters = $scope.settings.signal_radius;
+
+        Drawing.initBoard($scope.settings.floor_width, $scope.settings.scale);
 
         $scope.addAP = function(evt) {
-            Drawing.addAP(evt);
+            Drawing.addAP(evt, $scope.settings.signal_radius);
         };
+
+        $scope.changeUnits = function() {
+            console.log('changeUnits', $scope.settings);
+        };
+
+        $scope.updateScale = function() {
+            Drawing.scale($scope.settings.scale);
+        };
+
+        $scope.updateSignalStrength = function() {
+            if ($scope.settings.units == 'ft') {
+                $scope.settings.signal_radius_meters = Number.parseFloat((Math.round($scope.settings.signal_radius_feet / 3.28084 * 100) / 100).toFixed(0));
+            } else {
+                $scope.settings.signal_radius_feet = Number.parseFloat((Math.round($scope.settings.signal_radius_meters * 3.28084 * 100) / 100).toFixed(0));
+            }
+            $scope.settings.signal_radius = ($scope.settings.units == 'ft') ? $scope.settings.signal_radius_feet : $scope.settings.signal_radius_meters;
+            Drawing.updateSignalStrength($scope.settings.signal_radius);
+        };
+
+        $scope.updateSignalStrength();
 	}
 ]);
