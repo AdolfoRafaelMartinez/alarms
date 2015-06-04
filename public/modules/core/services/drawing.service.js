@@ -17,12 +17,20 @@ angular.module('core').service('Drawing', [
         var radius;
         var ap_index = 0;
 
+        var show_overlaps = true;
+        var show_distances = true;
+
         var AP_CIRCLE_STROKE_RGB = '#888';
         var AP_CIRCLE_RGBA = 'rgba(180, 220, 255, 0.5)';
         var AP_CIRCLE_RGBA_OPAQUE = 'rgba(200, 200, 255, 1)';
         var DISTANCE_STROKE_RGB = '#ccc';
         var DISTANCE_TEXT_RGB = '#888';
-        var DISTANCE_CUT_OFF = 80;
+        var DISTANCE_CUT_OFF = 45;
+        var HASH_COLOR = [ 
+            { overlap: 21, color: '#FF0000' },
+            { overlap: 14, color: '#00FF00' },
+            { overlap: 0,  color: '#F7FE2E' }
+ ];
 
         var tick = function(event) {
             // this set makes it so the stage only re-renders when an event handler indicates a change has happened.
@@ -78,6 +86,8 @@ angular.module('core').service('Drawing', [
                         names[i].ptext.text = '';
                     }
                 }
+
+                drawIntersections(ap);
                 is_dragging = true;
                 update = true;
             });
@@ -122,8 +132,8 @@ angular.module('core').service('Drawing', [
                         if (d > DISTANCE_CUT_OFF) {
                             text.text = '';
                         }
-                        text.x = m.p_start.x + (m.p_end.x - m.p_start.x) /2;
-                        text.y = m.p_start.y + (m.p_end.y - m.p_start.y) /2;
+                        text.x = m.p_start.x + (m.p_end.x - m.p_start.x) /2 - 10;;
+                        text.y = m.p_start.y + (m.p_end.y - m.p_start.y) /2 - 10;
                         text.textBaseline = "alphabetic";
                         m.ptext = text;
                         distances.addChild(text);
@@ -152,18 +162,78 @@ angular.module('core').service('Drawing', [
 
                 // add default layers
                 layers = [new createjs.Container()];
-                layers[0].puddle_type = 'ap';
+                layers[0].layer_type = 'ap';
                 current_layer = 0;
                 floorplan = new createjs.Container();
-                floorplan.puddle_type = 'background';
+                floorplan.layer_type = 'background';
                 distances = new createjs.Container();
-                distances.puddle_type = 'distances';
+                distances.layer_type = 'distances';
                 stage.addChild(floorplan);
                 stage.addChild(layers[0]);
                 stage.addChild(distances);
 
                 createjs.Ticker.addEventListener('tick', tick);
             }, 100);
+        };
+
+        var drawIntersections = function(ap, processing) {
+            var c, d, r2, i, j, rsq, overlap, apb, alpha, beta, color;
+            var hash_color, leftside, rightside;
+            var intersections = [];
+            _.each(stage.children, function(child) {
+                if (child.layer_type == 'ap') {
+                    for (i=0; i<child.children.length; i++) {
+                        if (child.children[i] != ap) {
+                            c = child.children[i];
+                            d = Math.sqrt(Math.pow(c.x - ap.x, 2) + Math.pow(c.y - ap.y, 2));
+                            if (d < radius *2) {
+                                r2 = 2 * radius;
+                                rsq = Math.pow(radius, 2);
+                                overlap = ((2 * rsq * Math.acos(d/r2) - d/2 * Math.sqrt(4*rsq - d*d)) / (2 * rsq * Math.acos(0)) * 100).toFixed(0);
+
+                                var text = new createjs.Text('' + overlap + '%', "12px Arial", DISTANCE_TEXT_RGB);
+                                alpha = Math.atan((ap.y - c.y)/(ap.x - c.x));
+                                beta  = Math.acos(Math.sqrt(Math.pow(ap.x - c.x, 2) + Math.pow(ap.y - c.y, 2)) / 2 /radius);
+                                apb = alpha + beta;
+                                text.x = radius * Math.cos(apb);
+                                text.y = radius * Math.sin(apb);
+                                text.textBaseline = "alphabetic";
+                                // ap.addChild(text);
+
+                                leftside = 0;
+                                if (ap.x >= c.x) leftside = 1;
+                                rightside = 1 - leftside;
+                                for (color=0; color < HASH_COLOR.length; color++) {
+                                    if (overlap > HASH_COLOR[color].overlap) {
+                                        hash_color = HASH_COLOR[color].color;
+                                        break;
+                                    }
+                                }
+
+                                var hash = new createjs.Shape();
+                                hash.puddleShape = 'hash';
+                                hash.graphics.beginFill(hash_color).arc(0, 0, radius, leftside * Math.PI + alpha - beta, leftside * Math.PI + alpha + beta + 0.01);
+                                hash.graphics.beginFill(hash_color).arc(c.x - ap.x, c.y - ap.y, radius, rightside * Math.PI + alpha - beta, rightside * Math.PI + alpha + beta + 0.01);
+                                intersections.push(hash);
+
+                                // update the intersections on the adjacent AP as well
+                                if (!processing) drawIntersections(c, true);
+                            }
+                        }
+                    }
+                }
+            });
+
+            for (j=0; j<ap.children.length; j++) {
+                if (ap.children[j].puddleShape == 'hash') {
+                    ap.removeChild(ap.children[j]);
+                }
+            }
+            if (show_overlaps) {
+                for (j=0; j<intersections.length; j++) {
+                    ap.addChild(intersections[j]);
+                }
+            }
         };
 
         this.addAP = function(evt, signal_radius) {
@@ -202,13 +272,14 @@ angular.module('core').service('Drawing', [
             ap.cursor = 'pointer';
             container.addChild(ap);
 
-            var text = new createjs.Text('AP ' + ap_index++, "14px Arial", DISTANCE_TEXT_RGB);
+            var text = new createjs.Text('AP ' + ap_index++, "12px Arial", DISTANCE_TEXT_RGB);
             text.x = -15;
             text.y = -10;
             text.textBaseline = "alphabetic";
             container.addChild(text);
 
             addDistances.call(this, container);
+            drawIntersections(container);
 
             update = true;
         };
@@ -218,10 +289,12 @@ angular.module('core').service('Drawing', [
             if (stage) {
                 radius = (stage_scale / 100) * (signal_radius * canvas.width / floor_width);
                 _.each(stage.children, function(child) {
-                    if (child.puddle_type == 'ap') {
+                    if (child.layer_type == 'ap') {
                         for (var i=0; i<child.children.length; i++) {
-                            if (child.children[i].puddleShape == 'signal') {
-                                child.children[i].graphics.clear().setStrokeStyle(1).beginFill(AP_CIRCLE_RGBA).beginStroke(AP_CIRCLE_STROKE_RGB).drawCircle(0, 0, radius);
+                            for (var j=0; j<child.children[i].children.length; j++) {
+                                if (child.children[i].children[j].puddleShape == 'signal') {
+                                    child.children[i].children[j].graphics.clear().setStrokeStyle(1).beginFill(AP_CIRCLE_RGBA).beginStroke(AP_CIRCLE_STROKE_RGB).drawCircle(0, 0, radius);
+                                }
                             }
                         }
                     }
@@ -229,6 +302,24 @@ angular.module('core').service('Drawing', [
 
                 update = true;
             }
+        };
+
+        this.toggleDistances = function() {
+            show_distances = !show_distances;
+            distances.visible = show_distances;
+            update = true;
+        };
+
+        this.toggleOverlaps = function() {
+            show_overlaps = !show_overlaps;
+            _.each(stage.children, function(child) {
+                if (child.layer_type == 'ap') {
+                    for (var i=0; i<child.children.length; i++) {
+                        drawIntersections(child.children[i]);
+                    }
+                }
+            });
+            update = true;
         };
 
         this.scale = function(percent) {

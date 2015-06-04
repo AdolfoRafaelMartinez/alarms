@@ -10,7 +10,6 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
         $scope.UNITS_MAX_METERS  = 30;
         $scope.UNITS_MAX_FEET    = Number.parseFloat((Math.round($scope.UNITS_MAX_METERS * 3.28084 * 100) / 100).toFixed(0));
 
-
 		// This provides Authentication context.
 		$scope.authentication = Authentication;
 
@@ -19,7 +18,9 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
             units          : 'ft',
             signal_radius  : 22,
             floor_width    : 250,
-            scale          : 100  // percent
+            scale          : 100,  // percent
+            show_distances : true,
+            show_overlaps  : true
         };
 
         if ($scope.settings.units == 'ft') $scope.settings.signal_radius_feet = $scope.settings.signal_radius;
@@ -37,6 +38,14 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
 
         $scope.updateScale = function() {
             Drawing.scale($scope.settings.scale);
+        };
+
+        $scope.toggleDistances = function() {
+            Drawing.toggleDistances();
+        };
+
+        $scope.toggleOverlaps = function() {
+            Drawing.toggleOverlaps();
         };
 
         $scope.updateSignalStrength = function() {
