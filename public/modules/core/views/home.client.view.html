@@ -4,12 +4,16 @@
       <md-list>
         <md-item>
             <div flex="10">
-                <div>Distances:</div>
-                <md-switch flex ng-model="settings.show_distances" ng-change="toggleDistances()" aria-label="Show Distances"></md-switch>
+                <md-switch flex ng-model="settings.show_distances" ng-change="toggleDistances()" aria-label="Show Distances">Distances</md-switch>
             </div>
             <div flex="10">
-                <div>Overlaps:</div>
-                <md-switch flex ng-model="settings.show_overlaps" ng-change="toggleOverlaps()" aria-label="Show Overlaps"></md-switch>
+                <md-switch flex ng-model="settings.show_overlaps" ng-change="toggleOverlaps()" aria-label="Show Overlaps">Overlaps</md-switch>
+            </div>
+        </md-item>
+        <md-item>
+            <div flex="10">
+                <input type="file" file-dialog />
+                <md-button ng-click="uploadFloorPlan()"> <i class="material-icons">perm_media</i> Upload Floor</md-button>
             </div>
         </md-item>
         <md-item ng-repeat="it in ul.layers">

@@ -58,6 +58,10 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
             Drawing.updateSignalStrength($scope.settings.signal_radius);
         };
 
+        $scope.uploadFloorPlan = function() {
+            
+        };
+
         $scope.updateSignalStrength();
 	}
 ]);
