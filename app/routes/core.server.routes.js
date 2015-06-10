@@ -18,7 +18,7 @@ module.exports = function(app) {
                 var contentType = file.headers['content-type'];
                 var extension = file.path.substring(file.path.lastIndexOf('.'));
                 var filename = uuid.v4() + extension;
-                var destPath = path.join(__dirname, './../../public/uploads/' + filename;
+                var destPath = path.join(__dirname, './../../public/uploads/' + filename);
 
                 var headers = {
                     'x-amz-acl': 'public-read',
