@@ -325,5 +325,18 @@ angular.module('core').service('Drawing', [
         this.scale = function(percent) {
             stage.setTransform(0, 0, percent/100, percent/100).update();
         };
+
+        this.addFloorPlan = function(url) {
+            var img = new Image();
+            img.src = url;
+            img.onload = function(event) {
+                var t = event.target;
+                var f = new createjs.Bitmap(t);
+                f.x = 0;
+                f.y = 0;
+                floorplan.addChild(f);
+                update = true;
+            };
+        };
     }
 ]);
