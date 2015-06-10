@@ -17,7 +17,7 @@ module.exports = function(app) {
                 var file = files[key][0];
                 var contentType = file.headers['content-type'];
                 var extension = file.path.substring(file.path.lastIndexOf('.'));
-                var filename = uuid.v4() + extension);
+                var filename = uuid.v4() + extension;
                 var destPath = path.join(__dirname, './../../public/uploads/' + filename;
 
                 var headers = {
