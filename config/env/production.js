@@ -18,6 +18,11 @@ module.exports = {
 				'public/lib/angular-ui-router/release/angular-ui-router.min.js',
 				'public/lib/angular-ui-utils/ui-utils.min.js',
 				'public/lib/angular-bootstrap/ui-bootstrap-tpls.min.js'
+                'public/lib/easeljs/lib/easeljs-NEXT.combined.js',
+
+                "public/lib/blueimp/JavaScript-Load-Image/js/load-image.all.min.js",
+                "public/lib/blueimp/JavaScript-Load-Image/js/lib/jquery.Jcrop.js",
+                "public/lib/blueimp/JavaScript-Canvas-To-Blob/js/canvas-to-blob.min.js"
 			]
 		},
 		css: 'public/dist/application.min.css',

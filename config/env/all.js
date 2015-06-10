@@ -29,7 +29,15 @@ module.exports = {
 				'public/lib/angular-ui-router/release/angular-ui-router.js',
 				'public/lib/angular-ui-utils/ui-utils.js',
 				'public/lib/angular-bootstrap/ui-bootstrap-tpls.js',
-                'public/lib/easeljs/lib/easeljs-NEXT.combined.js'
+                'public/lib/easeljs/lib/easeljs-NEXT.combined.js',
+
+                "public/lib/blueimp/JavaScript-Load-Image/js/load-image.all.min.js",
+                "public/lib/blueimp/JavaScript-Load-Image/js/lib/jquery.Jcrop.js",
+                "public/lib/blueimp/JavaScript-Canvas-To-Blob/js/canvas-to-blob.min.js",
+
+                "public/lib/ngFileUpload/js/uuid.js",
+                "public/lib/ngFileUpload/js/xhr_post.js",
+                "public/lib/ngFileUpload/js/ng_file_upload.js"
 			]
 		},
 		css: [
