@@ -26,7 +26,7 @@ angular.module('core').service('Drawing', [
         var AP_CIRCLE_RGBA_OPAQUE = 'rgba(200, 200, 255, 1)';
         var DISTANCE_STROKE_RGB = '#ccc';
         var DISTANCE_TEXT_RGB = '#888';
-        var DISTANCE_CUT_OFF = 45;
+        var DISTANCE_CUT_OFF = 60;
         var HASH_COLOR = [
             { overlap: 21, color: '#FF0000' },
             { overlap: 14, color: '#00FF00' },
