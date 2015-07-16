@@ -14,6 +14,7 @@ angular.module('core').service('Drawing', [
         var is_dragging = false;
         var floor_width;
         var stage_scale;
+        var scale_percent;
         var radius;
         var ap_index = 0;
 
@@ -26,7 +27,7 @@ angular.module('core').service('Drawing', [
         var DISTANCE_STROKE_RGB = '#ccc';
         var DISTANCE_TEXT_RGB = '#888';
         var DISTANCE_CUT_OFF = 45;
-        var HASH_COLOR = [ 
+        var HASH_COLOR = [
             { overlap: 21, color: '#FF0000' },
             { overlap: 14, color: '#00FF00' },
             { overlap: 0,  color: '#F7FE2E' }
@@ -47,20 +48,20 @@ angular.module('core').service('Drawing', [
                 this.parent.addChild(this);
                 names = [];
                 this.offset = {
-                    x: this.x - evt.stageX,
-                    y: this.y - evt.stageY
+                    x: this.x - evt.stageX * 100 / scale_percent,
+                    y: this.y - evt.stageY * 100 / scale_percent
                 };
                 for (var i=0; i<ap.distances.length; i++) names.push(distances.getChildByName(ap.distances[i].name));
             });
 
             ap.on('pressmove', function(evt) {
-                this.x = evt.stageX + this.offset.x;
-                this.y = evt.stageY + this.offset.y;
+                ap.x = evt.stageX * 100 / scale_percent + ap.offset.x;
+                ap.y = evt.stageY * 100 / scale_percent + ap.offset.y;
                 var i, l = names.length;
 
                 var mperpx = (floor_width / canvas.width / 1000) * (stage_scale / 100);
-                ap.px = mperpx * this.x;
-                ap.py = mperpx * this.y;
+                ap.px = mperpx * ap.x;
+                ap.py = mperpx * ap.y;
 
                 for (i=0; i<l; i++) {
                     if (ap == names[i].ap_start) {
@@ -142,7 +143,38 @@ angular.module('core').service('Drawing', [
             }
         };
 
+        this.touchStart = function(e) {
+            // console.log(e);
+        };
+
+        this.touchMove = function(e) {
+            // console.log(e);
+        };
+
+        this.touchEnd = function(e) {
+            // console.log(e);
+        };
+
+        this.mouseWheelEvent = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var e = window.event || e;
+            var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail))) * 1.02;
+            if (delta < 0) delta = 0.98;
+            this.scale(delta * scale_percent);
+
+            /*
+            selectedLayer.scaleX = selectedLayer.scaleY = selectedLayer.scaleX * delta;
+            if (selectedLayer.layer_type === 'background') {
+                constrainBox(selectedLayer);
+            }
+            */
+
+            return false;
+        };
+
         this.initBoard = function(width, scale) {
+            scale_percent = 100;
             $timeout(function() {
                 width *= 1000;
                 canvas = document.getElementsByTagName('canvas')[0];
@@ -158,6 +190,7 @@ angular.module('core').service('Drawing', [
 
                 // enabled mouse over / out events
                 stage.enableMouseOver(10);
+                addListeners(canvas, this);
                 stage.mouseMoveOutside = true; // keep tracking the mouse even when it leaves the canvas
 
                 // add default layers
@@ -173,7 +206,7 @@ angular.module('core').service('Drawing', [
                 stage.addChild(distances);
 
                 createjs.Ticker.addEventListener('tick', tick);
-            }, 100);
+            }.bind(this), 100);
         };
 
         var drawIntersections = function(ap, processing) {
@@ -252,8 +285,9 @@ angular.module('core').service('Drawing', [
             layers[current_layer].addChild(container);
 
             container.scaleX = container.scaleY = container.scale = 1;
-            container.x = evt.offsetX;
-            container.y = evt.offsetY;
+            console.log(evt.offsetX, evt.offsetY);
+            container.x = evt.offsetX * 100 / scale_percent;
+            container.y = evt.offsetY * 100 / scale_percent;
             container.px = mperpx * container.x;
             container.py = mperpx * container.y;
 
@@ -323,20 +357,36 @@ angular.module('core').service('Drawing', [
         };
 
         this.scale = function(percent) {
+            scale_percent = percent;
             stage.setTransform(0, 0, percent/100, percent/100).update();
         };
 
         this.addFloorPlan = function(url) {
             var img = new Image();
-            img.src = url;
+            img.src = url.replace('public/', '');
             img.onload = function(event) {
                 var t = event.target;
                 var f = new createjs.Bitmap(t);
                 f.x = 0;
                 f.y = 0;
+                f.regX = 0;
+                f.regY = 0;
+                var scaleX = canvas.width / this.width;
+                var scaleY = canvas.height / this.height;
+                if (scaleX > scaleY) f.scaleX = f.scaleY = scaleY;
+                else f.scaleY = f.scaleX = scaleX;
                 floorplan.addChild(f);
                 update = true;
             };
         };
     }
 ]);
+
+function addListeners(canvas, drawing) {
+    canvas.addEventListener('mousewheel', drawing.mouseWheelEvent.bind(drawing), false);
+    canvas.addEventListener('DOMMouseScroll', drawing.mouseWheelEvent.bind(drawing), false);
+    canvas.addEventListener('MozMousePixelScroll', drawing.mouseWheelEvent.bind(drawing), false);
+    canvas.addEventListener('touchstart', drawing.touchStart.bind(drawing), false);
+    canvas.addEventListener('touchmove', drawing.touchMove.bind(drawing), false);
+    canvas.addEventListener('touchend', drawing.touchEnd.bind(drawing), false);
+}

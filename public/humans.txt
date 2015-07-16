@@ -3,7 +3,8 @@
 
 # TEAM
 
-    Marian Vasile -- oma -- @markvasile
+    Marian Vasile -- dev -- @markvasile
+    Ryan R. Hadley -- design, business -- @haddlescaddle
 
 # THANKS
 

@@ -16,8 +16,8 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
         // Only change this, and the rest will follow
         $scope.settings = {
             units: 'ft',
-            signal_radius: 22,
-            floor_width: 250,
+            signal_radius: 30,
+            floor_width: 650,
             scale: 100, // percent
             show_distances: true,
             show_overlaps: true
