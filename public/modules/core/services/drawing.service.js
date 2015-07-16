@@ -23,7 +23,7 @@ angular.module('core').service('Drawing', [
 
         var AP_CIRCLE_STROKE_RGB = '#888';
         var AP_CIRCLE_RGBA = 'rgba(180, 220, 255, 0.5)';
-        var AP_CIRCLE_RGBA_OPAQUE = 'rgba(200, 200, 255, 1)';
+        var AP_CIRCLE_RGBA_OPAQUE = 'rgba(200, 200, 255, 0.2)';
         var DISTANCE_STROKE_RGB = '#ccc';
         var DISTANCE_TEXT_RGB = '#888';
         var DISTANCE_CUT_OFF = 60;
