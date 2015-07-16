@@ -37,7 +37,7 @@ module.exports = function(app) {
                         }
                     });
 
-                    res.json('/public/uploads/' + filename);
+                    res.json('/uploads/' + filename);
 
                 } else {
                     return res.json('Error: File not uploaded');
