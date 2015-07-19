@@ -16,6 +16,7 @@ angular.module('core').service('Drawing', [
         var stage_scale;
         var scale_percent;
         var radius;
+        var radius_real;
         var ap_index = 0;
 
         var show_overlaps = true;
@@ -173,8 +174,9 @@ angular.module('core').service('Drawing', [
             return false;
         };
 
-        this.initBoard = function(width, scale) {
+        this.initBoard = function(width, scale, radius) {
             scale_percent = 100;
+            radius_real = radius;
             $timeout(function() {
                 width *= 1000;
                 canvas = document.getElementsByTagName('canvas')[0];
@@ -269,6 +271,32 @@ angular.module('core').service('Drawing', [
             }
         };
 
+        this.calibrationLine = function(evt, end) {
+            var x = evt.offsetX * 100 / scale_percent;
+            var y = evt.offsetY * 100 / scale_percent;
+            if (end) {
+                this.calibration_line.graphics.lineTo(x, y);
+                this.calibration_line.p_end = {x: x, y: y};
+                update = true;
+            } else {
+                this.calibration_line = new createjs.Shape();
+                this.calibration_line.graphics.setStrokeStyle(1).beginStroke(DISTANCE_STROKE_RGB).moveTo(x, y);
+                this.calibration_line.p_start = {x: x, y: y};
+                stage.addChild(this.calibration_line);
+            }
+        }
+
+        this.completeCalibration = function(distance) {
+            stage.removeChild(this.calibration_line);
+            update = true;
+            var c = this.calibration_line;
+            var d = Math.sqrt(Math.pow(c.p_start.x - c.p_end.x, 2) + Math.pow(c.p_start.y - c.p_end.y, 2)) * 100 / scale_percent;
+            if (!radius) radius = (stage_scale / 100) * (radius_real * canvas.width / floor_width);
+            var fr = radius * distance / d;
+            console.log('radius', radius, fr, distance, d, distance/d, radius_real / 1000);
+            this.scale( fr / (radius_real / 1000) );
+        }
+
         this.addAP = function(evt, signal_radius) {
             signal_radius *= 1000;
             if (is_dragging) {
@@ -285,7 +313,6 @@ angular.module('core').service('Drawing', [
             layers[current_layer].addChild(container);
 
             container.scaleX = container.scaleY = container.scale = 1;
-            console.log(evt.offsetX, evt.offsetY);
             container.x = evt.offsetX * 100 / scale_percent;
             container.y = evt.offsetY * 100 / scale_percent;
             container.px = mperpx * container.x;
@@ -320,6 +347,7 @@ angular.module('core').service('Drawing', [
 
         this.updateSignalStrength = function(signal_radius) {
             signal_radius *= 1000;
+            radius_real = signal_radius;
             if (stage) {
                 radius = (stage_scale / 100) * (signal_radius * canvas.width / floor_width);
                 _.each(stage.children, function(child) {

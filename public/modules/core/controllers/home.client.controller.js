@@ -26,11 +26,29 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
         if ($scope.settings.units == 'ft') $scope.settings.signal_radius_feet = $scope.settings.signal_radius;
         if ($scope.settings.units == 'm') $scope.settings.signal_radius_meters = $scope.settings.signal_radius;
 
-        Drawing.initBoard($scope.settings.floor_width, $scope.settings.scale);
+        Drawing.initBoard($scope.settings.floor_width, $scope.settings.scale, $scope.settings.signal_radius);
 
         $scope.addAP = function(evt) {
-            Drawing.addAP(evt, $scope.settings.signal_radius);
+            if ($scope.calibration_step == 1) {
+                Drawing.calibrationLine(evt, 0);
+                $scope.calibration_step++;
+            } else if ($scope.calibration_step == 2) {
+                Drawing.calibrationLine(evt, 1);
+                $scope.calibration_done = true;
+            } else {
+                Drawing.addAP(evt, $scope.settings.signal_radius);
+            }
         };
+
+        $scope.startCalibration = function() {
+            $scope.calibration_step = 1;
+        }
+
+        $scope.completeCalibration = function() {
+            Drawing.completeCalibration($scope.calibration_distance);
+            $scope.calibration_done = false;
+            $scope.calibration_step = false;
+        }
 
         $scope.changeUnits = function() {
             console.log('changeUnits', $scope.settings);
