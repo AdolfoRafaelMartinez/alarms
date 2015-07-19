@@ -13,10 +13,11 @@ angular.module('core').service('Drawing', [
         var update = true;
         var is_dragging = false;
         var floor_width;
-        var stage_scale;
-        var scale_percent;
+        var floor_width_px;
+        var stage_scale = 100;
+        var stage_ppm;
         var radius;
-        var radius_real;
+        var real_radius;
         var ap_index = 0;
 
         var show_overlaps = true;
@@ -49,20 +50,20 @@ angular.module('core').service('Drawing', [
                 this.parent.addChild(this);
                 names = [];
                 this.offset = {
-                    x: this.x - evt.stageX * 100 / scale_percent,
-                    y: this.y - evt.stageY * 100 / scale_percent
+                    x: this.x - evt.stageX * 100 / stage_scale,
+                    y: this.y - evt.stageY * 100 / stage_scale
                 };
                 for (var i=0; i<ap.distances.length; i++) names.push(distances.getChildByName(ap.distances[i].name));
             });
 
             ap.on('pressmove', function(evt) {
-                ap.x = evt.stageX * 100 / scale_percent + ap.offset.x;
-                ap.y = evt.stageY * 100 / scale_percent + ap.offset.y;
+                ap.x = evt.stageX * 100 / stage_scale + ap.offset.x;
+                ap.y = evt.stageY * 100 / stage_scale + ap.offset.y;
                 var i, l = names.length;
 
-                var mperpx = (floor_width / canvas.width / 1000) * (stage_scale / 100);
-                ap.px = mperpx * ap.x;
-                ap.py = mperpx * ap.y;
+                var mperpx = 1 / stage_ppm;
+                ap.realx = mperpx * ap.x * stage_scale / 100;
+                ap.realy = mperpx * ap.y * stage_scale / 100;
 
                 for (i=0; i<l; i++) {
                     if (ap == names[i].ap_start) {
@@ -73,8 +74,8 @@ angular.module('core').service('Drawing', [
                         names[i].p_end.y = ap.y;
                     }
                     names[i].pdistance  = Math.sqrt(
-                                            Math.pow(names[i].ap_start.px - names[i].ap_end.px, 2) +
-                                            Math.pow(names[i].ap_start.py - names[i].ap_end.py, 2)
+                                            Math.pow(names[i].ap_start.realx - names[i].ap_end.realx, 2) +
+                                            Math.pow(names[i].ap_start.realy - names[i].ap_end.realy, 2)
                     );
                     if (names[i].pdistance < DISTANCE_CUT_OFF) {
                         names[i].graphics.clear().setStrokeStyle(1).beginStroke(DISTANCE_STROKE_RGB)
@@ -116,7 +117,7 @@ angular.module('core').service('Drawing', [
                 _.each(layers[i].children, function(ap2) {
                     if (ap != ap2) {
                         m = new createjs.Shape();
-                        d = Math.sqrt(Math.pow(ap2.px - ap.px, 2) + Math.pow(ap2.py - ap.py, 2));
+                        d = Math.sqrt(Math.pow(ap2.realx - ap.realx, 2) + Math.pow(ap2.realy - ap.realy, 2));
                         if (d < DISTANCE_CUT_OFF) {
                             m.graphics.setStrokeStyle(1).beginStroke(DISTANCE_STROKE_RGB).moveTo(ap.x, ap.y).lineTo(ap2.x, ap2.y);
                         }
@@ -162,30 +163,24 @@ angular.module('core').service('Drawing', [
             var e = window.event || e;
             var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail))) * 1.02;
             if (delta < 0) delta = 0.98;
-            this.scale(delta * scale_percent);
-
-            /*
-            selectedLayer.scaleX = selectedLayer.scaleY = selectedLayer.scaleX * delta;
-            if (selectedLayer.layer_type === 'background') {
-                constrainBox(selectedLayer);
-            }
-            */
+            this.scale(delta * stage_scale);
 
             return false;
         };
 
-        this.initBoard = function(width, scale, radius) {
-            scale_percent = 100;
-            radius_real = radius;
+        this.initBoard = function(r) {
+            radius = r;
+            real_radius = r;
+            DISTANCE_CUT_OFF = r * 2;
             $timeout(function() {
-                width *= 1000;
                 canvas = document.getElementsByTagName('canvas')[0];
                 canvas.width = canvas.parentElement.clientWidth - 40;
                 canvas.height = canvas.parentElement.clientHeight - 40;
                 canvas.style.width = (canvas.parentElement.clientWidth - 40) + 'px';
                 stage = new createjs.Stage(canvas);
-                stage_scale = scale;
-                floor_width = width;
+                floor_width = 200; // m or ft
+                floor_width_px = canvas.width;
+                stage_ppm = canvas.width / floor_width;
 
                 // enable touch interactions if supported on the current device:
                 createjs.Touch.enable(stage);
@@ -272,8 +267,8 @@ angular.module('core').service('Drawing', [
         };
 
         this.calibrationLine = function(evt, end) {
-            var x = evt.offsetX * 100 / scale_percent;
-            var y = evt.offsetY * 100 / scale_percent;
+            var x = evt.offsetX * 100 / stage_scale;
+            var y = evt.offsetY * 100 / stage_scale;
             if (end) {
                 this.calibration_line.graphics.lineTo(x, y);
                 this.calibration_line.p_end = {x: x, y: y};
@@ -290,15 +285,13 @@ angular.module('core').service('Drawing', [
             stage.removeChild(this.calibration_line);
             update = true;
             var c = this.calibration_line;
-            var d = Math.sqrt(Math.pow(c.p_start.x - c.p_end.x, 2) + Math.pow(c.p_start.y - c.p_end.y, 2)) * 100 / scale_percent;
-            if (!radius) radius = (stage_scale / 100) * (radius_real * canvas.width / floor_width);
-            var fr = radius * distance / d;
-            console.log('radius', radius, fr, distance, d, distance/d, radius_real / 1000);
-            this.scale( fr / (radius_real / 1000) );
+            var d = Math.sqrt(Math.pow(c.p_start.x - c.p_end.x, 2) + Math.pow(c.p_start.y - c.p_end.y, 2));
+            stage_ppm = d / distance;
+            floor_width = floor_width_px / stage_ppm;
+            this.updateSignalStrength(real_radius);
         }
 
         this.addAP = function(evt, signal_radius) {
-            signal_radius *= 1000;
             if (is_dragging) {
                 is_dragging = false;
                 return;
@@ -307,16 +300,16 @@ angular.module('core').service('Drawing', [
             var circle = new createjs.Shape();
             var ap = new createjs.Shape();
             var container = new createjs.Container();
-            var mperpx = (floor_width / canvas.width / 1000) * (stage_scale / 100);
-            radius = (stage_scale / 100) * (signal_radius * canvas.width / floor_width);
+            var mperpx = 1 / stage_ppm;
+            radius = signal_radius * stage_ppm;
             addHandlers.call(this, container);
             layers[current_layer].addChild(container);
 
             container.scaleX = container.scaleY = container.scale = 1;
-            container.x = evt.offsetX * 100 / scale_percent;
-            container.y = evt.offsetY * 100 / scale_percent;
-            container.px = mperpx * container.x;
-            container.py = mperpx * container.y;
+            container.x = evt.offsetX * 100 / stage_scale;
+            container.y = evt.offsetY * 100 / stage_scale;
+            container.realx = mperpx * container.x;
+            container.realy = mperpx * container.y;
 
             circle.id = _.uniqueId();
             circle.graphics.setStrokeStyle(1).beginFill(AP_CIRCLE_RGBA).beginStroke(AP_CIRCLE_STROKE_RGB).drawCircle(0, 0, radius);
@@ -346,10 +339,11 @@ angular.module('core').service('Drawing', [
         };
 
         this.updateSignalStrength = function(signal_radius) {
-            signal_radius *= 1000;
-            radius_real = signal_radius;
+            DISTANCE_CUT_OFF = signal_radius * 2;
+            real_radius = signal_radius;
             if (stage) {
-                radius = (stage_scale / 100) * (signal_radius * canvas.width / floor_width);
+                radius = signal_radius * stage_ppm; // in pixels
+                console.log('new radius in px', radius);
                 _.each(stage.children, function(child) {
                     if (child.layer_type == 'ap') {
                         for (var i=0; i<child.children.length; i++) {
@@ -385,11 +379,13 @@ angular.module('core').service('Drawing', [
         };
 
         this.scale = function(percent) {
-            scale_percent = percent;
+            stage_scale = percent;
+            stage_ppm = percent / 100 * floor_width_px / floor_width;
             stage.setTransform(0, 0, percent/100, percent/100).update();
         };
 
         this.addFloorPlan = function(url) {
+            var self = this;
             var img = new Image();
             img.src = url.replace('public/', '');
             img.onload = function(event) {
@@ -399,10 +395,14 @@ angular.module('core').service('Drawing', [
                 f.y = 0;
                 f.regX = 0;
                 f.regY = 0;
+                floor_width_px = this.width;
                 var scaleX = canvas.width / this.width;
                 var scaleY = canvas.height / this.height;
-                if (scaleX > scaleY) f.scaleX = f.scaleY = scaleY;
-                else f.scaleY = f.scaleX = scaleX;
+                if (scaleX > scaleY) {
+                    self.scale(1/scaleY);
+                } else {
+                    self.scale(1/scaleX);
+                }
                 floorplan.addChild(f);
                 update = true;
             };

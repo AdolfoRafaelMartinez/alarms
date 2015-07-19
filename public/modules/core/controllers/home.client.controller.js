@@ -16,9 +16,7 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
         // Only change this, and the rest will follow
         $scope.settings = {
             units: 'ft',
-            signal_radius: 30,
-            floor_width: 650,
-            scale: 100, // percent
+            signal_radius: 25,
             show_distances: true,
             show_overlaps: true
         };
@@ -26,7 +24,7 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
         if ($scope.settings.units == 'ft') $scope.settings.signal_radius_feet = $scope.settings.signal_radius;
         if ($scope.settings.units == 'm') $scope.settings.signal_radius_meters = $scope.settings.signal_radius;
 
-        Drawing.initBoard($scope.settings.floor_width, $scope.settings.scale, $scope.settings.signal_radius);
+        Drawing.initBoard($scope.settings.signal_radius);
 
         $scope.addAP = function(evt) {
             if ($scope.calibration_step == 1) {
