@@ -146,7 +146,7 @@ angular.module('core').service('Drawing', [
         };
 
         this.touchStart = function(e) {
-            // console.log(e);
+            // this.addAP(e);
         };
 
         this.touchMove = function(e) {
@@ -343,7 +343,6 @@ angular.module('core').service('Drawing', [
             real_radius = signal_radius;
             if (stage) {
                 radius = signal_radius * stage_ppm; // in pixels
-                console.log('new radius in px', radius);
                 _.each(stage.children, function(child) {
                     if (child.layer_type == 'ap') {
                         for (var i=0; i<child.children.length; i++) {
@@ -398,10 +397,12 @@ angular.module('core').service('Drawing', [
                 floor_width_px = this.width;
                 var scaleX = canvas.width / this.width;
                 var scaleY = canvas.height / this.height;
+                window.PUDDLECANVAS = canvas;
+                window.floorplan = f;
                 if (scaleX > scaleY) {
-                    self.scale(1/scaleY);
+                    self.scale(scaleY*100);
                 } else {
-                    self.scale(1/scaleX);
+                    self.scale(scaleX*100);
                 }
                 floorplan.addChild(f);
                 update = true;
@@ -414,7 +415,4 @@ function addListeners(canvas, drawing) {
     canvas.addEventListener('mousewheel', drawing.mouseWheelEvent.bind(drawing), false);
     canvas.addEventListener('DOMMouseScroll', drawing.mouseWheelEvent.bind(drawing), false);
     canvas.addEventListener('MozMousePixelScroll', drawing.mouseWheelEvent.bind(drawing), false);
-    canvas.addEventListener('touchstart', drawing.touchStart.bind(drawing), false);
-    canvas.addEventListener('touchmove', drawing.touchMove.bind(drawing), false);
-    canvas.addEventListener('touchend', drawing.touchEnd.bind(drawing), false);
 }
