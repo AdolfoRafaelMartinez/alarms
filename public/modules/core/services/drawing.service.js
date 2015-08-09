@@ -24,7 +24,7 @@ angular.module('core').service('Drawing', [
         var show_distances = true;
 
         var AP_CIRCLE_STROKE_RGB = '#888';
-        var AP_CIRCLE_RGBA = 'rgba(180, 220, 255, 0.5)';
+        var AP_CIRCLE_RGBA = 'rgba(180, 220, 255, 0.1)';
         var AP_CIRCLE_RGBA_OPAQUE = 'rgba(200, 200, 255, 0.2)';
         var DISTANCE_STROKE_RGB = '#ccc';
         var DISTANCE_TEXT_RGB = '#888';
@@ -96,13 +96,17 @@ angular.module('core').service('Drawing', [
             });
 
             ap.on('rollover', function(evt) {
-                this.children[0].graphics.clear().setStrokeStyle(1).beginFill(AP_CIRCLE_RGBA_OPAQUE).beginStroke(AP_CIRCLE_STROKE_RGB).drawCircle(0, 0, radius);
-                update = true;
+                if (this.children[0].graphics) {
+                    this.children[0].graphics.clear().setStrokeStyle(1).beginFill(AP_CIRCLE_RGBA_OPAQUE).beginStroke(AP_CIRCLE_STROKE_RGB).drawCircle(0, 0, radius);
+                    update = true;
+                }
             });
 
             ap.on('rollout', function(evt) {
-                this.children[0].graphics.clear().setStrokeStyle(1).beginFill(AP_CIRCLE_RGBA).beginStroke(AP_CIRCLE_STROKE_RGB).drawCircle(0, 0, radius);
-                update = true;
+                if (this.children[0].graphics) {
+                    this.children[0].graphics.clear().setStrokeStyle(1).beginFill(AP_CIRCLE_RGBA).beginStroke(AP_CIRCLE_STROKE_RGB).drawCircle(0, 0, radius);
+                    update = true;
+                }
             });
         };
 
@@ -255,13 +259,11 @@ angular.module('core').service('Drawing', [
             });
 
             for (j=0; j<ap.children.length; j++) {
-                if (ap.children[j].puddleShape == 'hash') {
-                    ap.removeChild(ap.children[j]);
-                }
+                ap.overlaps.removeAllChildren();
             }
             if (show_overlaps) {
                 for (j=0; j<intersections.length; j++) {
-                    ap.addChild(intersections[j]);
+                    ap.overlaps.addChild(intersections[j]);
                 }
             }
         };
@@ -310,6 +312,10 @@ angular.module('core').service('Drawing', [
             container.y = evt.offsetY * 100 / stage_scale;
             container.realx = mperpx * container.x;
             container.realy = mperpx * container.y;
+
+            var overlaps = new createjs.Container();
+            container.addChild(overlaps);
+            container.overlaps = overlaps;
 
             circle.id = _.uniqueId();
             circle.graphics.setStrokeStyle(1).beginFill(AP_CIRCLE_RGBA).beginStroke(AP_CIRCLE_STROKE_RGB).drawCircle(0, 0, radius);
@@ -365,6 +371,10 @@ angular.module('core').service('Drawing', [
             update = true;
         };
 
+        /**
+         * Overlaps are added as child for the AP container itself;
+         * the overlaps container is shown behind the main AP circle container
+         */
         this.toggleOverlaps = function() {
             show_overlaps = !show_overlaps;
             _.each(stage.children, function(child) {
@@ -415,4 +425,7 @@ function addListeners(canvas, drawing) {
     canvas.addEventListener('mousewheel', drawing.mouseWheelEvent.bind(drawing), false);
     canvas.addEventListener('DOMMouseScroll', drawing.mouseWheelEvent.bind(drawing), false);
     canvas.addEventListener('MozMousePixelScroll', drawing.mouseWheelEvent.bind(drawing), false);
+    canvas.addEventListener('touchstart', drawing.touchStart.bind(drawing), false);
+    canvas.addEventListener('touchmove', drawing.touchMove.bind(drawing), false);
+    canvas.addEventListener('touchend', drawing.touchEnd.bind(drawing), false);
 }

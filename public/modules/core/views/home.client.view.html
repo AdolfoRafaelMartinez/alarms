@@ -3,6 +3,16 @@
     <md-sidenav md-is-locked-open="$mdMedia('gt-sm')" class="md-whiteframe-z2" md-component-id="left">
       <md-list>
         <md-item>
+            <div flex="10" class="group">
+                <input type="text" required ng-model="flooplan_name" />
+                <span class="highlight"></span>
+                <span class="bar"></span>
+                <label>File Name</label>
+                <md-button ng-click="savePlan()">Save</md-button>
+            </div>
+        </md-item>
+        <md-item>
+            <h4>Show:</h4>
             <div flex="10">
                 <md-switch flex ng-model="settings.show_distances" ng-change="toggleDistances()" aria-label="Show Distances">Distances</md-switch>
             </div>
@@ -12,13 +22,13 @@
         </md-item>
         <md-item>
             <div flex="10">
-                <div ng-controller='FileUploadController' style='margin-top:50px'>
+                <div ng-controller='FileUploadController'>
                     <lvl-file-upload
                             auto-upload='false'
                             choose-file-button-text='Floorplan'
-                            choose-file-button-style='btn btn-primary'
+                            choose-file-button-style='md-button md-default-theme'
                             upload-file-button-text='Upload'
-                            upload-file-button-style='btn btn-primary'
+                            upload-file-button-style='md-button md-default-theme'
                             upload-url='/upload'
                             max-files='10'
                             max-file-size-mb='50'
