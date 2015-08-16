@@ -1,14 +1,15 @@
 'use strict';
+var users = require('../../app/controllers/users.server.controller'),
+    core = require('../../app/controllers/core.server.controller'),
+    uuid = require('uuid'), // https://github.com/defunctzombie/node-uuid
+    multiparty = require('multiparty'), // https://github.com/andrewrk/node-multiparty
+    fs = require('fs'),
+    path = require('path');
 
 module.exports = function(app) {
     // Root routing
-    var core = require('../../app/controllers/core.server.controller');
-    app.route('/').get(core.index);
 
-    var uuid = require('uuid'), // https://github.com/defunctzombie/node-uuid
-        multiparty = require('multiparty'), // https://github.com/andrewrk/node-multiparty
-        fs = require('fs'),
-        path = require('path');
+    app.route('/').get(core.index);
 
     app.post('/upload', function(req, res) {
         var form = new multiparty.Form();

@@ -2,6 +2,14 @@
 	margin-top: 50px;
 }
 
+section {
+    padding: 0 2em;
+}
+
+.nav a {
+    cursor: pointer;
+}
+
 .md-whiteframe-z2 {
     padding: 20px;
 }

@@ -2,9 +2,7 @@
 
 //Menu service used for managing  menus
 angular.module('core').service('Drawing', [
-   '$timeout',
-
-	function($timeout) {
+	function() {
         var canvas, stage, layers, current_layer, distances, floorplan;
 
         var mouseTarget; // the display object currently under the mouse, or being dragged
@@ -176,38 +174,36 @@ angular.module('core').service('Drawing', [
             radius = r;
             real_radius = r;
             DISTANCE_CUT_OFF = r * 2;
-            $timeout(function() {
-                canvas = document.getElementsByTagName('canvas')[0];
-                canvas.width = canvas.parentElement.clientWidth - 40;
-                canvas.height = canvas.parentElement.clientHeight - 40;
-                canvas.style.width = (canvas.parentElement.clientWidth - 40) + 'px';
-                stage = new createjs.Stage(canvas);
-                floor_width = 200; // m or ft
-                floor_width_px = canvas.width;
-                stage_ppm = canvas.width / floor_width;
+            canvas = document.getElementsByTagName('canvas')[0];
+            canvas.width = canvas.parentElement.clientWidth - 40;
+            canvas.height = canvas.parentElement.clientHeight - 40;
+            canvas.style.width = (canvas.parentElement.clientWidth - 40) + 'px';
+            stage = new createjs.Stage(canvas);
+            floor_width = 200; // m or ft
+            floor_width_px = canvas.width;
+            stage_ppm = canvas.width / floor_width;
 
-                // enable touch interactions if supported on the current device:
-                createjs.Touch.enable(stage);
+            // enable touch interactions if supported on the current device:
+            createjs.Touch.enable(stage);
 
-                // enabled mouse over / out events
-                stage.enableMouseOver(10);
-                addListeners(canvas, this);
-                stage.mouseMoveOutside = true; // keep tracking the mouse even when it leaves the canvas
+            // enabled mouse over / out events
+            stage.enableMouseOver(10);
+            addListeners(canvas, this);
+            stage.mouseMoveOutside = true; // keep tracking the mouse even when it leaves the canvas
 
-                // add default layers
-                layers = [new createjs.Container()];
-                layers[0].layer_type = 'ap';
-                current_layer = 0;
-                floorplan = new createjs.Container();
-                floorplan.layer_type = 'background';
-                distances = new createjs.Container();
-                distances.layer_type = 'distances';
-                stage.addChild(floorplan);
-                stage.addChild(layers[0]);
-                stage.addChild(distances);
+            // add default layers
+            layers = [new createjs.Container()];
+            layers[0].layer_type = 'ap';
+            current_layer = 0;
+            floorplan = new createjs.Container();
+            floorplan.layer_type = 'background';
+            distances = new createjs.Container();
+            distances.layer_type = 'distances';
+            stage.addChild(floorplan);
+            stage.addChild(layers[0]);
+            stage.addChild(distances);
 
-                createjs.Ticker.addEventListener('tick', tick);
-            }.bind(this), 100);
+            createjs.Ticker.addEventListener('tick', tick);
         };
 
         var drawIntersections = function(ap, processing) {
@@ -293,7 +289,7 @@ angular.module('core').service('Drawing', [
             this.updateSignalStrength(real_radius);
         }
 
-        this.addAP = function(evt, signal_radius) {
+        this.addAP = function(x, y, signal_radius) {
             if (is_dragging) {
                 is_dragging = false;
                 return;
@@ -308,8 +304,8 @@ angular.module('core').service('Drawing', [
             layers[current_layer].addChild(container);
 
             container.scaleX = container.scaleY = container.scale = 1;
-            container.x = evt.offsetX * 100 / stage_scale;
-            container.y = evt.offsetY * 100 / stage_scale;
+            container.x = x * 100 / stage_scale;
+            container.y = y * 100 / stage_scale;
             container.realx = mperpx * container.x;
             container.realy = mperpx * container.y;
 
@@ -330,6 +326,7 @@ angular.module('core').service('Drawing', [
             ap.regX = ap.regY = 0;
             ap.scaleX = ap.scaleY = ap.scale = 1;
             ap.cursor = 'pointer';
+            ap.overlaps = overlaps;
             container.addChild(ap);
 
             var text = new createjs.Text('AP ' + ap_index++, "12px Arial", DISTANCE_TEXT_RGB);
@@ -407,8 +404,6 @@ angular.module('core').service('Drawing', [
                 floor_width_px = this.width;
                 var scaleX = canvas.width / this.width;
                 var scaleY = canvas.height / this.height;
-                window.PUDDLECANVAS = canvas;
-                window.floorplan = f;
                 if (scaleX > scaleY) {
                     self.scale(scaleY*100);
                 } else {
@@ -418,6 +413,44 @@ angular.module('core').service('Drawing', [
                 update = true;
             };
         };
+
+        this.toJSON = function() {
+            var json = {
+                stage_scale: stage_scale,
+                stage_ppm: stage_ppm,
+                floor_width: floor_width,
+                floorplan: floorplan.children[0] ? floorplan.children[0].image.src : '',
+                aps: []
+            };
+
+            var children, i, d, m, layers_length = layers.length;
+            for (i=0; i<layers_length; i++) {
+                _.each(layers[i].children, function(ap) {
+                    json.aps.push({
+                        name: ap.name,
+                        x: ap.x,
+                        y: ap.y
+                    });
+                });
+            }
+
+            return json;
+        }
+
+        this.getThumb = function() {
+            return stage.toDataURL();
+        };
+
+        this.loadPlan = function(data, signal_radius) {
+            this.initBoard(signal_radius);
+            this.scale(100);
+            this.updateSignalStrength(signal_radius);
+            this.addFloorPlan(data.floorplan);
+            _.each(data.aps, function(ap) {
+                this.addAP(ap.x, ap.y, signal_radius);
+            }.bind(this));
+            this.scale(data.stage_scale || 100);
+        }
     }
 ]);
 
