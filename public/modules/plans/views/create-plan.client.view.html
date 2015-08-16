@@ -1,6 +1,7 @@
-<div flex layout="row" data-ng-controller="PlansController">
-    <div plans-side-menu></div>
-    <md-content flex layout="column" id="content">
-        
+<section flex layout="row"  data-ng-controller="PlansController" data-ng-init="newPlan()">
+    <md-sidenav md-is-locked-open="$mdMedia('gt-sm')" class="md-whiteframe-z2" md-component-id="left" plan-side-menu></md-sidenav>
+    <md-content flex="" layout="column" id="content" class="md-default-theme">
+        <div flex layout="row" class="drawing" plan-drawing-board></div>
+        <div class="controls" plan-controls></div>
     </md-content>
-</div>
+</section>

@@ -12,16 +12,6 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
         $scope.UNITS_MAX_METERS = 30;
         $scope.UNITS_MAX_FEET = Number.parseFloat((Math.round($scope.UNITS_MAX_METERS * 3.28084 * 100) / 100).toFixed(0));
 
-        $scope.settings = {
-            units: 'ft',
-            signal_radius: 25,
-            show_distances: true,
-            show_overlaps: true
-        };
-
-        if ($scope.settings.units == 'ft') $scope.settings.signal_radius_feet = $scope.settings.signal_radius;
-        if ($scope.settings.units == 'm') $scope.settings.signal_radius_meters = $scope.settings.signal_radius;
-
         $scope.addAP = function(evt) {
             if ($scope.calibration_step == 1) {
                 Drawing.calibrationLine(evt, 0);
@@ -109,22 +99,23 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
 			});
         };
 
-        function loadPlan(id) {
-            if (!id) {
-                $scope.flooplan_name = '';
-                $timeout(function() {
-                    Drawing.initBoard($scope.settings.signal_radius);
-                    $scope.updateSignalStrength();
-                }.bind(Drawing), 100);
-                return;
-            }
-			$scope.plan = Plans.get({
-				planId: id
-			}, function() {
-                $scope.settings = $scope.plan.settings;
-                $scope.flooplan_name = $scope.plan.title;
-                Drawing.loadPlan($scope.plan.stage, $scope.settings.signal_radius);
-            });
+        $scope.newPlan = function() {
+            $scope.flooplan_name = '';
+            $timeout(function() {
+                $scope.settings = {
+                    units: 'ft',
+                    signal_radius: 25,
+                    show_distances: true,
+                    show_overlaps: true
+                };
+
+                if ($scope.settings.units == 'ft') $scope.settings.signal_radius_feet = $scope.settings.signal_radius;
+                if ($scope.settings.units == 'm') $scope.settings.signal_radius_meters = $scope.settings.signal_radius;
+
+                Drawing.initBoard($scope.settings.signal_radius);
+                Drawing.scale(100);
+                $scope.updateSignalStrength();
+            }.bind(Drawing), 200);
         };
 
 		$scope.create = function() {

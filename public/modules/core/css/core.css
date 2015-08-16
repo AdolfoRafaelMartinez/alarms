@@ -10,6 +10,11 @@ section > div > div {
     cursor: pointer;
 }
 
+.list-group-item {
+    display: inline-block;
+    margin: 10px;
+}
+
 .md-whiteframe-z2 {
     padding: 20px;
 }
