@@ -1,0 +1,18 @@
+<section data-ng-init="find()">
+	<div class="page-header">
+		<h1>Your Floor Plans</h1>
+	</div>
+	<div class="list-group">
+		<a data-ng-repeat="plan in plans" data-ng-href="#!/plans/{{plan._id}}" class="list-group-item">
+			<small class="list-group-item-text">
+				Created on
+				<span data-ng-bind="plan.created | date:'mediumDate'"></span>
+			</small>
+            <img ng-src="/uploads/{{ plan.thumb }}" />
+			<h4 class="list-group-item-heading" data-ng-bind="plan.title"></h4>
+		</a>
+	</div>
+	<div class="alert alert-warning text-center" data-ng-if="plans.$resolved && !plans.length">
+		No plans yet, why don't you <a href="/#!/plans/create">create one</a>?
+	</div>
+</section>

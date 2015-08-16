@@ -1,0 +1,45 @@
+  <md-list>
+    <md-item>
+        <div flex="10" class="group">
+            <input type="text" required ng-model="flooplan_name" />
+            <span class="highlight"></span>
+            <span class="bar"></span>
+            <label>File Name</label>
+            <md-button ng-click="savePlan()">Save</md-button>
+        </div>
+    </md-item>
+    <md-item>
+        <h4>Show:</h4>
+        <div flex="10">
+            <md-switch flex ng-model="settings.show_distances" ng-change="toggleDistances()" aria-label="Show Distances">Distances</md-switch>
+        </div>
+        <div flex="10">
+            <md-switch flex ng-model="settings.show_overlaps" ng-change="toggleOverlaps()" aria-label="Show Overlaps">Overlaps</md-switch>
+        </div>
+    </md-item>
+    <md-item>
+        <div flex="10">
+            <div ng-controller='FileUploadController'>
+                <lvl-file-upload
+                        auto-upload='false'
+                        choose-file-button-text='Upload Floorplan'
+                        choose-file-button-style='md-button md-default-theme'
+                        upload-file-button-text='Upload'
+                        upload-file-button-style='md-button md-default-theme'
+                        upload-url='/upload'
+                        max-files='10'
+                        max-file-size-mb='50'
+                        get-additional-data='getData(files)'
+                        on-done='done(files, data)'
+                        on-progress='progress(percentDone)'
+                        on-error='error(files, type, msg)'/>
+            </div>
+        </div>
+    </md-item>
+    <md-item ng-repeat="it in ul.layers">
+        <md-button ng-click="ul.selectLayer(it)" ng-class="{'selected' : it === ul.selected }">
+          <md-icon md-svg-icon="{{it.icon}}" class="avatar"></md-icon>
+          {{it.name}}
+        </md-button>
+    </md-item>
+  </md-list>
