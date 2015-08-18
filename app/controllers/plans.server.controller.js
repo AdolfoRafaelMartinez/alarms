@@ -17,7 +17,6 @@ exports.create = function(req, res) {
     var filename = guid + '.png';
     var thumb = guid + '-thumb.jpg';
     var path = __dirname + '/../../public/uploads/';
-    console.log(__dirname);
     fs.writeFile(path + filename, base64Data, 'base64', function(err) {
         if (err) {
             console.log('error filename', err);
@@ -106,7 +105,7 @@ exports.delete = function(req, res) {
  * List of Plans
  */
 exports.list = function(req, res) {
-	Plan.find().sort('-created').populate('user', 'displayName').exec(function(err, plans) {
+	Plan.find({user: req.user.id}).sort('-created').populate('user', 'displayName').exec(function(err, plans) {
 		if (err) {
 			return res.status(400).send({
 				message: errorHandler.getErrorMessage(err)
@@ -128,3 +127,4 @@ exports.hasAuthorization = function(req, res, next) {
 	}
 	next();
 };
+

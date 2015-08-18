@@ -5,12 +5,12 @@ var users = require('../../app/controllers/users.server.controller'),
 module.exports = function(app) {
 
 	app.route('/plans')
-        .get(plans.list)
+        .get (users.requiresLogin, plans.list)
         .post(users.requiresLogin, plans.create);
 
 	app.route('/plans/:planId')
-        .get(plans.read)
-        .put(users.requiresLogin, plans.hasAuthorization, plans.update)
+        .get   (users.requiresLogin, plans.hasAuthorization, plans.read)
+        .put   (users.requiresLogin, plans.hasAuthorization, plans.update)
         .delete(users.requiresLogin, plans.hasAuthorization, plans.delete);
 
 	// Finish by binding the article middleware
