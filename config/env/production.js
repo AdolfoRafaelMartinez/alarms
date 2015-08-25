@@ -7,6 +7,7 @@ module.exports = {
 			css: [
 				'public/lib/bootstrap/dist/css/bootstrap.min.css',
 				'public/lib/bootstrap/dist/css/bootstrap-theme.min.css',
+				'public/lib/angular-material/angular-material.css'
 			],
 			js: [
 				'public/lib/angular/angular.min.js',
@@ -14,15 +15,21 @@ module.exports = {
 				'public/lib/angular-cookies/angular-cookies.js', 
 				'public/lib/angular-animate/angular-animate.js', 
 				'public/lib/angular-touch/angular-touch.js', 
+				'public/lib/angular-aria/angular-aria.js',
+				'public/lib/angular-material/angular-material.js',
 				'public/lib/angular-sanitize/angular-sanitize.js', 
 				'public/lib/angular-ui-router/release/angular-ui-router.min.js',
 				'public/lib/angular-ui-utils/ui-utils.min.js',
-				'public/lib/angular-bootstrap/ui-bootstrap-tpls.min.js'
+				'public/lib/angular-bootstrap/ui-bootstrap-tpls.min.js',
                 'public/lib/easeljs/lib/easeljs-NEXT.combined.js',
 
                 "public/lib/blueimp/JavaScript-Load-Image/js/load-image.all.min.js",
                 "public/lib/blueimp/JavaScript-Load-Image/js/lib/jquery.Jcrop.js",
-                "public/lib/blueimp/JavaScript-Canvas-To-Blob/js/canvas-to-blob.min.js"
+                "public/lib/blueimp/JavaScript-Canvas-To-Blob/js/canvas-to-blob.min.js",
+
+                "public/lib/ngFileUpload/js/uuid.js",
+                "public/lib/ngFileUpload/js/xhr_post.js",
+                "public/lib/ngFileUpload/js/ng_file_upload.js"
 			]
 		},
 		css: 'public/dist/application.min.css',
