@@ -10,19 +10,19 @@ module.exports = {
 			],
 			js: [
 				'public/lib/angular/angular.min.js',
-				'public/lib/angular-resource/angular-resource.js', 
-				'public/lib/angular-cookies/angular-cookies.js', 
-				'public/lib/angular-animate/angular-animate.js', 
-				'public/lib/angular-touch/angular-touch.js', 
-				'public/lib/angular-sanitize/angular-sanitize.js', 
+				'public/lib/angular-resource/angular-resource.js',
+				'public/lib/angular-cookies/angular-cookies.js',
+				'public/lib/angular-animate/angular-animate.js',
+				'public/lib/angular-touch/angular-touch.js',
+				'public/lib/angular-sanitize/angular-sanitize.js',
 				'public/lib/angular-ui-router/release/angular-ui-router.min.js',
 				'public/lib/angular-ui-utils/ui-utils.min.js',
-				'public/lib/angular-bootstrap/ui-bootstrap-tpls.min.js'
+				'public/lib/angular-bootstrap/ui-bootstrap-tpls.min.js',
                 'public/lib/easeljs/lib/easeljs-NEXT.combined.js',
 
-                "public/lib/blueimp/JavaScript-Load-Image/js/load-image.all.min.js",
-                "public/lib/blueimp/JavaScript-Load-Image/js/lib/jquery.Jcrop.js",
-                "public/lib/blueimp/JavaScript-Canvas-To-Blob/js/canvas-to-blob.min.js"
+                'public/lib/blueimp/JavaScript-Load-Image/js/load-image.all.min.js',
+                'public/lib/blueimp/JavaScript-Load-Image/js/lib/jquery.Jcrop.js',
+                'public/lib/blueimp/JavaScript-Canvas-To-Blob/js/canvas-to-blob.min.js'
 			]
 		},
 		css: 'public/dist/application.min.css',

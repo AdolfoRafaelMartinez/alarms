@@ -1,5 +1,7 @@
 'use strict';
 
+/*globals _ */
+
 //Menu service used for managing  menus
 angular.module('core').service('Drawing', [
 	function() {
@@ -42,6 +44,15 @@ angular.module('core').service('Drawing', [
             }
         };
 
+        function addListeners(canvas, drawing) {
+            canvas.addEventListener('mousewheel', drawing.mouseWheelEvent.bind(drawing), false);
+            canvas.addEventListener('DOMMouseScroll', drawing.mouseWheelEvent.bind(drawing), false);
+            canvas.addEventListener('MozMousePixelScroll', drawing.mouseWheelEvent.bind(drawing), false);
+            canvas.addEventListener('touchstart', drawing.touchStart.bind(drawing), false);
+            canvas.addEventListener('touchmove', drawing.touchMove.bind(drawing), false);
+            canvas.addEventListener('touchend', drawing.touchEnd.bind(drawing), false);
+        }
+
         var addHandlers = function(ap) {
             var names;
 
@@ -65,7 +76,7 @@ angular.module('core').service('Drawing', [
                 ap.realy = mperpx * ap.y * plan.stage_scale / 100;
 
                 for (i=0; i<l; i++) {
-                    if (ap == names[i].ap_start) {
+                    if (ap === names[i].ap_start) {
                         names[i].p_start.x = ap.x;
                         names[i].p_start.y = ap.y;
                     } else {
@@ -111,14 +122,15 @@ angular.module('core').service('Drawing', [
 
         function getNewName() {
             return _.uniqueId();
-        };
+        }
 
         var addDistances = function(ap) {
             var children, i, d, m, layers_length = layers.length;
             for (i=0; i<layers_length; i++) {
                 ap.distances = [];
+                /*jshint -W083 */
                 _.each(layers[i].children, function(ap2) {
-                    if (ap != ap2) {
+                    if (ap !== ap2) {
                         m = new createjs.Shape();
                         d = Math.sqrt(Math.pow(ap2.realx - ap.realx, 2) + Math.pow(ap2.realy - ap.realy, 2));
                         if (d < DISTANCE_CUT_OFF) {
@@ -134,13 +146,13 @@ angular.module('core').service('Drawing', [
                         ap2.distances.push(m);
                         distances.addChild(m);
 
-                        var text = new createjs.Text(d.toFixed(2) + ' ft', "12px Arial", "#888888");
+                        var text = new createjs.Text(d.toFixed(2) + ' ft', '12px Arial', '#888888');
                         if (d > DISTANCE_CUT_OFF) {
                             text.text = '';
                         }
-                        text.x = m.p_start.x + (m.p_end.x - m.p_start.x) /2 - 10;;
+                        text.x = m.p_start.x + (m.p_end.x - m.p_start.x) /2 - 10;
                         text.y = m.p_start.y + (m.p_end.y - m.p_start.y) /2 - 10;
-                        text.textBaseline = "alphabetic";
+                        text.textBaseline = 'alphabetic';
                         m.ptext = text;
                         distances.addChild(text);
                     }
@@ -161,9 +173,9 @@ angular.module('core').service('Drawing', [
         };
 
         this.mouseWheelEvent = function(e) {
+            e = window.event || e;
             e.preventDefault();
             e.stopPropagation();
-            var e = window.event || e;
             var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail))) * 1.02;
             if (delta < 0) delta = 0.98;
             this.scale(delta * plan.stage_scale);
@@ -212,9 +224,9 @@ angular.module('core').service('Drawing', [
             var hash_color, leftside, rightside;
             var intersections = [];
             _.each(stage.children, function(child) {
-                if (child.layer_type == 'ap') {
+                if (child.layer_type === 'ap') {
                     for (i=0; i<child.children.length; i++) {
-                        if (child.children[i] != ap) {
+                        if (child.children[i] !== ap) {
                             c = child.children[i];
                             d = Math.sqrt(Math.pow(c.x - ap.x, 2) + Math.pow(c.y - ap.y, 2));
                             if (d < plan.radius *2) {
@@ -222,13 +234,13 @@ angular.module('core').service('Drawing', [
                                 rsq = Math.pow(plan.radius, 2);
                                 overlap = ((2 * rsq * Math.acos(d/r2) - d/2 * Math.sqrt(4*rsq - d*d)) / (2 * rsq * Math.acos(0)) * 100).toFixed(0);
 
-                                var text = new createjs.Text('' + overlap + '%', "12px Arial", DISTANCE_TEXT_RGB);
+                                var text = new createjs.Text('' + overlap + '%', '12px Arial', DISTANCE_TEXT_RGB);
                                 alpha = Math.atan((ap.y - c.y)/(ap.x - c.x));
                                 beta  = Math.acos(Math.sqrt(Math.pow(ap.x - c.x, 2) + Math.pow(ap.y - c.y, 2)) / 2 /plan.radius);
                                 apb = alpha + beta;
                                 text.x = plan.radius * Math.cos(apb);
                                 text.y = plan.radius * Math.sin(apb);
-                                text.textBaseline = "alphabetic";
+                                text.textBaseline = 'alphabetic';
                                 // ap.addChild(text);
 
                                 leftside = 0;
@@ -278,7 +290,7 @@ angular.module('core').service('Drawing', [
                 this.calibration_line.p_start = {x: x, y: y};
                 stage.addChild(this.calibration_line);
             }
-        }
+        };
 
         this.completeCalibration = function(distance) {
             stage.removeChild(this.calibration_line);
@@ -288,7 +300,7 @@ angular.module('core').service('Drawing', [
             plan.stage_ppm = d / distance;
             floor_width = floor_width_px / plan.stage_ppm;
             this.updateSignalStrength(plan.real_radius);
-        }
+        };
 
         this.addAP = function(x, y, signal_radius) {
             if (is_dragging) {
@@ -329,10 +341,10 @@ angular.module('core').service('Drawing', [
             ap.overlaps = overlaps;
             container.addChild(ap);
 
-            var text = new createjs.Text('AP ' + plan.ap_index++, "12px Arial", DISTANCE_TEXT_RGB);
+            var text = new createjs.Text('AP ' + plan.ap_index++, '12px Arial', DISTANCE_TEXT_RGB);
             text.x = -15;
             text.y = -10;
-            text.textBaseline = "alphabetic";
+            text.textBaseline = 'alphabetic';
             container.addChild(text);
 
             addDistances.call(this, container);
@@ -347,10 +359,10 @@ angular.module('core').service('Drawing', [
             if (stage) {
                 plan.radius = signal_radius * plan.stage_ppm; // in pixels
                 _.each(stage.children, function(child) {
-                    if (child.layer_type == 'ap') {
+                    if (child.layer_type === 'ap') {
                         for (var i=0; i<child.children.length; i++) {
                             for (var j=0; j<child.children[i].children.length; j++) {
-                                if (child.children[i].children[j].puddleShape == 'signal') {
+                                if (child.children[i].children[j].puddleShape === 'signal') {
                                     child.children[i].children[j].graphics.clear().setStrokeStyle(1).beginFill(AP_CIRCLE_RGBA).beginStroke(AP_CIRCLE_STROKE_RGB).drawCircle(0, 0, plan.radius);
                                 }
                             }
@@ -375,7 +387,7 @@ angular.module('core').service('Drawing', [
         this.toggleOverlaps = function() {
             show_overlaps = !show_overlaps;
             _.each(stage.children, function(child) {
-                if (child.layer_type == 'ap') {
+                if (child.layer_type === 'ap') {
                     for (var i=0; i<child.children.length; i++) {
                         drawIntersections(child.children[i]);
                     }
@@ -423,6 +435,7 @@ angular.module('core').service('Drawing', [
 
             var children, i, d, m, layers_length = layers.length;
             for (i=0; i<layers_length; i++) {
+                /*jshint -W083 */
                 _.each(layers[i].children, function(ap) {
                     json.aps.push({
                         name: ap.name,
@@ -433,7 +446,7 @@ angular.module('core').service('Drawing', [
             }
 
             return json;
-        }
+        };
 
         this.getThumb = function() {
             return stage.toDataURL();
@@ -449,15 +462,7 @@ angular.module('core').service('Drawing', [
                 this.addAP(ap.x, ap.y, signal_radius);
             }.bind(this));
             if (data.plan && data.plan.stage_scale) this.scale(data.plan.stage_scale);
-        }
+        };
     }
 ]);
 
-function addListeners(canvas, drawing) {
-    canvas.addEventListener('mousewheel', drawing.mouseWheelEvent.bind(drawing), false);
-    canvas.addEventListener('DOMMouseScroll', drawing.mouseWheelEvent.bind(drawing), false);
-    canvas.addEventListener('MozMousePixelScroll', drawing.mouseWheelEvent.bind(drawing), false);
-    canvas.addEventListener('touchstart', drawing.touchStart.bind(drawing), false);
-    canvas.addEventListener('touchmove', drawing.touchMove.bind(drawing), false);
-    canvas.addEventListener('touchend', drawing.touchEnd.bind(drawing), false);
-}

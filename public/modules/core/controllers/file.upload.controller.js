@@ -3,7 +3,7 @@
 angular.module('core').controller('FileUploadController', ['$scope', 'Drawing', '$timeout',
     function($scope, Drawing, $timeout) {
         $scope.progress = function(percentDone) {
-            console.log("progress: " + percentDone + "%");
+            console.log('progress: ' + percentDone + '%');
         };
 
         $scope.done = function(files, data) {
@@ -20,16 +20,14 @@ angular.module('core').controller('FileUploadController', ['$scope', 'Drawing', 
 
         $scope.getData = function(files) {
             return {
-                msg: "from the client",
+                msg: 'from the client',
                 date: new Date()
             };
         };
 
         $scope.error = function(files, type, msg) {
-            console.log("Upload error: " + msg);
-            console.log("Error type:" + type);
-            writeFiles(files);
-        }
+            // writeFiles(files);
+        };
 
     }
 ]);
