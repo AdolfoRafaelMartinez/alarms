@@ -13,10 +13,10 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
         $scope.UNITS_MAX_FEET = Number.parseFloat((Math.round($scope.UNITS_MAX_METERS * 3.28084 * 100) / 100).toFixed(0));
 
         $scope.addAP = function(evt) {
-            if ($scope.calibration_step == 1) {
+            if ($scope.calibration_step === 1) {
                 Drawing.calibrationLine(evt, 0);
                 $scope.calibration_step++;
-            } else if ($scope.calibration_step == 2) {
+            } else if ($scope.calibration_step === 2) {
                 Drawing.calibrationLine(evt, 1);
                 $scope.calibration_done = true;
             } else {
@@ -26,13 +26,13 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
 
         $scope.startCalibration = function() {
             $scope.calibration_step = 1;
-        }
+        };
 
         $scope.completeCalibration = function() {
             Drawing.completeCalibration($scope.calibration_distance);
             $scope.calibration_done = false;
             $scope.calibration_step = false;
-        }
+        };
 
         $scope.changeUnits = function() {
             console.log('changeUnits', $scope.settings);
@@ -51,12 +51,12 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
         };
 
         $scope.updateSignalStrength = function() {
-            if ($scope.settings.units == 'ft') {
+            if ($scope.settings.units === 'ft') {
                 $scope.settings.signal_radius_meters = Number.parseFloat((Math.round($scope.settings.signal_radius_feet / 3.28084 * 100) / 100).toFixed(0));
             } else {
                 $scope.settings.signal_radius_feet = Number.parseFloat((Math.round($scope.settings.signal_radius_meters * 3.28084 * 100) / 100).toFixed(0));
             }
-            $scope.settings.signal_radius = ($scope.settings.units == 'ft') ? $scope.settings.signal_radius_feet : $scope.settings.signal_radius_meters;
+            $scope.settings.signal_radius = ($scope.settings.units === 'ft') ? $scope.settings.signal_radius_feet : $scope.settings.signal_radius_meters;
             Drawing.updateSignalStrength($scope.settings.signal_radius);
         };
 
@@ -109,8 +109,8 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
                     show_overlaps: true
                 };
 
-                if ($scope.settings.units == 'ft') $scope.settings.signal_radius_feet = $scope.settings.signal_radius;
-                if ($scope.settings.units == 'm') $scope.settings.signal_radius_meters = $scope.settings.signal_radius;
+                if ($scope.settings.units === 'ft') $scope.settings.signal_radius_feet = $scope.settings.signal_radius;
+                if ($scope.settings.units === 'm') $scope.settings.signal_radius_meters = $scope.settings.signal_radius;
 
                 Drawing.initBoard($scope.settings.signal_radius);
                 Drawing.scale(100);
