@@ -92,10 +92,18 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
             $scope.plan.stage = Drawing.toJSON();
             $scope.plan.settings = $scope.settings;
 
-			$scope.plan.$update(function(response) {
-			}, function(errorResponse) {
-				$scope.error = errorResponse.data.message;
-			});
+            if (!$scope.plan._id) {
+                $scope.plan.$save(function(response) {
+                    $location.path('plans/' + response._id);
+                }, function(errorResponse) {
+                    $scope.error = errorResponse.data.message;
+                });
+            } else {
+                $scope.plan.$update(function(response) {
+                }, function(errorResponse) {
+                    $scope.error = errorResponse.data.message;
+                });
+            }
         };
 
         $scope.newPlan = function() {
