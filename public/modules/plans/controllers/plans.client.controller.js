@@ -87,13 +87,12 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
         };
 
         $scope.savePlan = function() {
-			var plan = new Plans({
-                title: $scope.flooplan_name,
-                thumb: Drawing.getThumb(),
-                stage: Drawing.toJSON(),
-                settings: $scope.settings
-			});
-			plan.$save(function(response) {
+            $scope.plan.title = $scope.flooplan_name;
+            $scope.plan.thumb = Drawing.getThumb();
+            $scope.plan.stage = Drawing.toJSON();
+            $scope.plan.settings = $scope.settings;
+
+			$scope.plan.$update(function(response) {
 			}, function(errorResponse) {
 				$scope.error = errorResponse.data.message;
 			});
@@ -101,6 +100,9 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
 
         $scope.newPlan = function() {
             $scope.flooplan_name = '';
+            $scope.plan = new Plans({
+                title: 'Untitled'
+            });
             $timeout(function() {
                 $scope.settings = {
                     units: 'ft',
