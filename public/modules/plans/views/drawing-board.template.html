@@ -1,2 +1,17 @@
 <canvas ng-click="addAP($event)"></canvas>
 
+<div class="dropdown position-fixed" id="context_menu">
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a class="pointer" role="menuitem" tabindex="1" ng-click="deleteAP()">
+          Delete AP
+      </a>
+    </li>
+    <li>
+      <a class="pointer" role="menuitem" tabindex="4" ng-click="apProperties()">
+         AP Properties
+      </a>
+    </li>
+  </ul>
+</div>
+

@@ -182,5 +182,10 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
                 Drawing.loadPlan($scope.plan.stage, $scope.settings.signal_radius);
             });
 		};
+
+        $scope.deleteAP = function() {
+            console.log('deleting AP');
+            Drawing.deleteSelectedAP();
+        };
 	}
 ]);

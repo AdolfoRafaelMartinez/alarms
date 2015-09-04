@@ -2,15 +2,16 @@
 
 /*globals _ */
 
-//Menu service used for managing  menus
-angular.module('core').service('Drawing', [
-	function() {
+// Drawing service on HTML5 canvas
+angular.module('core').service('Drawing', ['contextMenu',
+	function(contextMenu) {
         var canvas, stage, layers, current_layer, distances, floorplan;
 
         var mouseTarget; // the display object currently under the mouse, or being dragged
         var dragStarted; // indicates whether we are currently in a drag operation
         var update = true;
         var is_dragging = false;
+        var selectedAP;
         var floor_width;
         var floor_width_px;
         var plan = {
@@ -25,7 +26,7 @@ angular.module('core').service('Drawing', [
         var show_distances = true;
 
         var AP_CIRCLE_STROKE_RGB = '#888';
-        var AP_CIRCLE_RGBA = 'rgba(180, 220, 255, 0.1)';
+        var AP_CIRCLE_RGBA = 'rgba(180, 220, 255, 0.9)';
         var AP_CIRCLE_RGBA_OPAQUE = 'rgba(200, 200, 255, 0.2)';
         var DISTANCE_STROKE_RGB = '#ccc';
         var DISTANCE_TEXT_RGB = '#888';
@@ -57,6 +58,12 @@ angular.module('core').service('Drawing', [
             var names;
 
             ap.on('mousedown', function(evt) {
+                if (evt.nativeEvent.button === 2) {
+                    event.stopPropagation();
+                    event.preventDefault();
+                    selectedAP = ap;
+                    return;
+                }
                 this.parent.addChild(this);
                 names = [];
                 this.offset = {
@@ -353,6 +360,13 @@ angular.module('core').service('Drawing', [
             update = true;
         };
 
+        this.deleteSelectedAP = function() {
+            if (!selectedAP) return;
+            layers[current_layer].removeChild(selectedAP);
+            contextMenu.close();
+            update = true;
+        };
+
         this.updateSignalStrength = function(signal_radius) {
             DISTANCE_CUT_OFF = signal_radius * 2;
             plan.real_radius = signal_radius;
@@ -465,4 +479,3 @@ angular.module('core').service('Drawing', [
         };
     }
 ]);
-
