@@ -51,25 +51,6 @@ angular.module('core').service('contextMenu', ['$timeout',
             close();
         };
 
-        $timeout(function() {
-            $(angular.element('canvas')[0]).bind('contextmenu', function(event) {
-              if (!this.disabled) {
-                if (menuElement !== null) {
-                  close();
-                }
-                menuElement = angular.element(
-                    document.getElementById('context_menu')
-                );
-                var element = event.target;
-
-                event.preventDefault();
-                event.stopPropagation();
-                open(event);
-              }
-            });
-            $(document).bind('keyup', handleKeyUpEvent);
-        }, 1000);
-
         function handleKeyUpEvent(event) {
           if (!this.disabled && opened && event.keyCode === 27) {
               close();
@@ -86,8 +67,25 @@ angular.module('core').service('contextMenu', ['$timeout',
           }
         };
 
-        this.setup = function(obj) {
-            ap = obj;
+        this.setup = function() {
+            $timeout(function() {
+                $(angular.element('canvas')[0]).bind('contextmenu', function(event) {
+                  if (!this.disabled) {
+                    if (menuElement !== null) {
+                      close();
+                    }
+                    menuElement = angular.element(
+                        document.getElementById('context_menu')
+                    );
+                    var element = event.target;
+
+                    event.preventDefault();
+                    event.stopPropagation();
+                    open(event);
+                  }
+                });
+                $(document).bind('keyup', handleKeyUpEvent);
+            }, 0);
         };
     }
 ]);

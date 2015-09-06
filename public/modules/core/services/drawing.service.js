@@ -160,6 +160,7 @@ angular.module('core').service('Drawing', ['contextMenu',
                         text.x = m.p_start.x + (m.p_end.x - m.p_start.x) /2 - 10;
                         text.y = m.p_start.y + (m.p_end.y - m.p_start.y) /2 - 10;
                         text.textBaseline = 'alphabetic';
+                        text.name = m.name;
                         m.ptext = text;
                         distances.addChild(text);
                     }
@@ -224,6 +225,7 @@ angular.module('core').service('Drawing', ['contextMenu',
             stage.addChild(distances);
 
             createjs.Ticker.addEventListener('tick', tick);
+            contextMenu.setup();
         };
 
         var drawIntersections = function(ap, processing) {
@@ -362,9 +364,35 @@ angular.module('core').service('Drawing', ['contextMenu',
 
         this.deleteSelectedAP = function() {
             if (!selectedAP) return;
-            layers[current_layer].removeChild(selectedAP);
             contextMenu.close();
+            var i, j, k;
+            var selected_distances_length = selectedAP.distances.length;
+            console.log(selectedAP);
+            for (i=distances.children.length-1; i>=0; i--) {
+                for (k=selected_distances_length -1; k>=0; k--) {
+                    if (selectedAP.distances[k] && distances.children[i].name === selectedAP.distances[k].name) {
+                        distances.removeChild(distances.children[i]);
+                        break;
+                    }
+                }
+            }
+            for (i=0; i<layers.length; i++) {
+                _.each(layers[i].children, function(ap2) {
+                    for (j=ap2.distances.length -1; j>=0; j--) {
+                        for (k=selected_distances_length -1; k>=0; k--) {
+                            if (ap2.distances[j] && selectedAP.distances[k]) {
+                                if (ap2.distances[j].name === selectedAP.distances[k].name) {
+                                    ap2.distances.splice(j, 1);
+                                }
+                            }
+                        }
+                    };
+                });
+            }
+            layers[current_layer].removeChild(selectedAP);
+            this.toggleOverlaps();
             update = true;
+            this.toggleOverlaps();
         };
 
         this.updateSignalStrength = function(signal_radius) {

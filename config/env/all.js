@@ -3,8 +3,8 @@
 module.exports = {
 	app: {
 		title: 'puddleJump',
-		description: 'Full-Stack JavaScript with MongoDB, Express, AngularJS, and Node.js',
-		keywords: 'MongoDB, Express, AngularJS, Node.js'
+		description: 'Wireless Spread Configuration Utility',
+		keywords: 'Wireless, Access Point Configuration'
 	},
 	port: process.env.PORT || 3000,
 	templateEngine: 'swig',

@@ -24,6 +24,10 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
             }
         };
 
+        $scope.deleteAP = function() {
+            Drawing.deleteSelectedAP();
+        };
+
         $scope.startCalibration = function() {
             $scope.calibration_step = 1;
         };
@@ -182,10 +186,5 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
                 Drawing.loadPlan($scope.plan.stage, $scope.settings.signal_radius);
             });
 		};
-
-        $scope.deleteAP = function() {
-            console.log('deleting AP');
-            Drawing.deleteSelectedAP();
-        };
 	}
 ]);
