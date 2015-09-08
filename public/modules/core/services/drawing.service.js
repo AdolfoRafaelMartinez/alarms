@@ -3,8 +3,8 @@
 /*globals _ */
 
 // Drawing service on HTML5 canvas
-angular.module('core').service('Drawing', ['contextMenu',
-	function(contextMenu) {
+angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
+	function(contextMenu, $q, $timeout) {
         var canvas, stage, layers, current_layer, distances, floorplan;
 
         var mouseTarget; // the display object currently under the mouse, or being dragged
@@ -12,14 +12,14 @@ angular.module('core').service('Drawing', ['contextMenu',
         var update = true;
         var is_dragging = false;
         var selectedAP;
-        var floor_width;
-        var floor_width_px;
         var plan = {
             stage_scale: 100,
             ap_index: 0,
             stage_ppm: 300,
             radius: 0,
-            real_radius: 0
+            real_radius: 0,
+            floor_width: 0,
+            floor_width_px: 0
         };
 
         var show_overlaps = true;
@@ -200,9 +200,11 @@ angular.module('core').service('Drawing', ['contextMenu',
             canvas.height = canvas.parentElement.clientHeight - 40;
             canvas.style.width = (canvas.parentElement.clientWidth - 40) + 'px';
             stage = new createjs.Stage(canvas);
-            floor_width = 200; // m or ft
-            floor_width_px = canvas.width;
-            plan.stage_ppm = canvas.width / floor_width;
+            if (!plan || !plan.floor_width) {
+                plan.floor_width = 200; // m or ft
+                plan.floor_width_px = canvas.width;
+            }
+            plan.stage_ppm = canvas.width / plan.floor_width;
 
             // enable touch interactions if supported on the current device:
             createjs.Touch.enable(stage);
@@ -307,7 +309,7 @@ angular.module('core').service('Drawing', ['contextMenu',
             var c = this.calibration_line;
             var d = Math.sqrt(Math.pow(c.p_start.x - c.p_end.x, 2) + Math.pow(c.p_start.y - c.p_end.y, 2));
             plan.stage_ppm = d / distance;
-            floor_width = floor_width_px / plan.stage_ppm;
+            plan.floor_width = plan.floor_width_px / plan.stage_ppm;
             this.updateSignalStrength(plan.real_radius);
         };
 
@@ -438,15 +440,18 @@ angular.module('core').service('Drawing', ['contextMenu',
             update = true;
         };
 
+        this.stage_scale = 100;
+
         this.scale = function(percent) {
-            plan.stage_scale = percent;
-            plan.stage_ppm = percent / 100 * floor_width_px / floor_width;
+            plan.stage_scale = this.stage_scale = percent;
+            plan.stage_ppm = percent / 100 * plan.floor_width_px / plan.floor_width;
             stage.setTransform(0, 0, percent/100, percent/100).update();
         };
 
         this.addFloorPlan = function(url) {
             var self = this;
             var img = new Image();
+            var defer = $q.defer();
             img.src = url.replace('public/', '');
             img.onload = function(event) {
                 var t = event.target;
@@ -455,7 +460,7 @@ angular.module('core').service('Drawing', ['contextMenu',
                 f.y = 0;
                 f.regX = 0;
                 f.regY = 0;
-                floor_width_px = this.width;
+                plan.floor_width_px = this.width;
                 var scaleX = canvas.width / this.width;
                 var scaleY = canvas.height / this.height;
                 if (scaleX > scaleY) {
@@ -465,7 +470,12 @@ angular.module('core').service('Drawing', ['contextMenu',
                 }
                 floorplan.addChild(f);
                 update = true;
+                $timeout(function() {
+                    defer.resolve();
+                }, 0);
             };
+
+            return defer.promise;
         };
 
         this.toJSON = function() {
@@ -494,16 +504,20 @@ angular.module('core').service('Drawing', ['contextMenu',
             return stage.toDataURL();
         };
 
-        this.loadPlan = function(data, signal_radius) {
+        this.loadPlan = function(data, signal_radius, scale) {
+            this.plan = data.plan;
             this.initBoard(signal_radius);
             this.scale(100);
             this.updateSignalStrength(signal_radius);
-            this.addFloorPlan(data.floorplan);
-            this.plan = data.plan;
+            if (data.floorplan) {
+                this.addFloorPlan(data.floorplan)
+                    .then(function() {
+                        if (data.plan && data.plan.stage_scale) this.scale(data.plan.stage_scale);
+                    }.bind(this));
+            }
             _.each(data.aps, function(ap) {
                 this.addAP(ap.x, ap.y, signal_radius);
             }.bind(this));
-            if (data.plan && data.plan.stage_scale) this.scale(data.plan.stage_scale);
         };
     }
 ]);

@@ -12,6 +12,8 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
         $scope.UNITS_MAX_METERS = 30;
         $scope.UNITS_MAX_FEET = Number.parseFloat((Math.round($scope.UNITS_MAX_METERS * 3.28084 * 100) / 100).toFixed(0));
 
+        $scope.stage_scale = Drawing.stage_scale;
+
         $scope.addAP = function(evt) {
             if ($scope.calibration_step === 1) {
                 Drawing.calibrationLine(evt, 0);
@@ -45,6 +47,11 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
         $scope.updateScale = function() {
             Drawing.scale($scope.settings.scale);
         };
+
+        $scope.$watch('stage_scale', function(new_scale, old_scale) {
+            if (!$scope.settings) $scope.settings = {};
+            $scope.settings.scale = new_scale;
+        });
 
         $scope.toggleDistances = function() {
             Drawing.toggleDistances();
@@ -120,7 +127,8 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
                     units: 'ft',
                     signal_radius: 25,
                     show_distances: true,
-                    show_overlaps: true
+                    show_overlaps: true,
+                    scale: 100
                 };
 
                 if ($scope.settings.units === 'ft') $scope.settings.signal_radius_feet = $scope.settings.signal_radius;
