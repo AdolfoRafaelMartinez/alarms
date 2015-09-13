@@ -16,6 +16,9 @@ module.exports = {
 				'public/lib/bootstrap/dist/css/bootstrap.css',
 				'public/lib/bootstrap/dist/css/bootstrap-theme.css',
 				'public/lib/angular-material/angular-material.css',
+				'public/lib/jQueryFileUpload/css/style.css',
+				'public/lib/jQueryFileUpload/css/jquery.fileupload.css',
+				'public/lib/jQueryFileUpload/css/jquery.fileupload-ui.css',
 			],
 			js: [
 				'public/lib/angular/angular.js',

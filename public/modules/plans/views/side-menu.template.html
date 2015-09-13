@@ -5,19 +5,11 @@
             <span class="highlight"></span>
             <span class="bar"></span>
             <label>File Name</label>
-            <md-button ng-click="savePlan()">Save</md-button>
+            <md-button ng-click="savePlan()" aria-label="Save plan"><ng-md-icon icon="{{ icons.save }}"></ng-md-icon> <span>Save</span></md-button>
         </div>
     </md-item>
     <md-item>
-        <h4>Show:</h4>
-        <div flex="10">
-            <md-switch flex ng-model="settings.show_distances" ng-change="toggleDistances()" aria-label="Show Distances">Distances</md-switch>
-        </div>
-        <div flex="10">
-            <md-switch flex ng-model="settings.show_overlaps" ng-change="toggleOverlaps()" aria-label="Show Overlaps">Overlaps</md-switch>
-        </div>
-    </md-item>
-    <md-item>
+        <div flex="10">Foolplans<hr /></div>
         <div flex="10">
             <div ng-controller='FileUploadController'>
                 <lvl-file-upload
@@ -33,6 +25,28 @@
                         on-done='done(files, data)'
                         on-progress='progress(percentDone)'
                         on-error='error(files, type, msg)'/>
+            </div>
+            <div class="col-lg-5 fade" data-ng-class="{in: active()}">
+                <!-- The global progress bar -->
+                <div class="progress progress-striped active" data-file-upload-progress="progress()"><div class="progress-bar progress-bar-success" data-ng-style="{width: num + '%'}"></div></div>
+            </div>
+        </div>
+    </md-item>
+    <md-item>
+        <div flex="10">
+            <div>
+                <h4>Tools:</h4>
+                <hr />
+                <md-button ng-click="selectTool('pan')" aria-label="pan-tool"><ng-md-icon icon="{{ icons.pan }}"></ng-md-icon></md-button>
+                <md-button ng-click="selectTool('ap')" aria-label="ap-placement-tool"><ng-md-icon icon="{{ icons.ap }}"></ng-md-icon></md-button>
+                <h4>Show:</h4>
+                <hr />
+                <div flex="10">
+                    <md-switch flex ng-model="settings.show_distances" ng-change="toggleDistances()" aria-label="Show Distances">Distances</md-switch>
+                </div>
+                <div flex="10">
+                    <md-switch flex ng-model="settings.show_overlaps" ng-change="toggleOverlaps()" aria-label="Show Overlaps">Overlaps</md-switch>
+                </div>
             </div>
         </div>
     </md-item>

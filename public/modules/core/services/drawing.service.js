@@ -9,11 +9,19 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
 
         var mouseTarget; // the display object currently under the mouse, or being dragged
         var dragStarted; // indicates whether we are currently in a drag operation
+        var mouse_mode = 'ap';
+        var mouse_last_position;
         var update = true;
         var is_dragging = false;
         var selectedAP;
         var plan = {
             stage_scale: 100,
+            stage: {
+                x: 0,
+                y: 0,
+                regX: 0,
+                regY: 0
+            },
             ap_index: 0,
             stage_ppm: 300,
             radius: 0,
@@ -27,7 +35,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
 
         var AP_CIRCLE_STROKE_RGB = '#888';
         var AP_CIRCLE_RGBA = 'rgba(180, 220, 255, 0.9)';
-        var AP_CIRCLE_RGBA_OPAQUE = 'rgba(200, 200, 255, 0.2)';
+        var AP_CIRCLE_RGBA_OPAQUE = 'rgba(200, 200, 255, 0.6)';
         var DISTANCE_STROKE_RGB = '#ccc';
         var DISTANCE_TEXT_RGB = '#888';
         var DISTANCE_CUT_OFF = 60;
@@ -52,12 +60,16 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
             canvas.addEventListener('touchstart', drawing.touchStart.bind(drawing), false);
             canvas.addEventListener('touchmove', drawing.touchMove.bind(drawing), false);
             canvas.addEventListener('touchend', drawing.touchEnd.bind(drawing), false);
+            canvas.addEventListener('mousedown', drawing.touchStart.bind(drawing), false);
+            canvas.addEventListener('mousemove', drawing.touchMove.bind(drawing), false);
+            canvas.addEventListener('mouseup', drawing.touchEnd.bind(drawing), false);
         }
 
         var addHandlers = function(ap) {
             var names;
 
-            ap.on('mousedown', function(evt) {
+            function mousedown(evt) {
+                if (mouse_mode !== 'ap') return;
                 if (evt.nativeEvent.button === 2) {
                     event.stopPropagation();
                     event.preventDefault();
@@ -71,9 +83,10 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
                     y: this.y - evt.stageY * 100 / plan.stage_scale
                 };
                 for (var i=0; i<ap.distances.length; i++) names.push(distances.getChildByName(ap.distances[i].name));
-            });
+            };
 
-            ap.on('pressmove', function(evt) {
+            function mousemove(evt) {
+                if (mouse_mode !== 'ap') return;
                 ap.x = evt.stageX * 100 / plan.stage_scale + ap.offset.x;
                 ap.y = evt.stageY * 100 / plan.stage_scale + ap.offset.y;
                 var i, l = names.length;
@@ -110,7 +123,13 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
                 drawIntersections(ap);
                 is_dragging = true;
                 update = true;
-            });
+            };
+
+            ap.on('mousedown', mousedown);
+            ap.on('touchstart', mousedown);
+            ap.on('pressmove', mousemove);
+            ap.on('mousemove', mousemove);
+            ap.on('touchmove', mousemove);
 
             ap.on('rollover', function(evt) {
                 if (this.children[0].graphics) {
@@ -169,15 +188,42 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
         };
 
         this.touchStart = function(e) {
-            // this.addAP(e);
+            switch (mouse_mode) {
+                case 'pan':
+                    is_dragging = true;
+                    mouse_last_position = { x: e.x, y: e.y };
+                    break;
+
+                case 'ap':
+                    break;
+            }
         };
 
         this.touchMove = function(e) {
-            // console.log(e);
+            switch (mouse_mode) {
+                case 'pan':
+                    if (!is_dragging) return;
+                    stage.x += e.x - mouse_last_position.x;
+                    stage.y += e.y - mouse_last_position.y;
+                    update = true;
+                break;
+
+                case 'ap':
+                    break;
+
+            }
+            mouse_last_position = { x: e.x, y: e.y  };
         };
 
         this.touchEnd = function(e) {
-            // console.log(e);
+            switch (mouse_mode) {
+                case 'pan':
+                    is_dragging = false;
+                    break;
+
+                case 'ap':
+                    break;
+            }
         };
 
         this.mouseWheelEvent = function(e) {
@@ -186,12 +232,17 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
             e.stopPropagation();
             var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail))) * 1.02;
             if (delta < 0) delta = 0.98;
+            var mousex = e.x - $(canvas)[0].offsetParent.offsetLeft -20;
+            var mousey = e.y - $(canvas)[0].offsetParent.offsetTop -20;
+            stage.x = mousex - delta *(mousex - stage.x);
+            stage.y = mousey - delta *(mousey - stage.y);
             this.scale(delta * plan.stage_scale);
 
             return false;
         };
 
         this.initBoard = function(r) {
+            mouse_mode = 'ap';
             plan.radius = r;
             plan.real_radius = r;
             DISTANCE_CUT_OFF = r * 2;
@@ -266,8 +317,8 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
 
                                 var hash = new createjs.Shape();
                                 hash.puddleShape = 'hash';
-                                hash.graphics.beginFill(hash_color).arc(0, 0, plan.radius, leftside * Math.PI + alpha - beta, leftside * Math.PI + alpha + beta + 0.01);
-                                hash.graphics.beginFill(hash_color).arc(c.x - ap.x, c.y - ap.y, plan.radius, rightside * Math.PI + alpha - beta, rightside * Math.PI + alpha + beta + 0.01);
+                                hash.graphics.beginFill(hash_color).arc(0, 0, plan.radius -2, leftside * Math.PI + alpha - beta, leftside * Math.PI + alpha + beta + 0.01);
+                                hash.graphics.beginFill(hash_color).arc(c.x - ap.x, c.y - ap.y, plan.radius -2, rightside * Math.PI + alpha - beta, rightside * Math.PI + alpha + beta + 0.01);
                                 intersections.push(hash);
 
                                 // update the intersections on the adjacent AP as well
@@ -327,14 +378,14 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
             layers[current_layer].addChild(container);
 
             container.scaleX = container.scaleY = container.scale = 1;
-            container.x = x * 100 / plan.stage_scale;
-            container.y = y * 100 / plan.stage_scale;
+            container.x = (x - stage.x) * 100 / plan.stage_scale;
+            container.y = (y - stage.y) * 100 / plan.stage_scale;
             container.realx = mperpx * container.x;
             container.realy = mperpx * container.y;
 
             var overlaps = new createjs.Container();
-            container.addChild(overlaps);
             container.overlaps = overlaps;
+            overlaps.mouseEnabled = false;
 
             circle.id = _.uniqueId();
             circle.graphics.setStrokeStyle(1).beginFill(AP_CIRCLE_RGBA).beginStroke(AP_CIRCLE_STROKE_RGB).drawCircle(0, 0, plan.radius);
@@ -351,6 +402,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
             ap.cursor = 'pointer';
             ap.overlaps = overlaps;
             container.addChild(ap);
+            container.addChild(overlaps);
 
             var text = new createjs.Text('AP ' + plan.ap_index++, '12px Arial', DISTANCE_TEXT_RGB);
             text.x = -15;
@@ -445,7 +497,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
         this.scale = function(percent) {
             plan.stage_scale = this.stage_scale = percent;
             plan.stage_ppm = percent / 100 * plan.floor_width_px / plan.floor_width;
-            stage.setTransform(0, 0, percent/100, percent/100).update();
+            stage.setTransform(stage.x, stage.y, percent/100, percent/100).update();
         };
 
         this.addFloorPlan = function(url) {
@@ -479,6 +531,10 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
         };
 
         this.toJSON = function() {
+            plan.stage.x = stage.x;
+            plan.stage.y = stage.y;
+            plan.stage.regX = stage.regX;
+            plan.stage.regY = stage.regY;
             var json = {
                 plan: plan,
                 floorplan: floorplan.children[0] ? floorplan.children[0].image.src : '',
@@ -518,6 +574,10 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
             _.each(data.aps, function(ap) {
                 this.addAP(ap.x, ap.y, signal_radius);
             }.bind(this));
+        };
+
+        this.selectTool = function(mode) {
+            mouse_mode = mode;
         };
     }
 ]);

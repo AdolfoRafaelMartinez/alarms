@@ -14,7 +14,20 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
 
         $scope.stage_scale = Drawing.stage_scale;
 
+        var iconset = {
+            save: 'save',
+            done: 'done',
+            pan: 'open_with',
+            ap: 'room'
+        };
+        $scope.icons = {
+            save: iconset.save,
+            pan: iconset.pan,
+            ap: iconset.ap
+        };
+
         $scope.addAP = function(evt) {
+            if ($scope.mouse_mode === 'pan') return;
             if ($scope.calibration_step === 1) {
                 Drawing.calibrationLine(evt, 0);
                 $scope.calibration_step++;
@@ -89,6 +102,7 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
             }).progress(function(event) {
                 $scope.uploadProgress = Math.floor(event.loaded / event.total);
                 $scope.$apply();
+                console.log($scope.uploadProgress);
             }).success(function(data, status, headers, config) {
                 console.log('Photo uploaded!');
             }).error(function(err) {
@@ -111,6 +125,10 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
                 });
             } else {
                 $scope.plan.$update(function(response) {
+                    $scope.icons.save = iconset.done;
+                    $timeout(function() {
+                        $scope.icons.save = iconset.save;
+                    }, 3000);
                 }, function(errorResponse) {
                     $scope.error = errorResponse.data.message;
                 });
@@ -194,5 +212,10 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
                 Drawing.loadPlan($scope.plan.stage, $scope.settings.signal_radius);
             });
 		};
+
+        $scope.selectTool = function(mode) {
+            $scope.mouse_mode = mode;
+            Drawing.selectTool(mode);
+        };
 	}
 ]);

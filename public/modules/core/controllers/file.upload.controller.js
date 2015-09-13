@@ -3,6 +3,7 @@
 angular.module('core').controller('FileUploadController', ['$scope', 'Drawing', '$timeout',
     function($scope, Drawing, $timeout) {
         $scope.progress = function(percentDone) {
+            $scope.num = percentDone;
             console.log('progress: ' + percentDone + '%');
         };
 

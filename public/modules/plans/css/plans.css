@@ -5,3 +5,8 @@
 .pointer {
     cursor: pointer;
 }
+
+.md-button ng-md-icon {
+    line-height: 30px;
+    vertical-align: text-top;
+}
