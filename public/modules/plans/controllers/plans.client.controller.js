@@ -17,6 +17,7 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
         var iconset = {
             save: 'save',
             done: 'done',
+            loading: 'loop',
             pan: 'open_with',
             ap: 'room'
         };
@@ -124,6 +125,7 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
                     $scope.error = errorResponse.data.message;
                 });
             } else {
+                $scope.icons.save = iconset.loading;
                 $scope.plan.$update(function(response) {
                     $scope.icons.save = iconset.done;
                     $timeout(function() {
