@@ -10,7 +10,10 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
         var mouseTarget; // the display object currently under the mouse, or being dragged
         var dragStarted; // indicates whether we are currently in a drag operation
         var mouse_mode = 'ap';
+        var ap_clicked;
         var mouse_last_position;
+        var mouse_last_click;
+        var calibration_step;
         var update = true;
         var is_dragging = false;
         var selectedAP;
@@ -34,15 +37,15 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
         var show_distances = true;
 
         var AP_CIRCLE_STROKE_RGB = '#888';
-        var AP_CIRCLE_RGBA = 'rgba(180, 220, 255, 0.9)';
-        var AP_CIRCLE_RGBA_OPAQUE = 'rgba(200, 200, 255, 0.6)';
+        var AP_CIRCLE_RGBA = 'rgba(180, 220, 255, 0.6)';
+        var AP_CIRCLE_RGBA_OPAQUE = 'rgba(200, 200, 255, 0.2)';
         var DISTANCE_STROKE_RGB = '#ccc';
         var DISTANCE_TEXT_RGB = '#888';
         var DISTANCE_CUT_OFF = 60;
         var HASH_COLOR = [
-            { overlap: 21, color: '#FF0000' },
-            { overlap: 14, color: '#00FF00' },
-            { overlap: 0,  color: '#F7FE2E' }
+            { overlap: 21, color: 'rgba(255, 0, 0, 0.2)' },
+            { overlap: 14, color: 'rgba(0, 255, 0, 0.2)' },
+            { overlap: 0,  color: 'rgba(240, 255, 40, 0.2)' }
  ];
 
         var tick = function(event) {
@@ -70,9 +73,10 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
 
             function mousedown(evt) {
                 if (mouse_mode !== 'ap') return;
+                ap_clicked = true;
+                evt.stopPropagation();
+                evt.preventDefault();
                 if (evt.nativeEvent.button === 2) {
-                    event.stopPropagation();
-                    event.preventDefault();
                     selectedAP = ap;
                     return;
                 }
@@ -125,11 +129,18 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
                 update = true;
             };
 
+            function mouseup(evt) {
+                ap_clicked = false;
+            };
+
             ap.on('mousedown', mousedown);
             ap.on('touchstart', mousedown);
             ap.on('pressmove', mousemove);
             ap.on('mousemove', mousemove);
             ap.on('touchmove', mousemove);
+            ap.on('mouseup', mouseup);
+            ap.on('pressup', mouseup);
+            ap.on('touchend', mouseup);
 
             ap.on('rollover', function(evt) {
                 if (this.children[0].graphics) {
@@ -188,42 +199,39 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
         };
 
         this.touchStart = function(e) {
-            switch (mouse_mode) {
-                case 'pan':
-                    is_dragging = true;
-                    mouse_last_position = { x: e.x, y: e.y };
-                    break;
-
-                case 'ap':
-                    break;
-            }
+            mouse_last_position = { x: e.x, y: e.y };
+            mouse_last_click = { x: e.x, y: e.y };
         };
 
         this.touchMove = function(e) {
-            switch (mouse_mode) {
-                case 'pan':
-                    if (!is_dragging) return;
-                    stage.x += e.x - mouse_last_position.x;
-                    stage.y += e.y - mouse_last_position.y;
-                    update = true;
-                break;
-
-                case 'ap':
-                    break;
-
+            if (!mouse_last_click) return;
+            if (mouse_mode === 'ap' || !ap_clicked) {
+                is_dragging = true;
             }
-            mouse_last_position = { x: e.x, y: e.y  };
+            if (mouse_mode !== 'ap' || !ap_clicked) {
+                stage.x += e.x - mouse_last_position.x;
+                stage.y += e.y - mouse_last_position.y;
+                update = true;
+                mouse_last_position = { x: e.x, y: e.y  };
+            }
         };
 
         this.touchEnd = function(e) {
-            switch (mouse_mode) {
-                case 'pan':
-                    is_dragging = false;
-                    break;
-
-                case 'ap':
-                    break;
+            if (e.button !== 2 && !is_dragging) {
+                var x = (e.x - stage.x - canvas.offsetParent.offsetLeft - 20) * 100 / plan.stage_scale;
+                var y = (e.y - stage.y - canvas.offsetParent.offsetTop - 20) * 100 / plan.stage_scale;
+                if (calibration_step === 1) {
+                    calibration_step++;
+                    this.calibrationLine(x, y, 0);
+                } else if (calibration_step === 2) {
+                    this.calibrationLine(x, y, 1);
+                    this.calibrationDone();
+                } else if (mouse_last_click.x === e.x && mouse_last_click.y === e.y) {
+                    this.addAP(x, y, plan.real_radius);
+                }
             }
+            is_dragging = false;
+            mouse_last_click = false;
         };
 
         this.mouseWheelEvent = function(e) {
@@ -339,9 +347,12 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
             }
         };
 
-        this.calibrationLine = function(evt, end) {
-            var x = evt.offsetX * 100 / plan.stage_scale;
-            var y = evt.offsetY * 100 / plan.stage_scale;
+        this.startCalibration = function(cb) {
+            calibration_step = 1;
+            this.calibrationDone = cb;
+        };
+
+        this.calibrationLine = function(x, y, end) {
             if (end) {
                 this.calibration_line.graphics.lineTo(x, y);
                 this.calibration_line.p_end = {x: x, y: y};
@@ -355,8 +366,8 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
         };
 
         this.completeCalibration = function(distance) {
+            calibration_step = false;
             stage.removeChild(this.calibration_line);
-            update = true;
             var c = this.calibration_line;
             var d = Math.sqrt(Math.pow(c.p_start.x - c.p_end.x, 2) + Math.pow(c.p_start.y - c.p_end.y, 2));
             plan.stage_ppm = d / distance;
@@ -378,8 +389,8 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
             layers[current_layer].addChild(container);
 
             container.scaleX = container.scaleY = container.scale = 1;
-            container.x = (x - stage.x) * 100 / plan.stage_scale;
-            container.y = (y - stage.y) * 100 / plan.stage_scale;
+            container.x = x;
+            container.y = y;
             container.realx = mperpx * container.x;
             container.realy = mperpx * container.y;
 
@@ -421,7 +432,6 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
             contextMenu.close();
             var i, j, k;
             var selected_distances_length = selectedAP.distances.length;
-            console.log(selectedAP);
             for (i=distances.children.length-1; i>=0; i--) {
                 for (k=selected_distances_length -1; k>=0; k--) {
                     if (selectedAP.distances[k] && distances.children[i].name === selectedAP.distances[k].name) {
@@ -451,7 +461,6 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
 
         this.updateSignalStrength = function(signal_radius) {
             DISTANCE_CUT_OFF = signal_radius * 2;
-            plan.real_radius = signal_radius;
             if (stage) {
                 plan.radius = signal_radius * plan.stage_ppm; // in pixels
                 _.each(stage.children, function(child) {
@@ -560,20 +569,24 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
             return stage.toDataURL();
         };
 
-        this.loadPlan = function(data, signal_radius, scale) {
-            this.plan = data.plan;
-            this.initBoard(signal_radius);
-            this.scale(100);
-            this.updateSignalStrength(signal_radius);
-            if (data.floorplan) {
-                this.addFloorPlan(data.floorplan)
-                    .then(function() {
-                        if (data.plan && data.plan.stage_scale) this.scale(data.plan.stage_scale);
-                    }.bind(this));
-            }
-            _.each(data.aps, function(ap) {
-                this.addAP(ap.x, ap.y, signal_radius);
-            }.bind(this));
+        this.loadPlan = function(data, signal_radius) {
+            $timeout(function() {
+                plan = data.plan;
+                this.initBoard(signal_radius);
+                this.scale(100);
+                if (data.floorplan) {
+                    this.addFloorPlan(data.floorplan)
+                        .then(function() {
+                            if (data.plan && data.plan.stage_scale) this.scale(data.plan.stage_scale);
+                        }.bind(this));
+                }
+                stage.x = data.plan.stage.x;
+                stage.y = data.plan.stage.y;
+                _.each(data.aps, function(ap) {
+                    this.addAP(ap.x, ap.y, signal_radius);
+                }.bind(this));
+                this.updateSignalStrength(signal_radius);
+            }.bind(this), 100);
         };
 
         this.selectTool = function(mode) {

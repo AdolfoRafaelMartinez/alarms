@@ -21,23 +21,11 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
             pan: 'open_with',
             ap: 'room'
         };
+
         $scope.icons = {
             save: iconset.save,
             pan: iconset.pan,
             ap: iconset.ap
-        };
-
-        $scope.addAP = function(evt) {
-            if ($scope.mouse_mode === 'pan') return;
-            if ($scope.calibration_step === 1) {
-                Drawing.calibrationLine(evt, 0);
-                $scope.calibration_step++;
-            } else if ($scope.calibration_step === 2) {
-                Drawing.calibrationLine(evt, 1);
-                $scope.calibration_done = true;
-            } else {
-                Drawing.addAP(evt.offsetX, evt.offsetY, $scope.settings.signal_radius);
-            }
         };
 
         $scope.deleteAP = function() {
@@ -45,7 +33,11 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
         };
 
         $scope.startCalibration = function() {
-            $scope.calibration_step = 1;
+            Drawing.startCalibration(function() {
+                $scope.calibration_done = true;
+                $scope.$digest();
+            });
+            $scope.calibration_step = true;
         };
 
         $scope.completeCalibration = function() {
@@ -211,6 +203,7 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
 			}, function() {
                 $scope.settings = $scope.plan.settings;
                 $scope.flooplan_name = $scope.plan.title;
+                console.log('loadPlan', $scope.settings.signal_radius);
                 Drawing.loadPlan($scope.plan.stage, $scope.settings.signal_radius);
             });
 		};
