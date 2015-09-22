@@ -96,8 +96,8 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
                 var i, l = names.length;
 
                 var mperpx = 1 / plan.stage_ppm;
-                ap.realx = mperpx * ap.x * plan.stage_scale / 100;
-                ap.realy = mperpx * ap.y * plan.stage_scale / 100;
+                ap.realx = mperpx * ap.x;
+                ap.realy = mperpx * ap.y;
 
                 for (i=0; i<l; i++) {
                     if (ap === names[i].ap_start) {
@@ -263,7 +263,8 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
                 plan.floor_width = 200; // m or ft
                 plan.floor_width_px = canvas.width;
             }
-            plan.stage_ppm = canvas.width / plan.floor_width;
+            // plan.stage_ppm = canvas.width / plan.floor_width;
+            plan.stage_ppm = plan.floor_width_px / plan.floor_width;
 
             // enable touch interactions if supported on the current device:
             createjs.Touch.enable(stage);
@@ -505,7 +506,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
 
         this.scale = function(percent) {
             plan.stage_scale = this.stage_scale = percent;
-            plan.stage_ppm = percent / 100 * plan.floor_width_px / plan.floor_width;
+            plan.stage_ppm = plan.floor_width_px / plan.floor_width;
             stage.setTransform(stage.x, stage.y, percent/100, percent/100).update();
         };
 
@@ -586,6 +587,9 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
                     this.addAP(ap.x, ap.y, signal_radius);
                 }.bind(this));
                 this.updateSignalStrength(signal_radius);
+                $timeout(function() {
+                    this.updateSignalStrength(signal_radius);
+                }.bind(this), 1000);
             }.bind(this), 100);
         };
 

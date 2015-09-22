@@ -74,6 +74,7 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
                 $scope.settings.signal_radius_feet = Number.parseFloat((Math.round($scope.settings.signal_radius_meters * 3.28084 * 100) / 100).toFixed(0));
             }
             $scope.settings.signal_radius = ($scope.settings.units === 'ft') ? $scope.settings.signal_radius_feet : $scope.settings.signal_radius_meters;
+            console.log('updateSignalStrength', $scope.settings.signal_radius);
             Drawing.updateSignalStrength($scope.settings.signal_radius);
         };
 
