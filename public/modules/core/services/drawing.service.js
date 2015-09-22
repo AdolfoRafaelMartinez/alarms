@@ -107,21 +107,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
                         names[i].p_end.x = ap.x;
                         names[i].p_end.y = ap.y;
                     }
-                    names[i].pdistance  = Math.sqrt(
-                                            Math.pow(names[i].ap_start.realx - names[i].ap_end.realx, 2) +
-                                            Math.pow(names[i].ap_start.realy - names[i].ap_end.realy, 2)
-                    );
-                    if (names[i].pdistance < DISTANCE_CUT_OFF) {
-                        names[i].graphics.clear().setStrokeStyle(1).beginStroke(DISTANCE_STROKE_RGB)
-                            .moveTo(names[i].p_start.x, names[i].p_start.y)
-                            .lineTo(names[i].p_end.x, names[i].p_end.y);
-                        names[i].ptext.text = names[i].pdistance.toFixed(2) + ' ft';
-                        names[i].ptext.x    = names[i].p_start.x + (names[i].p_end.x - names[i].p_start.x) /2;
-                        names[i].ptext.y    = names[i].p_start.y + (names[i].p_end.y - names[i].p_start.y) /2;
-                    } else {
-                        names[i].graphics.clear();
-                        names[i].ptext.text = '';
-                    }
+                    drawDistanceObject(names[i], names[i].p_start, names[i].p_end);
                 }
 
                 drawIntersections(ap);
@@ -169,7 +155,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
                 _.each(layers[i].children, function(ap2) {
                     if (ap !== ap2) {
                         m = new createjs.Shape();
-                        d = Math.sqrt(Math.pow(ap2.realx - ap.realx, 2) + Math.pow(ap2.realy - ap.realy, 2));
+                        d = getDistance(ap2, ap);
                         if (d < DISTANCE_CUT_OFF) {
                             m.graphics.setStrokeStyle(1).beginStroke(DISTANCE_STROKE_RGB).moveTo(ap.x, ap.y).lineTo(ap2.x, ap2.y);
                         }
@@ -197,6 +183,28 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
                 });
             }
         };
+
+        function getDistance(ap_start, ap_end) {
+            return Math.sqrt(
+                Math.pow(ap_start.realx - ap_end.realx, 2) +
+                Math.pow(ap_start.realy - ap_end.realy, 2)
+            );
+        }
+
+        function drawDistanceObject(obj) {
+            obj.pdistance = getDistance(obj.ap_start, obj.ap_end);
+            if (obj.pdistance < DISTANCE_CUT_OFF) {
+                obj.graphics.clear().setStrokeStyle(1).beginStroke(DISTANCE_STROKE_RGB)
+                    .moveTo(obj.p_start.x, obj.p_start.y)
+                    .lineTo(obj.p_end.x, obj.p_end.y);
+                obj.ptext.text = obj.pdistance.toFixed(2) + ' ft';
+                obj.ptext.x    = obj.p_start.x + (obj.p_end.x - obj.p_start.x) /2;
+                obj.ptext.y    = obj.p_start.y + (obj.p_end.y - obj.p_start.y) /2;
+            } else {
+                obj.graphics.clear();
+                obj.ptext.text = '';
+            }
+        }
 
         this.touchStart = function(e) {
             mouse_last_position = { x: e.x, y: e.y };
