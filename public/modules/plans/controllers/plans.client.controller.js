@@ -12,8 +12,6 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
         $scope.UNITS_MAX_METERS = 30;
         $scope.UNITS_MAX_FEET = Number.parseFloat((Math.round($scope.UNITS_MAX_METERS * 3.28084 * 100) / 100).toFixed(0));
 
-        $scope.stage_scale = Drawing.stage_scale;
-
         var iconset = {
             save: 'save',
             done: 'done',
@@ -53,11 +51,6 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
         $scope.updateScale = function() {
             Drawing.scale($scope.settings.scale);
         };
-
-        $scope.$watch('stage_scale', function(new_scale, old_scale) {
-            if (!$scope.settings) $scope.settings = {};
-            $scope.settings.scale = new_scale;
-        });
 
         $scope.toggleDistances = function() {
             Drawing.toggleDistances();
@@ -193,6 +186,16 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
 			});
 		};
 
+        $scope.updateControls = function(key, val) {
+            if ($scope.$$phase) {
+                $scope.settings[key] = val;
+            } else {
+                $scope.$apply(function() {
+                    $scope.settings[key] = val;
+                });
+            }
+        };
+
 		$scope.find = function() {
 			$scope.plans = Plans.query();
 		};
@@ -203,7 +206,7 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
 			}, function() {
                 $scope.settings = $scope.plan.settings;
                 $scope.flooplan_name = $scope.plan.title;
-                Drawing.loadPlan($scope.plan.stage, $scope.settings.signal_radius);
+                Drawing.loadPlan($scope.plan.stage, $scope.settings.signal_radius, $scope.updateControls);
             });
 		};
 

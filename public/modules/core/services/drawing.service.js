@@ -250,9 +250,12 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
             if (delta < 0) delta = 0.98;
             var mousex = e.x - $(canvas)[0].offsetParent.offsetLeft -20;
             var mousey = e.y - $(canvas)[0].offsetParent.offsetTop -20;
-            stage.x = mousex - delta *(mousex - stage.x);
-            stage.y = mousey - delta *(mousey - stage.y);
-            this.scale(delta * plan.stage_scale);
+            var new_scale = delta * plan.stage_scale;
+            if (new_scale <= 200) {
+                stage.x = mousex - delta *(mousex - stage.x);
+                stage.y = mousey - delta *(mousey - stage.y);
+                this.scale(delta * plan.stage_scale);
+            }
 
             return false;
         };
@@ -510,10 +513,9 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
             update = true;
         };
 
-        this.stage_scale = 100;
-
         this.scale = function(percent) {
-            plan.stage_scale = this.stage_scale = percent;
+            plan.stage_scale = percent;
+            this.updateControls('scale', Math.round(plan.stage_scale));
             plan.stage_ppm = plan.floor_width_px / plan.floor_width;
             stage.setTransform(stage.x, stage.y, percent/100, percent/100).update();
         };
@@ -578,19 +580,25 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
             return stage.toDataURL();
         };
 
-        this.loadPlan = function(data, signal_radius) {
+        this.loadPlan = function(data, signal_radius, updateControls) {
+            this.updateControls = updateControls;
             $timeout(function() {
                 plan = data.plan;
+                var stage_scale = plan.stage_scale;
                 this.initBoard(signal_radius);
                 this.scale(100);
                 if (data.floorplan) {
                     this.addFloorPlan(data.floorplan)
                         .then(function() {
-                            if (data.plan && data.plan.stage_scale) this.scale(data.plan.stage_scale);
+                            if (data.plan && data.plan.stage_scale) this.scale(stage_scale);
                         }.bind(this));
                 }
+
                 stage.x = data.plan.stage.x;
                 stage.y = data.plan.stage.y;
+                stage.regX = data.plan.stage.regX;
+                stage.regY = data.plan.stage.regY;
+
                 _.each(data.aps, function(ap) {
                     this.addAP(ap.x, ap.y, signal_radius);
                 }.bind(this));
@@ -599,6 +607,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
                     this.updateSignalStrength(signal_radius);
                 }.bind(this), 1000);
             }.bind(this), 100);
+
         };
 
         this.selectTool = function(mode) {
