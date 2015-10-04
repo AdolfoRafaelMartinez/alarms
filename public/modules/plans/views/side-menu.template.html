@@ -37,8 +37,14 @@
             <div>
                 <h4>Tools:</h4>
                 <hr />
-                <md-button ng-click="selectTool('pan')" aria-label="pan-tool"><ng-md-icon icon="{{ icons.pan }}"></ng-md-icon></md-button>
-                <md-button ng-click="selectTool('ap')" aria-label="ap-placement-tool"><ng-md-icon icon="{{ icons.ap }}"></ng-md-icon></md-button>
+                <md-button ng-click="show_walls=false; selectTool('pan')" aria-label="pan-tool"><ng-md-icon icon="{{ icons.pan }}"></ng-md-icon></md-button>
+                <md-button ng-click="show_walls=false; selectTool('ap')" aria-label="ap-placement-tool"><ng-md-icon icon="{{ icons.ap }}"></ng-md-icon></md-button>
+                <md-button ng-click="show_walls= true; selectTool('wall')" aria-label="wall-placement-tool"><ng-md-icon icon="{{ icons.wall }}"></ng-md-icon></md-button>
+				<div ng-show="show_walls">
+					Wall type: <md-select role="application" ng-model="wall_type" ng-change="selectWallType()">
+						<md-option ng-value="wall_id" ng-repeat="(wall_id, wall_type) in wall_types">{{ wall_type.desc }}</md-option>
+					</md-select>
+				</div>
                 <h4>Show:</h4>
                 <hr />
                 <div flex="10">

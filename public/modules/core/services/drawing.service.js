@@ -14,6 +14,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
         var mouse_last_position;
         var mouse_last_click;
         var calibration_step;
+        var current_wall;
         var update = true;
         var is_dragging = false;
         var selectedAP;
@@ -72,14 +73,14 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
             var names;
 
             function mousedown(evt) {
-                if (mouse_mode !== 'ap') return;
-                ap_clicked = true;
-                evt.stopPropagation();
-                evt.preventDefault();
                 if (evt.nativeEvent.button === 2) {
                     selectedAP = ap;
                     return;
                 }
+                if (mouse_mode !== 'ap') return;
+                ap_clicked = true;
+                evt.stopPropagation();
+                evt.preventDefault();
                 this.parent.addChild(this);
                 names = [];
                 this.offset = {
@@ -90,6 +91,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
             };
 
             function mousemove(evt) {
+                if (evt.nativeEvent.button === 2) return;
                 if (mouse_mode !== 'ap') return;
                 ap.x = evt.stageX * 100 / plan.stage_scale + ap.offset.x;
                 ap.y = evt.stageY * 100 / plan.stage_scale + ap.offset.y;
@@ -150,6 +152,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
         var addDistances = function(ap) {
             var children, i, d, m, layers_length = layers.length;
             for (i=0; i<layers_length; i++) {
+                if (layers[i].layer_type !== 'ap') continue;
                 ap.distances = [];
                 /*jshint -W083 */
                 _.each(layers[i].children, function(ap2) {
@@ -225,18 +228,37 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
         };
 
         this.touchEnd = function(e) {
+            contextMenu.disabled = false;
             if (e.button !== 2 && !is_dragging) {
-                var x = (e.x - stage.x - canvas.offsetParent.offsetLeft - 20) * 100 / plan.stage_scale;
-                var y = (e.y - stage.y - canvas.offsetParent.offsetTop - 20) * 100 / plan.stage_scale;
-                if (calibration_step === 1) {
-                    calibration_step++;
-                    this.calibrationLine(x, y, 0);
-                } else if (calibration_step === 2) {
-                    this.calibrationLine(x, y, 1);
-                    this.calibrationDone();
-                } else if (mouse_last_click.x === e.x && mouse_last_click.y === e.y) {
-                    this.addAP(x, y, plan.real_radius);
+                if (mouse_last_click.x === e.x && mouse_last_click.y === e.y) {
+                    var x = (e.x - stage.x - canvas.offsetParent.offsetLeft - 20) * 100 / plan.stage_scale;
+                    var y = (e.y - stage.y - canvas.offsetParent.offsetTop - 20) * 100 / plan.stage_scale;
+                    if (mouse_mode === 'wall') {
+                        contextMenu.disabled = true;
+                        if (current_wall) {
+                            this.addWallSegment(x, y);
+                            update = true;
+                        } else {
+                            current_wall = new createjs.Shape();
+                            current_wall.graphics.setStrokeStyle(this.wall_type.width).setStrokeDash(this.wall_type.dash).beginStroke(this.wall_type.color).moveTo(x, y);
+                            if (current_wall.p_corners === undefined) current_wall.p_corners = [];
+                            current_wall.p_corners.push({x: x, y: y, wall_type: this.wall_type});
+                            layers[1].addChild(current_wall);
+                        }
+                    } else {
+                        if (calibration_step === 1) {
+                            calibration_step++;
+                            this.calibrationLine(x, y, 0);
+                        } else if (calibration_step === 2) {
+                            this.calibrationLine(x, y, 1);
+                            this.calibrationDone();
+                        } else {
+                            this.addAP(x, y, plan.real_radius);
+                        }
+                    }
                 }
+            } else if (e.button === 2) {
+                current_wall = false;
             }
             is_dragging = false;
             mouse_last_click = false;
@@ -288,6 +310,8 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
             // add default layers
             layers = [new createjs.Container()];
             layers[0].layer_type = 'ap';
+            layers[1] = new createjs.Container();
+            layers[1].layer_type = 'walls';
             current_layer = 0;
             floorplan = new createjs.Container();
             floorplan.layer_type = 'background';
@@ -295,6 +319,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
             distances.layer_type = 'distances';
             stage.addChild(floorplan);
             stage.addChild(layers[0]);
+            stage.addChild(layers[1]);
             stage.addChild(distances);
 
             createjs.Ticker.addEventListener('tick', tick);
@@ -387,6 +412,16 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
             this.updateSignalStrength(plan.real_radius);
         };
 
+        this.addWallSegment = function(x, y) {
+            current_wall.graphics.lineTo(x, y).endStroke();
+            current_wall.graphics.setStrokeStyle(this.wall_type.width).setStrokeDash([20, 10]).beginStroke(this.wall_type.color).moveTo(x, y);
+            current_wall.p_corners.push({x: x, y: y, wall_type: this.wall_type});
+        };
+
+        this.cancelWall = function() {
+            if (current_wall) current_wall.graphics.endStroke();
+        };
+
         this.addAP = function(x, y, signal_radius) {
             if (is_dragging) {
                 is_dragging = false;
@@ -453,6 +488,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
                 }
             }
             for (i=0; i<layers.length; i++) {
+                if (layers[i].layer_type !== 'ap') continue;
                 _.each(layers[i].children, function(ap2) {
                     for (j=ap2.distances.length -1; j>=0; j--) {
                         for (k=selected_distances_length -1; k>=0; k--) {
@@ -515,7 +551,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
 
         this.scale = function(percent) {
             plan.stage_scale = percent;
-            this.updateControls('scale', Math.round(plan.stage_scale));
+            if (this.updateControls) this.updateControls('scale', Math.round(plan.stage_scale));
             plan.stage_ppm = plan.floor_width_px / plan.floor_width;
             stage.setTransform(stage.x, stage.y, percent/100, percent/100).update();
         };
@@ -563,14 +599,23 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
 
             var children, i, d, m, layers_length = layers.length;
             for (i=0; i<layers_length; i++) {
-                /*jshint -W083 */
-                _.each(layers[i].children, function(ap) {
-                    json.aps.push({
-                        name: ap.name,
-                        x: ap.x,
-                        y: ap.y
+                if (layers[i].layer_type === 'ap') {
+                    /*jshint -W083 */
+                    _.each(layers[i].children, function(ap) {
+                        json.aps.push({
+                            name: ap.name,
+                            x: ap.x,
+                            y: ap.y
+                        });
                     });
-                });
+                } else if (layers[i].layer_type === 'wall') {
+                    /*jshint -W083 */
+                    _.each(layers[i].children, function(wall) {
+                        json.walls.push({
+                            p_corners: wall.p_corners
+                        });
+                    });
+                }
             }
 
             return json;
@@ -592,6 +637,9 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
                         .then(function() {
                             if (data.plan && data.plan.stage_scale) this.scale(stage_scale);
                         }.bind(this));
+                    this.toggleOverlaps();
+                    update = true;
+                    $timeout(this.toggleOverlaps, 0);
                 }
 
                 stage.x = data.plan.stage.x;
@@ -612,6 +660,11 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
 
         this.selectTool = function(mode) {
             mouse_mode = mode;
+        };
+
+        this.selectWallType = function(wall) {
+            this.cancelWall();
+            this.wall_type = wall;
         };
     }
 ]);

@@ -52,13 +52,18 @@ angular.module('core').service('contextMenu', ['$timeout',
         };
 
         function handleKeyUpEvent(event) {
-          if (!this.disabled && opened && event.keyCode === 27) {
+          if (opened && event.keyCode === 27) {
               close();
           }
         }
 
         this.handleClickEvent = function(event, ap) {
-          if (!this.disabled && opened && event.button !== 2) {
+          if( this.disabled ) {
+              event.preventDefault();
+              event.stopPropagation();
+              return;
+          }
+          if (opened && event.button !== 2) {
               close();
           } else {
               event.preventDefault();
@@ -68,9 +73,12 @@ angular.module('core').service('contextMenu', ['$timeout',
         };
 
         this.setup = function() {
+            var self = this;
             $timeout(function() {
                 $(angular.element('canvas')[0]).bind('contextmenu', function(event) {
-                  if (!this.disabled) {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  if (!self.disabled) {
                     if (menuElement !== null) {
                       close();
                     }
@@ -78,9 +86,7 @@ angular.module('core').service('contextMenu', ['$timeout',
                         document.getElementById('context_menu')
                     );
                     var element = event.target;
-
-                    event.preventDefault();
-                    event.stopPropagation();
+                    if( self.disabled ) return;
                     open(event);
                   }
                 });

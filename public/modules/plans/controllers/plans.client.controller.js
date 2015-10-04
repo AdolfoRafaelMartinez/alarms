@@ -17,14 +17,49 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
             done: 'done',
             loading: 'loop',
             pan: 'open_with',
-            ap: 'room'
+            ap: 'room',
+            wall: 'office'
         };
 
         $scope.icons = {
             save: iconset.save,
             pan: iconset.pan,
-            ap: iconset.ap
+            ap: iconset.ap,
+            wall: iconset.wall
         };
+
+        $scope.wall_types = {
+            DW: {
+                desc: 'dry wall',
+                color: '#48cccd',
+                width: 8,
+                dash: [20, 10]
+                },
+            BR: {
+                desc: 'brick',
+                color: '#e66c2c',
+                width: 16,
+                dash: [20, 10]
+                },
+            ML: {
+                desc: 'metal',
+                color: '#bfcfec',
+                width: 8,
+                dash: [10, 4]
+                },
+            WD: {
+                desc: 'wood',
+                color: '#ee9a4d',
+                width: 8,
+                dash: [20, 10]
+                }
+        };
+
+        $scope.selectWallType = function() {
+            Drawing.selectWallType($scope.wall_types[$scope.wall_type]);
+        };
+        $scope.wall_type = 'DW';
+        $scope.selectWallType();
 
         $scope.deleteAP = function() {
             Drawing.deleteSelectedAP();
