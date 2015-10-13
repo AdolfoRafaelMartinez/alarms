@@ -227,6 +227,19 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
             }
         };
 
+        this.addWall = function(x, y) {
+            if (current_wall) {
+                this.addWallSegment(x, y);
+            } else {
+                current_wall = new createjs.Shape();
+                current_wall.graphics.setStrokeStyle(this.wall_type.width).setStrokeDash(this.wall_type.dash).beginStroke(this.wall_type.color).moveTo(x, y);
+                current_wall.wall_type = this.wall_type;
+                if (current_wall.p_corners === undefined) current_wall.p_corners = [];
+                current_wall.p_corners.push({x: x, y: y});
+                layers[1].addChild(current_wall);
+            }
+        }
+
         this.touchEnd = function(e) {
             contextMenu.disabled = false;
             if (e.button !== 2 && !is_dragging) {
@@ -235,16 +248,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
                     var y = (e.y - stage.y - canvas.offsetParent.offsetTop - 20) * 100 / plan.stage_scale;
                     if (mouse_mode === 'wall') {
                         contextMenu.disabled = true;
-                        if (current_wall) {
-                            this.addWallSegment(x, y);
-                            update = true;
-                        } else {
-                            current_wall = new createjs.Shape();
-                            current_wall.graphics.setStrokeStyle(this.wall_type.width).setStrokeDash(this.wall_type.dash).beginStroke(this.wall_type.color).moveTo(x, y);
-                            if (current_wall.p_corners === undefined) current_wall.p_corners = [];
-                            current_wall.p_corners.push({x: x, y: y, wall_type: this.wall_type});
-                            layers[1].addChild(current_wall);
-                        }
+                        this.addWall(x, y);
                     } else {
                         if (calibration_step === 1) {
                             calibration_step++;
@@ -256,6 +260,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
                             this.addAP(x, y, plan.real_radius);
                         }
                     }
+                    update = true;
                 }
             } else if (e.button === 2) {
                 current_wall = false;
@@ -415,11 +420,12 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
         this.addWallSegment = function(x, y) {
             current_wall.graphics.lineTo(x, y).endStroke();
             current_wall.graphics.setStrokeStyle(this.wall_type.width).setStrokeDash([20, 10]).beginStroke(this.wall_type.color).moveTo(x, y);
-            current_wall.p_corners.push({x: x, y: y, wall_type: this.wall_type});
+            current_wall.p_corners.push({x: x, y: y});
         };
 
         this.cancelWall = function() {
             if (current_wall) current_wall.graphics.endStroke();
+            current_wall = false;
         };
 
         this.addAP = function(x, y, signal_radius) {
@@ -594,7 +600,8 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
             var json = {
                 plan: plan,
                 floorplan: floorplan.children[0] ? floorplan.children[0].image.src : '',
-                aps: []
+                aps: [],
+                walls: []
             };
 
             var children, i, d, m, layers_length = layers.length;
@@ -608,10 +615,11 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
                             y: ap.y
                         });
                     });
-                } else if (layers[i].layer_type === 'wall') {
+                } else if (layers[i].layer_type === 'walls') {
                     /*jshint -W083 */
                     _.each(layers[i].children, function(wall) {
                         json.walls.push({
+                            wall_type: wall.wall_type,
                             p_corners: wall.p_corners
                         });
                     });
@@ -651,6 +659,13 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
                     this.addAP(ap.x, ap.y, signal_radius);
                 }.bind(this));
                 this.updateSignalStrength(signal_radius);
+                _.each(data.walls, function(wall) {
+                    current_wall = false;
+                    this.wall_type = wall.wall_type;
+                    _.each(wall.p_corners, function(segment) {
+                        this.addWall(segment.x, segment.y);
+                    }.bind(this));
+                }.bind(this));
                 $timeout(function() {
                     this.updateSignalStrength(signal_radius);
                 }.bind(this), 1000);
