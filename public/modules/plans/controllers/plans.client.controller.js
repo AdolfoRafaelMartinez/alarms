@@ -65,6 +65,10 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
             Drawing.deleteSelectedAP();
         };
 
+        $scope.deleteWall = function() {
+            Drawing.deleteSelectedWall();
+        };
+
         $scope.startCalibration = function() {
             Drawing.startCalibration(function() {
                 $scope.calibration_done = true;

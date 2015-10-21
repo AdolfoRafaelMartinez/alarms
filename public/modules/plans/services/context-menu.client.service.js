@@ -43,6 +43,8 @@ angular.module('core').service('contextMenu', ['$timeout',
         }
 
         function close() {
+          console.log('closing', menuElement);
+          window.gMenu = menuElement;
           menuElement.removeClass('open');
           opened = false;
         }
@@ -52,9 +54,10 @@ angular.module('core').service('contextMenu', ['$timeout',
         };
 
         function handleKeyUpEvent(event) {
-          if (opened && event.keyCode === 27) {
-              close();
-          }
+            if (opened && event.keyCode === 27) {
+                console.log('keyUp', event);
+                close();
+            }
         }
 
         this.handleClickEvent = function(event, ap) {
@@ -72,8 +75,15 @@ angular.module('core').service('contextMenu', ['$timeout',
           }
         };
 
+        function selectMenu(menu) {
+            document.getElementById('apMenu').style.display = 'none';
+            document.getElementById('wallMenu').style.display = 'none';
+            document.getElementById(menu + 'Menu').style.display = 'block';
+        }
+
         this.setup = function() {
             var self = this;
+            selectMenu('ap');
             $timeout(function() {
                 $(angular.element('canvas')[0]).bind('contextmenu', function(event) {
                   event.preventDefault();
@@ -93,5 +103,10 @@ angular.module('core').service('contextMenu', ['$timeout',
                 $(document).bind('keyup', handleKeyUpEvent);
             }, 0);
         };
+
+        this.switchMenu = function(menu) {
+            selectMenu(menu);
+        };
+
     }
 ]);

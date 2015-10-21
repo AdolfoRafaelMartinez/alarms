@@ -52,6 +52,14 @@ canvas {
     margin: 0 20px;
 }
 
+#context_menu {
+    display: none;
+}
+
+#context_menu.open {
+    display: block;
+}
+
 .group {
   position:relative;
     margin-top: 45px;

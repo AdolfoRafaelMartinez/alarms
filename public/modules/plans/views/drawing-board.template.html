@@ -1,15 +1,27 @@
 <canvas></canvas>
 
 <div class="dropdown position-fixed" id="context_menu">
-  <ul class="dropdown-menu" role="menu">
+  <ul class="dropdown-menu" role="menu" id="apMenu">
     <li>
       <a class="pointer" role="menuitem" tabindex="1" ng-click="deleteAP()">
           Delete AP
       </a>
     </li>
     <li>
-      <a class="pointer" role="menuitem" tabindex="4" ng-click="apProperties()">
+      <a class="pointer" role="menuitem" tabindex="2" ng-click="apProperties()">
          AP Properties
+      </a>
+    </li>
+  </ul>
+  <ul class="dropdown-menu" role="menu" id="wallMenu">
+    <li>
+      <a class="pointer" role="menuitem" tabindex="1" ng-click="deleteWall()">
+          Delete Wall
+      </a>
+    </li>
+    <li>
+      <a class="pointer" role="menuitem" tabindex="2" ng-click="wallProperties()">
+         Wall Properties
       </a>
     </li>
   </ul>

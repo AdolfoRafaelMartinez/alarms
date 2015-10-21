@@ -1,6 +1,25 @@
 'use strict';
 
 /*globals _ */
+function ColorLuminance(hex, lum) {
+
+	// validate hex string
+	hex = String(hex).replace(/[^0-9a-f]/gi, '');
+	if (hex.length < 6) {
+		hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+	}
+	lum = lum || 0;
+
+	// convert to decimal and change luminosity
+	var rgb = "#", c, i;
+	for (i = 0; i < 3; i++) {
+		c = parseInt(hex.substr(i*2,2), 16);
+		c = Math.round(Math.min(Math.max(0, c + (c * lum)), 255)).toString(16);
+		rgb += ("00"+c).substr(c.length);
+	}
+
+	return rgb;
+}
 
 // Drawing service on HTML5 canvas
 angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
@@ -11,6 +30,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
         var dragStarted; // indicates whether we are currently in a drag operation
         var mouse_mode = 'ap';
         var ap_clicked;
+        var wall_clicked;
         var mouse_last_position;
         var mouse_last_click;
         var calibration_step;
@@ -18,6 +38,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
         var update = true;
         var is_dragging = false;
         var selectedAP;
+        var selectedWall;
         var plan = {
             stage_scale: 100,
             stage: {
@@ -69,24 +90,66 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
             canvas.addEventListener('mouseup', drawing.touchEnd.bind(drawing), false);
         }
 
+        var addWallHandlers = function(wall, index) {
+            function mousedown(evt) {
+                if (evt.nativeEvent.button === 2) {
+                    selectedWall = wall;
+                    contextMenu.switchMenu('wall');
+                    return;
+                }
+                evt.stopPropagation();
+                evt.preventDefault();
+            };
+
+            function mouseup(evt) {
+                wall_clicked = false;
+            };
+
+            wall.on('mousedown', mousedown);
+            wall.on('touchstart', mousedown);
+            wall.on('mouseup', mouseup);
+            wall.on('pressup', mouseup);
+            wall.on('touchend', mouseup);
+
+            wall.on('rollover', function(evt) {
+                if (this.graphics) {
+                    var color = ColorLuminance(wall.wall_type.color, 0.2);
+                    this.graphics.clear().setStrokeStyle(wall.wall_type.width).setStrokeDash(wall.wall_type.dash).beginStroke(color).moveTo(wall.p_corners[index-1].x, wall.p_corners[index-1].y);
+                    this.graphics.lineTo(wall.p_corners[index].x, wall.p_corners[index].y).endStroke();
+                    update = true;
+                }
+            });
+
+            wall.on('rollout', function(evt) {
+                if (this.graphics) {
+                    this.graphics.clear().setStrokeStyle(wall.wall_type.width).setStrokeDash(wall.wall_type.dash).beginStroke(wall.wall_type.color).moveTo(wall.p_corners[index-1].x, wall.p_corners[index-1].y);
+                    this.graphics.lineTo(wall.p_corners[index].x, wall.p_corners[index].y).endStroke();
+                    update = true;
+                }
+            });
+
+        };
+
+
         var addHandlers = function(ap) {
             var names;
 
             function mousedown(evt) {
                 if (evt.nativeEvent.button === 2) {
                     selectedAP = ap;
+                    contextMenu.switchMenu('ap');
                     return;
                 }
                 if (mouse_mode !== 'ap') return;
                 ap_clicked = true;
                 evt.stopPropagation();
                 evt.preventDefault();
-                this.parent.addChild(this);
-                names = [];
                 this.offset = {
                     x: this.x - evt.stageX * 100 / plan.stage_scale,
                     y: this.y - evt.stageY * 100 / plan.stage_scale
                 };
+                this.parent.addChild(this);
+                names = [];
                 for (var i=0; i<ap.distances.length; i++) names.push(distances.getChildByName(ap.distances[i].name));
             };
 
@@ -237,6 +300,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
                 if (current_wall.p_corners === undefined) current_wall.p_corners = [];
                 current_wall.p_corners.push({x: x, y: y});
                 layers[1].addChild(current_wall);
+                addWallHandlers.call(this, current_wall, current_wall.p_corners.length);
             }
         }
 
@@ -274,7 +338,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
             e.preventDefault();
             e.stopPropagation();
             var delta = Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail))) * 1.02;
-            if (delta < 0) delta = 0.98;
+            if (delta <= 0) delta = 0.98;
             var mousex = e.x - $(canvas)[0].offsetParent.offsetLeft -20;
             var mousey = e.y - $(canvas)[0].offsetParent.offsetTop -20;
             var new_scale = delta * plan.stage_scale;
@@ -419,8 +483,14 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
 
         this.addWallSegment = function(x, y) {
             current_wall.graphics.lineTo(x, y).endStroke();
-            current_wall.graphics.setStrokeStyle(this.wall_type.width).setStrokeDash([20, 10]).beginStroke(this.wall_type.color).moveTo(x, y);
             current_wall.p_corners.push({x: x, y: y});
+            current_wall = new createjs.Shape();
+            current_wall.graphics.setStrokeStyle(this.wall_type.width).setStrokeDash(this.wall_type.dash).beginStroke(this.wall_type.color).moveTo(x, y);
+            if (current_wall.p_corners === undefined) current_wall.p_corners = [];
+            current_wall.p_corners.push({x: x, y: y});
+            current_wall.wall_type = this.wall_type;
+            layers[1].addChild(current_wall);
+            addWallHandlers.call(this, current_wall, current_wall.p_corners.length);
         };
 
         this.cancelWall = function() {
@@ -511,6 +581,13 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
             this.toggleOverlaps();
             update = true;
             this.toggleOverlaps();
+        };
+
+        this.deleteSelectedWall = function() {
+            if (!selectedWall) return;
+            contextMenu.close();
+            layers[1].removeChild(selectedWall);
+            update = true;
         };
 
         this.updateSignalStrength = function(signal_radius) {
@@ -675,6 +752,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
 
         this.selectTool = function(mode) {
             mouse_mode = mode;
+            contextMenu.switchMenu(mode);
         };
 
         this.selectWallType = function(wall) {
