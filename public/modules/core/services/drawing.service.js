@@ -752,6 +752,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
 
         this.selectTool = function(mode) {
             mouse_mode = mode;
+            this.cancelWall(); // todo: do the same for other actions, like nav away
             contextMenu.switchMenu(mode);
         };
 
