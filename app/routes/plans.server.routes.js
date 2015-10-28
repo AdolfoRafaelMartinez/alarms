@@ -13,6 +13,8 @@ module.exports = function(app) {
         .put   (users.requiresLogin, plans.hasAuthorization, plans.update)
         .delete(users.requiresLogin, plans.hasAuthorization, plans.delete);
 
-	// Finish by binding the article middleware
+    app.route('/plans/:planId/coverage').post(users.requiresLogin, plans.hasAuthorization, plans.coverage);
+
+	// Finish by binding the plan middleware
 	app.param('planId', plans.planByID);
 };

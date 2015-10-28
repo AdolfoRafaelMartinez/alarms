@@ -93,10 +93,34 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
 
         $scope.toggleDistances = function() {
             Drawing.toggleDistances();
+            $scope.settings.show_heatmap = false;
+            Drawing.heatmap('off');
         };
 
         $scope.toggleOverlaps = function() {
             Drawing.toggleOverlaps();
+            $scope.settings.show_heatmap = false;
+            Drawing.heatmap('off');
+        };
+
+        $scope.toggleHeatmap = function() {
+            if ($scope.settings.show_distances) {
+                $scope.settings.show_distances = false;
+                Drawing.toggleDistances('off');
+            }
+            if ($scope.settings.show_overlaps) {
+                $scope.settings.show_overlaps = false;
+                Drawing.toggleOverlaps('off');
+            }
+            if (!$scope.settings.show_heatmap) {
+                Drawing.heatmap('off');
+                $scope.settings.show_overlaps = true;
+                $scope.settings.show_distances = true;
+                Drawing.toggleOverlaps();
+                Drawing.toggleDistances();
+            } else {
+                Drawing.heatmap();
+            }
         };
 
         $scope.updateSignalStrength = function() {
@@ -172,6 +196,7 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
                     signal_radius: 25,
                     show_distances: true,
                     show_overlaps: true,
+                    show_heatmap: false,
                     scale: 100
                 };
 
@@ -245,7 +270,7 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
 			}, function() {
                 $scope.settings = $scope.plan.settings;
                 $scope.flooplan_name = $scope.plan.title;
-                Drawing.loadPlan($scope.plan.stage, $scope.settings.signal_radius, $scope.updateControls);
+                Drawing.loadPlan($stateParams.planId, $scope.plan.stage, $scope.settings.signal_radius, $scope.updateControls);
             });
 		};
 

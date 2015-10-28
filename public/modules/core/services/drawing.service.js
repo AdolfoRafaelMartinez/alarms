@@ -22,8 +22,8 @@ function ColorLuminance(hex, lum) {
 }
 
 // Drawing service on HTML5 canvas
-angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
-	function(contextMenu, $q, $timeout) {
+angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeout',
+	function(contextMenu, $q, $http, $timeout) {
         var canvas, stage, layers, current_layer, distances, floorplan;
 
         var mouseTarget; // the display object currently under the mouse, or being dragged
@@ -359,6 +359,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
             canvas = document.getElementsByTagName('canvas')[0];
             canvas.width = canvas.parentElement.clientWidth - 40;
             canvas.height = canvas.parentElement.clientHeight - 40;
+            document.getElementById('heatmap').setAttribute("style", "position: absolute; left: 20px; right: 20px; z-index: 100; display: none; width:" + canvas.width + "px; height:" + canvas.height + "px");
             canvas.style.width = (canvas.parentElement.clientWidth - 40) + 'px';
             stage = new createjs.Stage(canvas);
             if (!plan || !plan.floor_width) {
@@ -610,8 +611,9 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
             }
         };
 
-        this.toggleDistances = function() {
+        this.toggleDistances = function(off) {
             show_distances = !show_distances;
+            if (off === 'off') show_distances = false;
             distances.visible = show_distances;
             update = true;
         };
@@ -620,8 +622,9 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
          * Overlaps are added as child for the AP container itself;
          * the overlaps container is shown behind the main AP circle container
          */
-        this.toggleOverlaps = function() {
+        this.toggleOverlaps = function(off) {
             show_overlaps = !show_overlaps;
+            if (off === 'off') show_overlaps = false;
             _.each(stage.children, function(child) {
                 if (child.layer_type === 'ap') {
                     for (var i=0; i<child.children.length; i++) {
@@ -710,10 +713,11 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
             return stage.toDataURL();
         };
 
-        this.loadPlan = function(data, signal_radius, updateControls) {
+        this.loadPlan = function(plan_id, data, signal_radius, updateControls) {
             this.updateControls = updateControls;
             $timeout(function() {
-                plan = data.plan;
+                plan = data.plan.stage;
+                plan._id = plan_id;
                 var stage_scale = plan.stage_scale;
                 this.initBoard(signal_radius);
                 this.scale(100);
@@ -748,6 +752,72 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$timeout',
                 }.bind(this), 1000);
             }.bind(this), 100);
 
+        };
+
+        function drawHeatmap(data) {
+            var node = document.getElementById('heatmap');
+            while (node.firstChild) {
+                    node.removeChild(node.firstChild);
+            }
+
+            var heatmapInstance = h337.create({
+                /*
+                gradient: {
+                    '0.65': 'white',
+                    '0.97': 'blue',
+                    '0.98': 'green',
+                    '0.99': 'red'
+                },
+                */
+                container: document.querySelector('#heatmap')
+            });
+
+            var layers_length = layers.length;
+            var points = [];
+            for (var i=0; i<layers_length; i++) {
+                if (layers[i].layer_type !== 'ap') continue;
+                layers[i].visible = false;
+                /*jshint -W083 */
+                _.each(layers[i].children, function(ap2) {
+                    points.push({
+                        x: stage.x + ap2.x /100 * plan.stage_scale,
+                        y: stage.y + ap2.y /100 * plan.stage_scale,
+                        value: 100,
+                        radius: 1 * plan.radius / 100 * plan.stage_scale
+                    });
+                });
+
+                /* TODO: add a mouse over event with a tooltip showing signal strength at any point on the map
+                 * use getValueAt({ x: 12, y: 12 });
+                 */
+            }
+
+            $http.post('/plans/' + plan._id + '/coverage', {points: points})
+                .success(function(response) {
+                    var points = [];
+                    _.each(response, function(radial) {
+                        _.each(radial, function(p) { points.push(p); });
+                    });
+                    heatmapInstance.setData({
+                        max: 100,
+                        data: points
+                    });
+                });
+
+            document.getElementById('heatmap').style.display = 'block';
+        }
+
+        this.heatmap = function(off) {
+
+            var i, layers_length = layers.length;
+
+            if (off === 'off') {
+                document.getElementById('heatmap').style.display = 'none';
+                for (i=0; i<layers_length; i++) if (layers[i].layer_type === 'ap') layers[i].visible = true;
+                return;
+            }
+
+            drawHeatmap();
         };
 
         this.selectTool = function(mode) {

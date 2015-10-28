@@ -145,6 +145,46 @@ exports.list = function(req, res) {
 	});
 };
 
+var PUDDLE_PATTERN_GRANULARITY = 10;
+var PUDDLE_POINT_RADIUS = 20;
+function defaultAntenaPattern() {
+    var pattern = [];
+    for (var i=0; i<360; i+=PUDDLE_PATTERN_GRANULARITY) pattern.push(Math.random()*5 - 10);
+
+    return pattern;
+};
+
+/**
+ * Calculate signal coverage
+ */
+exports.coverage = function(req, res) {
+    var access_points = req.plan.stage.aps;
+    // TEMP
+    access_points = req.body.points;
+    var walls = req.plan.walls;
+    var points = [];
+    var r_max = 400; // cut off distance
+    var r_inc= 25; // granularity
+    _.each(access_points, function(ap) {
+        var antenna_pattern = defaultAntenaPattern();
+        var radius;
+        points.push([{x: ap.x, y: ap.y, value: 100, radius: ap.radius/3}]);
+        for (radius = r_inc; radius < r_max; radius += r_inc) {
+            var radial_points = [];
+            var loss;
+            var g = 0;
+            _.each(antenna_pattern, function(strength) {
+                loss = 20*Math.log10(5550) + 20*Math.log10(0.000621371 * radius / req.plan.stage.plan.stage_ppm) + 36.6;
+                radial_points.push({x: ap.x + radius * Math.sin(g), y: ap.y + radius * Math.cos(g), value: 100 - loss, radius: ap.radius/3});
+                g += PUDDLE_PATTERN_GRANULARITY;
+            });
+            points.push(radial_points);
+        }
+    });
+
+    res.json(points);
+};
+
 /**
  * Plan authorization middleware
  */
