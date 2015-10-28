@@ -22,6 +22,7 @@ module.exports = {
 				'public/lib/angular-ui-utils/ui-utils.min.js',
 				'public/lib/angular-bootstrap/ui-bootstrap-tpls.min.js',
                 'public/lib/easeljs/lib/easeljs-NEXT.combined.js',
+                'public/lib/heatmap.js-amd/build/heatmap.min.js',
 
                 'public/lib/blueimp/JavaScript-Load-Image/js/load-image.all.min.js',
                 'public/lib/blueimp/JavaScript-Load-Image/js/lib/jquery.Jcrop.js',
