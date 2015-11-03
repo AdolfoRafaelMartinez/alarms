@@ -11,11 +11,11 @@ function ColorLuminance(hex, lum) {
 	lum = lum || 0;
 
 	// convert to decimal and change luminosity
-	var rgb = "#", c, i;
+	var rgb = '#', c, i;
 	for (i = 0; i < 3; i++) {
 		c = parseInt(hex.substr(i*2,2), 16);
 		c = Math.round(Math.min(Math.max(0, c + (c * lum)), 255)).toString(16);
-		rgb += ("00"+c).substr(c.length);
+		rgb += ('00'+c).substr(c.length);
 	}
 
 	return rgb;
@@ -99,11 +99,11 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
                 }
                 evt.stopPropagation();
                 evt.preventDefault();
-            };
+            }
 
             function mouseup(evt) {
                 wall_clicked = false;
-            };
+            }
 
             wall.on('mousedown', mousedown);
             wall.on('touchstart', mousedown);
@@ -112,8 +112,9 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
             wall.on('touchend', mouseup);
 
             wall.on('rollover', function(evt) {
+                if (mouse_mode !== 'wall') return;
                 if (this.graphics) {
-                    var color = ColorLuminance(wall.wall_type.color, 0.2);
+                    var color = new ColorLuminance(wall.wall_type.color, 0.2);
                     this.graphics.clear().setStrokeStyle(wall.wall_type.width).setStrokeDash(wall.wall_type.dash).beginStroke(color).moveTo(wall.p_corners[index-1].x, wall.p_corners[index-1].y);
                     this.graphics.lineTo(wall.p_corners[index].x, wall.p_corners[index].y).endStroke();
                     update = true;
@@ -121,6 +122,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
             });
 
             wall.on('rollout', function(evt) {
+                if (mouse_mode !== 'wall') return;
                 if (this.graphics) {
                     this.graphics.clear().setStrokeStyle(wall.wall_type.width).setStrokeDash(wall.wall_type.dash).beginStroke(wall.wall_type.color).moveTo(wall.p_corners[index-1].x, wall.p_corners[index-1].y);
                     this.graphics.lineTo(wall.p_corners[index].x, wall.p_corners[index].y).endStroke();
@@ -144,14 +146,16 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
                 ap_clicked = true;
                 evt.stopPropagation();
                 evt.preventDefault();
+                /* jshint validthis: true */
                 this.offset = {
                     x: this.x - evt.stageX * 100 / plan.stage_scale,
                     y: this.y - evt.stageY * 100 / plan.stage_scale
                 };
                 this.parent.addChild(this);
+                /* jshint validthis: false */
                 names = [];
                 for (var i=0; i<ap.distances.length; i++) names.push(distances.getChildByName(ap.distances[i].name));
-            };
+            }
 
             function mousemove(evt) {
                 if (evt.nativeEvent.button === 2) return;
@@ -178,11 +182,11 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
                 drawIntersections(ap);
                 is_dragging = true;
                 update = true;
-            };
+            }
 
             function mouseup(evt) {
                 ap_clicked = false;
-            };
+            }
 
             ap.on('mousedown', mousedown);
             ap.on('touchstart', mousedown);
@@ -194,6 +198,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
             ap.on('touchend', mouseup);
 
             ap.on('rollover', function(evt) {
+                if (mouse_mode !== 'ap') return;
                 if (this.children[0].graphics) {
                     this.children[0].graphics.clear().setStrokeStyle(1).beginFill(AP_CIRCLE_RGBA_OPAQUE).beginStroke(AP_CIRCLE_STROKE_RGB).drawCircle(0, 0, plan.radius);
                     update = true;
@@ -201,6 +206,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
             });
 
             ap.on('rollout', function(evt) {
+                if (mouse_mode !== 'ap') return;
                 if (this.children[0].graphics) {
                     this.children[0].graphics.clear().setStrokeStyle(1).beginFill(AP_CIRCLE_RGBA).beginStroke(AP_CIRCLE_STROKE_RGB).drawCircle(0, 0, plan.radius);
                     update = true;
@@ -302,13 +308,13 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
                 layers[1].addChild(current_wall);
                 addWallHandlers.call(this, current_wall, current_wall.p_corners.length);
             }
-        }
+        };
 
         this.touchEnd = function(e) {
             contextMenu.disabled = false;
             if (e.button !== 2 && !is_dragging) {
                 if (mouse_last_click.x === e.x && mouse_last_click.y === e.y) {
-                    var x = (e.x - stage.x - canvas.offsetParent.offsetLeft - 20) * 100 / plan.stage_scale;
+                    var x = (e.x - stage.x - canvas.offsetParent.offsetLeft - 40) * 100 / plan.stage_scale;
                     var y = (e.y - stage.y - canvas.offsetParent.offsetTop - 20) * 100 / plan.stage_scale;
                     if (mouse_mode === 'wall') {
                         contextMenu.disabled = true;
@@ -359,14 +365,13 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
             canvas = document.getElementsByTagName('canvas')[0];
             canvas.width = canvas.parentElement.clientWidth - 40;
             canvas.height = canvas.parentElement.clientHeight - 40;
-            document.getElementById('heatmap').setAttribute("style", "position: absolute; left: 20px; right: 20px; z-index: 100; display: none; width:" + canvas.width + "px; height:" + canvas.height + "px");
+            document.getElementById('heatmap').setAttribute('style', 'position: absolute; left: 20px; right: 20px; z-index: 100; display: none; width:' + canvas.width + 'px; height:' + canvas.height + 'px');
             canvas.style.width = (canvas.parentElement.clientWidth - 40) + 'px';
             stage = new createjs.Stage(canvas);
             if (!plan || !plan.floor_width) {
                 plan.floor_width = 200; // m or ft
                 plan.floor_width_px = canvas.width;
             }
-            // plan.stage_ppm = canvas.width / plan.floor_width;
             plan.stage_ppm = plan.floor_width_px / plan.floor_width;
 
             // enable touch interactions if supported on the current device:
@@ -466,7 +471,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
                 update = true;
             } else {
                 this.calibration_line = new createjs.Shape();
-                this.calibration_line.graphics.setStrokeStyle(1).beginStroke(DISTANCE_STROKE_RGB).moveTo(x, y);
+                this.calibration_line.graphics.setStrokeStyle(4).beginStroke('#000').moveTo(x, y);
                 this.calibration_line.p_start = {x: x, y: y};
                 stage.addChild(this.calibration_line);
             }
@@ -564,9 +569,11 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
                     }
                 }
             }
+            var lchild, ap2;
             for (i=0; i<layers.length; i++) {
                 if (layers[i].layer_type !== 'ap') continue;
-                _.each(layers[i].children, function(ap2) {
+                for (lchild=0; layers[i].children.length; lchild++) {
+                    ap2 = layers[i].children[lchild];
                     for (j=ap2.distances.length -1; j>=0; j--) {
                         for (k=selected_distances_length -1; k>=0; k--) {
                             if (ap2.distances[j] && selectedAP.distances[k]) {
@@ -575,8 +582,8 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
                                 }
                             }
                         }
-                    };
-                });
+                    }
+                }
             }
             layers[current_layer].removeChild(selectedAP);
             this.toggleOverlaps();
@@ -606,6 +613,8 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
                         }
                     }
                 });
+                this.toggleOverlaps();
+                this.toggleOverlaps();
 
                 update = true;
             }
@@ -636,6 +645,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
         };
 
         this.scale = function(percent) {
+            if (!percent) return;
             plan.stage_scale = percent;
             if (this.updateControls) this.updateControls('scale', Math.round(plan.stage_scale));
             plan.stage_ppm = plan.floor_width_px / plan.floor_width;
@@ -716,9 +726,10 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
         this.loadPlan = function(plan_id, data, signal_radius, updateControls) {
             this.updateControls = updateControls;
             $timeout(function() {
-                plan = data.plan.stage;
+                console.log(data);
+                plan = data.plan;
                 plan._id = plan_id;
-                var stage_scale = plan.stage_scale;
+                var stage_scale = plan.stage.stage_scale;
                 this.initBoard(signal_radius);
                 this.scale(100);
                 if (data.floorplan) {

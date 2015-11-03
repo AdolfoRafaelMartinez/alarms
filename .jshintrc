@@ -36,7 +36,10 @@
 		"inject",
 		"expect",
         "createjs",
-        "$upload"
+        "$upload",
+        "$",
+        "h337",
+        "$scope"
 	],
 	"indent": 4, // Specify indentation spacing
 	"devel": true, // Allow development statements e.g. `console.log();`.

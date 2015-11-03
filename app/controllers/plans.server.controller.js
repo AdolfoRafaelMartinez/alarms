@@ -152,7 +152,7 @@ function defaultAntenaPattern() {
     for (var i=0; i<360; i+=PUDDLE_PATTERN_GRANULARITY) pattern.push(Math.random()*5 - 10);
 
     return pattern;
-};
+}
 
 /**
  * Calculate signal coverage
@@ -165,6 +165,7 @@ exports.coverage = function(req, res) {
     var points = [];
     var r_max = 400; // cut off distance
     var r_inc= 25; // granularity
+    var p, strength;
     _.each(access_points, function(ap) {
         var antenna_pattern = defaultAntenaPattern();
         var radius;
@@ -173,11 +174,12 @@ exports.coverage = function(req, res) {
             var radial_points = [];
             var loss;
             var g = 0;
-            _.each(antenna_pattern, function(strength) {
+            for (p = 0; p<antenna_pattern.length; p++) {
+                strength = antenna_pattern[p];
                 loss = 20*Math.log10(5550) + 20*Math.log10(0.000621371 * radius / req.plan.stage.plan.stage_ppm) + 36.6;
                 radial_points.push({x: ap.x + radius * Math.sin(g), y: ap.y + radius * Math.cos(g), value: 100 - loss, radius: ap.radius/3});
                 g += PUDDLE_PATTERN_GRANULARITY;
-            });
+            }
             points.push(radial_points);
         }
     });
