@@ -572,7 +572,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
             var lchild, ap2;
             for (i=0; i<layers.length; i++) {
                 if (layers[i].layer_type !== 'ap') continue;
-                for (lchild=0; layers[i].children.length; lchild++) {
+                for (lchild=0; lchild < layers[i].children.length; lchild++) {
                     ap2 = layers[i].children[lchild];
                     for (j=ap2.distances.length -1; j>=0; j--) {
                         for (k=selected_distances_length -1; k>=0; k--) {
