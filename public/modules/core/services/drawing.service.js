@@ -22,9 +22,9 @@ function ColorLuminance(hex, lum) {
 }
 
 // Drawing service on HTML5 canvas
-angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeout',
-	function(contextMenu, $q, $http, $timeout) {
-        var canvas, stage, layers, current_layer, distances, floorplan;
+angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeout', 'Heatmap',
+	function(contextMenu, $q, $http, $timeout, Heatmap) {
+        var canvas, stage, layers, current_layer, distances, coverage, floorplan;
 
         var mouseTarget; // the display object currently under the mouse, or being dragged
         var dragStarted; // indicates whether we are currently in a drag operation
@@ -169,6 +169,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
                 ap.realy = mperpx * ap.y;
 
                 for (i=0; i<l; i++) {
+                    if (!names[i]) continue;
                     if (ap === names[i].ap_start) {
                         names[i].p_start.x = ap.x;
                         names[i].p_start.y = ap.y;
@@ -365,7 +366,6 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
             canvas = document.getElementsByTagName('canvas')[0];
             canvas.width = canvas.parentElement.clientWidth - 40;
             canvas.height = canvas.parentElement.clientHeight - 40;
-            document.getElementById('heatmap').setAttribute('style', 'position: absolute; left: 20px; right: 20px; z-index: 100; display: none; width:' + canvas.width + 'px; height:' + canvas.height + 'px');
             canvas.style.width = (canvas.parentElement.clientWidth - 40) + 'px';
             stage = new createjs.Stage(canvas);
             if (!plan || !plan.floor_width) {
@@ -387,6 +387,8 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
             layers[0].layer_type = 'ap';
             layers[1] = new createjs.Container();
             layers[1].layer_type = 'walls';
+            coverage = new createjs.Container();
+            coverage.layer_type = 'coverage';
             current_layer = 0;
             floorplan = new createjs.Container();
             floorplan.layer_type = 'background';
@@ -396,6 +398,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
             stage.addChild(layers[0]);
             stage.addChild(layers[1]);
             stage.addChild(distances);
+            stage.addChild(coverage);
 
             createjs.Ticker.addEventListener('tick', tick);
             contextMenu.setup();
@@ -726,7 +729,6 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
         this.loadPlan = function(plan_id, data, signal_radius, updateControls) {
             this.updateControls = updateControls;
             $timeout(function() {
-                console.log(data);
                 plan = data.plan;
                 plan._id = plan_id;
                 var stage_scale = plan.stage.stage_scale;
@@ -766,35 +768,19 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
         };
 
         function drawHeatmap(data) {
-            var node = document.getElementById('heatmap');
-            while (node.firstChild) {
-                    node.removeChild(node.firstChild);
-            }
-
-            var heatmapInstance = h337.create({
-                /*
-                gradient: {
-                    '0.65': 'white',
-                    '0.97': 'blue',
-                    '0.98': 'green',
-                    '0.99': 'red'
-                },
-                */
-                container: document.querySelector('#heatmap')
-            });
-
             var layers_length = layers.length;
             var points = [];
+
             for (var i=0; i<layers_length; i++) {
                 if (layers[i].layer_type !== 'ap') continue;
                 layers[i].visible = false;
                 /*jshint -W083 */
                 _.each(layers[i].children, function(ap2) {
                     points.push({
-                        x: stage.x + ap2.x /100 * plan.stage_scale,
-                        y: stage.y + ap2.y /100 * plan.stage_scale,
+                        x: ap2.x,
+                        y: ap2.y,
                         value: 100,
-                        radius: 1 * plan.radius / 100 * plan.stage_scale
+                        radius: plan.radius
                     });
                 });
 
@@ -803,31 +789,28 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
                  */
             }
 
-            $http.post('/plans/' + plan._id + '/coverage', {points: points})
+            $http.post('/plans/' + plan._id + '/coverage', {points: points, ppm: plan.stage_ppm})
                 .success(function(response) {
-                    var points = [];
-                    _.each(response, function(radial) {
-                        _.each(radial, function(p) { points.push(p); });
-                    });
-                    heatmapInstance.setData({
-                        max: 100,
-                        data: points
-                    });
+                    var bitheat = new createjs.Bitmap(response);
+                    bitheat.x = 0;
+                    bitheat.y = 0;
+                    coverage.addChild(bitheat);
+                    update = true;
                 });
 
-            document.getElementById('heatmap').style.display = 'block';
         }
 
         this.heatmap = function(off) {
-
-            var i, layers_length = layers.length;
-
-            if (off === 'off') {
-                document.getElementById('heatmap').style.display = 'none';
-                for (i=0; i<layers_length; i++) if (layers[i].layer_type === 'ap') layers[i].visible = true;
+            if (off) {
+                coverage.removeAllChildren();
+                var layers_length = layers.length;
+                for (var i=0; i<layers_length; i++)
+                {
+                    if (layers[i].layer_type !== 'ap') continue;
+                    layers[i].visible = true;
+                }
                 return;
             }
-
             drawHeatmap();
         };
 
@@ -841,5 +824,14 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
             this.cancelWall();
             this.wall_type = wall;
         };
+
+        Heatmap.setup({
+            colors: {
+                '100': [48, 110, 255],
+                '75': [110, 255, 48],
+                '65': [255, 255, 0],
+                '0': [255, 255, 255]
+            }
+        });
     }
 ]);
