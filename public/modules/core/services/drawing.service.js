@@ -568,6 +568,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
             drawIntersections(container);
 
             update = true;
+            $timeout(this.getTotalAPs, 0);
         };
 
         this.deleteSelectedAP = function() {
