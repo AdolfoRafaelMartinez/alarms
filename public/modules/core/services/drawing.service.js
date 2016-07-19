@@ -507,6 +507,17 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
             current_wall = false;
         };
 
+        this.getTotalAPs = function() {
+            var totalAPs = 0;
+            if (typeof layers === 'undefined') return 0;
+            for (var i=0; i<layers.length; i++) {
+                if (layers[i].layer_type !== 'ap') continue;
+                totalAPs += layers[i].children ? layers[i].children.length : 0;
+            }
+
+            return totalAPs;
+        };
+
         this.addAP = function(x, y, signal_radius) {
             if (is_dragging) {
                 is_dragging = false;
@@ -675,6 +686,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
                 } else {
                     self.scale(scaleX*100);
                 }
+                floorplan.removeAllChildren();
                 floorplan.addChild(f);
                 update = true;
                 $timeout(function() {

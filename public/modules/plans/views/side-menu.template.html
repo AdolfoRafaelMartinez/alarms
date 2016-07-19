@@ -7,6 +7,7 @@
             <label>File Name</label>
             <md-button ng-click="savePlan()" aria-label="Save plan"><ng-md-icon icon="{{ icons.save }}"></ng-md-icon> <span>Save</span></md-button>
         </div>
+        <div flex="10" style="background: #edf; border: 1px dashed #aaf; padding: 1em 0.5em;">AP count: {{ getTotalAPs() }}</div>
     </md-item>
     <md-item>
         <div flex="10">Floorplans<hr /></div>

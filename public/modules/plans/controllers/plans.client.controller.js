@@ -160,6 +160,10 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
             });
         };
 
+        $scope.getTotalAPs = function() {
+            return Drawing.getTotalAPs();
+        };
+
         $scope.savePlan = function() {
             $scope.plan.title = $scope.flooplan_name;
             $scope.plan.thumb = Drawing.getThumb();
