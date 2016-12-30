@@ -1,4 +1,4 @@
-[![MEAN.JS Logo](http://bitlion.com/images/puddlejump_logo.png)](http://bitlion.com)
+[![PuddleJump Logo](http://bitlion.com/images/puddlejump_logo.png)](http://bitlion.com)
 
 PuddleJump is a WiFi design collaboration tool. More information coming soon.
 
@@ -36,8 +36,6 @@ This will clone the latest version of the PuddleJump repository.
 
 
 ## Quick Install
-Once you've downloaded the boilerplate and installed all the prerequisites, you're just a few steps away from starting to develop you MEAN application.
-
 The first thing you should do is install the Node.js dependencies. The boilerplate comes pre-bundled with a package.json file that contains the list of modules you need to start your application, to learn more about the modules installed visit the NPM & Package.json section.
 
 To install Node.js dependencies you're going to use npm again, in the application folder run this in the command-line:
@@ -62,29 +60,6 @@ Your application should run on the 3000 port so in your browser just go to [http
                             
 That's it! your application should be running by now, to proceed with your development check the other sections in this documentation. 
 If you encounter any problem try the Troubleshooting section.
-
-## Development and deployment With Docker
-
-* Install [Docker](http://www.docker.com/)
-* Install [Fig](https://github.com/orchardup/fig)
-
-* Local development and testing with fig: 
-```bash
-$ fig up
-```
-
-* Local development and testing with just Docker:
-```bash
-$ docker build -t mean .
-$ docker run -p 27017:27017 -d --name db mongo
-$ docker run -p 3000:3000 --link db:db_1 mean
-$
-```
-
-* To enable live reload forward 35729 port and mount /app and /public as volumes:
-```bash
-$ docker run -p 3000:3000 -p 35729:35729 -v /Users/mdl/workspace/mean-stack/mean/public:/home/mean/public -v /Users/mdl/workspace/mean-stack/mean/app:/home/mean/app --link db:db_1 mean
-```
 
 ## Running in a secure environment
 To run your application in a secure manner you'll need to use OpenSSL and generate a set of self-signed certificates. Unix-based users can use the following commnad: 
