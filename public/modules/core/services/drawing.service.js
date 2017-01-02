@@ -221,6 +221,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 
         var addDistances = function(ap) {
             var children, i, d, m, layers_length = layers.length;
+						var fontsize = 12;
             for (i=0; i<layers_length; i++) {
                 if (layers[i].layer_type !== 'ap') continue;
                 ap.distances = [];
@@ -242,7 +243,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
                         ap2.distances.push(m);
                         distances.addChild(m);
 
-                        var text = new createjs.Text(d.toFixed(2) + ' ft', '12px Arial', '#888888');
+                        var text = new createjs.Text(d.toFixed(2) + ' ft', fontsize + 'px Arial', '#888888');
                         if (d > DISTANCE_CUT_OFF) {
                             text.text = '';
                         }
@@ -250,6 +251,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
                         text.y = m.p_start.y + (m.p_end.y - m.p_start.y) /2 - 10;
                         text.textBaseline = 'alphabetic';
                         text.name = m.name;
+						text.scaleX = text.scaleY = 100/plan.stage_scale;
                         m.ptext = text;
                         distances.addChild(text);
                     }
@@ -264,20 +266,21 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
             );
         }
 
-        function drawDistanceObject(obj) {
-            obj.pdistance = getDistance(obj.ap_start, obj.ap_end);
-            if (obj.pdistance < DISTANCE_CUT_OFF) {
-                obj.graphics.clear().setStrokeStyle(1).beginStroke(DISTANCE_STROKE_RGB)
-                    .moveTo(obj.p_start.x, obj.p_start.y)
-                    .lineTo(obj.p_end.x, obj.p_end.y);
-                obj.ptext.text = obj.pdistance.toFixed(2) + ' ft';
-                obj.ptext.x    = obj.p_start.x + (obj.p_end.x - obj.p_start.x) /2;
-                obj.ptext.y    = obj.p_start.y + (obj.p_end.y - obj.p_start.y) /2;
-            } else {
-                obj.graphics.clear();
-                obj.ptext.text = '';
-            }
-        }
+		function drawDistanceObject(obj) {
+			obj.pdistance = getDistance(obj.ap_start, obj.ap_end);
+			if (obj.pdistance < DISTANCE_CUT_OFF) {
+				obj.graphics.clear().setStrokeStyle(1).beginStroke(DISTANCE_STROKE_RGB)
+					.moveTo(obj.p_start.x, obj.p_start.y)
+					.lineTo(obj.p_end.x, obj.p_end.y);
+				obj.ptext.text = obj.pdistance.toFixed(2) + ' ft';
+				obj.ptext.scaleX = obj.ptext.scaleY = 100/plan.stage_scale;
+				obj.ptext.x    = obj.p_start.x + (obj.p_end.x - obj.p_start.x) /2;
+				obj.ptext.y    = obj.p_start.y + (obj.p_end.y - obj.p_start.y) /2;
+			} else {
+				obj.graphics.clear();
+				obj.ptext.text = '';
+			}
+		}
 
         this.touchStart = function(e) {
             mouse_last_position = { x: e.x, y: e.y };
@@ -561,6 +564,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
             var text = new createjs.Text('AP ' + plan.ap_index++, '12px Arial', DISTANCE_TEXT_RGB);
             text.x = -15;
             text.y = -10;
+			text.scaleX = text.scaleY = 100 / plan.stage_scale;
             text.textBaseline = 'alphabetic';
             container.addChild(text);
 
@@ -665,6 +669,16 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
             if (this.updateControls) this.updateControls('scale', Math.round(plan.stage_scale));
             plan.stage_ppm = plan.floor_width_px / plan.floor_width;
             stage.setTransform(stage.x, stage.y, percent/100, percent/100).update();
+			for (var i=0; i<distances.children.length; i++) {
+				if (distances.children[i].text) distances.children[i].scaleX = distances.children[i].scaleY = 100/plan.stage_scale;
+			}
+            _.each(stage.children, function(child) {
+                if (child.layer_type === 'ap') {
+                    for (var i=0; i<child.children.length; i++) {
+						child.children[i].children[3].scaleX = child.children[i].children[3].scaleY = 100 / plan.stage_scale;
+                    }
+                }
+            });
         };
 
         this.addFloorPlan = function(url) {

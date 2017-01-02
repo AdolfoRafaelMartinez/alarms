@@ -144,10 +144,10 @@ exports.list = function(req, res) {
 	});
 };
 
-exports.blueFloorPlan = function(req, res) {
-	Plan.findById(id).populate('user', 'displayName').exec(function(err, plan) {
+exports.blueFloorPlan = function(req, res, next) {
+	Plan.findById(req.id).populate('user', 'displayName').exec(function(err, plan) {
 		if (err) return next(err);
-		if (!plan) return next(new Error('Failed to load plan ' + id));
+		if (!plan) return next(new Error('Failed to load plan ' + req.id));
 		req.plan = plan;
 		next();
 	});
@@ -219,4 +219,3 @@ exports.hasAuthorization = function(req, res, next) {
 	}
 	next();
 };
-
