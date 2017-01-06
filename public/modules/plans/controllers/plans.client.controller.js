@@ -265,7 +265,7 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
         };
 
 		$scope.find = function() {
-			$scope.plans = Plans.query();
+			$scope.plans = Plans.query({search: $scope.search});
 		};
 
 		$scope.findOne = function() {

@@ -133,7 +133,7 @@ exports.delete = function(req, res) {
  * List of Plans
  */
 exports.list = function(req, res) {
-	Plan.find({user: req.user.id}).limit(200).sort('-created').populate('user', 'displayName').exec(function(err, plans) {
+	Plan.find({user: req.user.id, title: new RegExp(req.query.search, 'i')}).limit(200).sort('-created').populate('user', 'displayName').exec(function(err, plans) {
 		if (err) {
 			return res.status(400).send({
 				message: errorHandler.getErrorMessage(err)
