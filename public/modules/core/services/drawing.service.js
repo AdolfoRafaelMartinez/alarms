@@ -47,7 +47,7 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 			regX: 0,
 			regY: 0
 		},
-		ap_index: 0,
+		ap_index: 1,
 		stage_ppm: 300,
 		radius: 0,
 		real_radius: 0,
@@ -399,6 +399,7 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 		mouse_mode = 'ap';
 		plan.radius = r;
 		plan.real_radius = r;
+		plan.ap_index = 1;
 		DISTANCE_CUT_OFF = r * 2;
 		canvas = document.getElementsByTagName('canvas')[0];
 		canvas.width = canvas.parentElement.clientWidth - canvasMarginW;
@@ -597,8 +598,6 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 		container.addChild(overlaps);
 
 		var text = new createjs.Text('AP ' + plan.ap_index++, '12px Arial', AP_TEXT_RGB);
-		// text.x = -15;
-		// text.y = -10;
 		text.scaleX = text.scaleY = 100 / plan.stage_scale;
 		text.textBaseline = 'alphabetic';
 
@@ -613,6 +612,15 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 		update = true;
 		$timeout(this.getTotalAPs, 0);
 	};
+
+	this.reIndexAPs = function() {
+		var ap_index = 1;
+		for (var i=0; i<layers.length; i++) {
+			if (layers[i].layer_type !== 'ap') continue;
+			_.map(layers[i].children, ap => ap.children[4].text = `AP ${ap_index++}`);
+		}
+		plan.ap_index = ap_index;
+	}
 
 	this.deleteSelectedAP = function() {
 		if (!selectedAP) return;
@@ -647,6 +655,7 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 		this.toggleOverlaps();
 		update = true;
 		this.toggleOverlaps();
+		this.reIndexAPs();
 	};
 
 	this.deleteSelectedWall = function() {
@@ -821,6 +830,7 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 			_.each(data.aps, function(ap) {
 				this.addAP(ap.x, ap.y, signal_radius);
 			}.bind(this));
+			this.reIndexAPs();
 			this.updateSignalStrength(signal_radius);
 			_.each(data.walls, function(wall) {
 				current_wall = false;
