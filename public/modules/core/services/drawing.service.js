@@ -266,6 +266,64 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 		}
 	};
 
+	var drawIntersections = function(ap, processing) {
+		var c, d, r2, i, j, rsq, overlap, apb, alpha, beta, color;
+		var hash_color, leftside, rightside;
+		var intersections = [];
+		_.each(stage.children, function(child) {
+			if (child.layer_type === 'ap') {
+				for (i=0; i<child.children.length; i++) {
+					if (child.children[i] !== ap) {
+						c = child.children[i];
+						d = Math.sqrt(Math.pow(c.x - ap.x, 2) + Math.pow(c.y - ap.y, 2));
+						if (d < plan.radius *2) {
+							r2 = 2 * plan.radius;
+							rsq = Math.pow(plan.radius, 2);
+							overlap = ((2 * rsq * Math.acos(d/r2) - d/2 * Math.sqrt(4*rsq - d*d)) / (2 * rsq * Math.acos(0)) * 100).toFixed(0);
+
+							var text = new createjs.Text('' + overlap + '%', '12px Arial', DISTANCE_TEXT_RGB);
+							alpha = Math.atan((ap.y - c.y)/(ap.x - c.x));
+							beta  = Math.acos(Math.sqrt(Math.pow(ap.x - c.x, 2) + Math.pow(ap.y - c.y, 2)) / 2 /plan.radius);
+							apb = alpha + beta;
+							text.x = plan.radius * Math.cos(apb);
+							text.y = plan.radius * Math.sin(apb);
+							text.textBaseline = 'alphabetic';
+							// ap.addChild(text);
+
+							leftside = 0;
+							if (ap.x >= c.x) leftside = 1;
+							rightside = 1 - leftside;
+							for (color=0; color < HASH_COLOR.length; color++) {
+								if (overlap > HASH_COLOR[color].overlap) {
+									hash_color = HASH_COLOR[color].color;
+									break;
+								}
+							}
+
+							var hash = new createjs.Shape();
+							hash.puddleShape = 'hash';
+							hash.graphics.beginFill(hash_color).arc(0, 0, plan.radius -1, leftside * Math.PI + alpha - beta, leftside * Math.PI + alpha + beta - 1/plan.radius);
+							hash.graphics.beginFill(hash_color).arc(c.x - ap.x, c.y - ap.y, plan.radius -1, rightside * Math.PI + alpha - beta, rightside * Math.PI + alpha + beta - 1/plan.radius);
+							intersections.push(hash);
+
+							// update the intersections on the adjacent AP as well
+							if (!processing) drawIntersections(c, true);
+						}
+					}
+				}
+			}
+		});
+
+		for (j=0; j<ap.children.length; j++) {
+			ap.overlaps.removeAllChildren();
+		}
+		if (show_overlaps) {
+			for (j=0; j<intersections.length; j++) {
+				ap.overlaps.addChild(intersections[j]);
+			}
+		}
+	};
+
 	var addHandlers = function(ap) {
 		var names;
 
@@ -499,64 +557,6 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 		return totalAPs;
 	};
 
-	var drawIntersections = function(ap, processing) {
-		var c, d, r2, i, j, rsq, overlap, apb, alpha, beta, color;
-		var hash_color, leftside, rightside;
-		var intersections = [];
-		_.each(stage.children, function(child) {
-			if (child.layer_type === 'ap') {
-				for (i=0; i<child.children.length; i++) {
-					if (child.children[i] !== ap) {
-						c = child.children[i];
-						d = Math.sqrt(Math.pow(c.x - ap.x, 2) + Math.pow(c.y - ap.y, 2));
-						if (d < plan.radius *2) {
-							r2 = 2 * plan.radius;
-							rsq = Math.pow(plan.radius, 2);
-							overlap = ((2 * rsq * Math.acos(d/r2) - d/2 * Math.sqrt(4*rsq - d*d)) / (2 * rsq * Math.acos(0)) * 100).toFixed(0);
-
-							var text = new createjs.Text('' + overlap + '%', '12px Arial', DISTANCE_TEXT_RGB);
-							alpha = Math.atan((ap.y - c.y)/(ap.x - c.x));
-							beta  = Math.acos(Math.sqrt(Math.pow(ap.x - c.x, 2) + Math.pow(ap.y - c.y, 2)) / 2 /plan.radius);
-							apb = alpha + beta;
-							text.x = plan.radius * Math.cos(apb);
-							text.y = plan.radius * Math.sin(apb);
-							text.textBaseline = 'alphabetic';
-							// ap.addChild(text);
-
-							leftside = 0;
-							if (ap.x >= c.x) leftside = 1;
-							rightside = 1 - leftside;
-							for (color=0; color < HASH_COLOR.length; color++) {
-								if (overlap > HASH_COLOR[color].overlap) {
-									hash_color = HASH_COLOR[color].color;
-									break;
-								}
-							}
-
-							var hash = new createjs.Shape();
-							hash.puddleShape = 'hash';
-							hash.graphics.beginFill(hash_color).arc(0, 0, plan.radius -1, leftside * Math.PI + alpha - beta, leftside * Math.PI + alpha + beta - 1/plan.radius);
-							hash.graphics.beginFill(hash_color).arc(c.x - ap.x, c.y - ap.y, plan.radius -1, rightside * Math.PI + alpha - beta, rightside * Math.PI + alpha + beta - 1/plan.radius);
-							intersections.push(hash);
-
-							// update the intersections on the adjacent AP as well
-							if (!processing) drawIntersections(c, true);
-						}
-					}
-				}
-			}
-		});
-
-		for (j=0; j<ap.children.length; j++) {
-			ap.overlaps.removeAllChildren();
-		}
-		if (show_overlaps) {
-			for (j=0; j<intersections.length; j++) {
-				ap.overlaps.addChild(intersections[j]);
-			}
-		}
-	};
-
 	this.addAP = function(x, y, signal_radius) {
 		if (is_dragging) {
 			is_dragging = false;
@@ -620,7 +620,7 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 			_.map(layers[i].children, ap => ap.children[4].text = `AP ${ap_index++}`);
 		}
 		plan.ap_index = ap_index;
-	}
+	};
 
 	this.deleteSelectedAP = function() {
 		if (!selectedAP) return;
