@@ -57,14 +57,15 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 
 	var show_overlaps = true;
 	var show_distances = true;
-	var canvasMarginW = 80;
+	var show_radius = true;
+	var canvasMarginW = 40;
 	var canvasMarginH = 40;
 
 	var AP_CIRCLE_STROKE_RGB = '#888';
 	var AP_CIRCLE_RGBA = 'rgba(180, 220, 255, 0.6)';
 	var AP_CIRCLE_RGBA_OPAQUE = 'rgba(200, 200, 255, 0.2)';
 	var AP_TEXT_RGB = '#fff';
-	var AP_BUBBLE_RGB = '#000';
+	var AP_BUBBLE_RGB = 'rgba(0, 0, 0, 0.8)';
 	var DISTANCE_STROKE_RGB = '#444';
 	var DISTANCE_TEXT_RGB = '#aaa';
 	var DISTANCE_BUBBLE_RGB = '#fff';
@@ -181,8 +182,9 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 		bubble.scaleX = bubble.scaleY = text.scaleX;
 		bubble.name = 'bubble';
 		text.regX = textBounds.width / 2;
+		text.regY = -25;
 		bubble.regX = text.regX + 5;
-		bubble.regY = 3 + textBounds.height;
+		bubble.regY = -23 + textBounds.height;
 
 		return bubble;
 	}
@@ -263,6 +265,64 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 			stage.y += e.y - mouse_last_position.y;
 			update = true;
 			mouse_last_position = { x: e.x, y: e.y  };
+		}
+	};
+
+	var drawIntersections = function(ap, processing) {
+		var c, d, r2, i, j, rsq, overlap, apb, alpha, beta, color;
+		var hash_color, leftside, rightside;
+		var intersections = [];
+		_.each(stage.children, function(child) {
+			if (child.layer_type === 'ap') {
+				for (i=0; i<child.children.length; i++) {
+					if (child.children[i] !== ap) {
+						c = child.children[i];
+						d = Math.sqrt(Math.pow(c.x - ap.x, 2) + Math.pow(c.y - ap.y, 2));
+						if (d < plan.radius *2) {
+							r2 = 2 * plan.radius;
+							rsq = Math.pow(plan.radius, 2);
+							overlap = ((2 * rsq * Math.acos(d/r2) - d/2 * Math.sqrt(4*rsq - d*d)) / (2 * rsq * Math.acos(0)) * 100).toFixed(0);
+
+							var text = new createjs.Text('' + overlap + '%', '12px Arial', DISTANCE_TEXT_RGB);
+							alpha = Math.atan((ap.y - c.y)/(ap.x - c.x));
+							beta  = Math.acos(Math.sqrt(Math.pow(ap.x - c.x, 2) + Math.pow(ap.y - c.y, 2)) / 2 /plan.radius);
+							apb = alpha + beta;
+							text.x = plan.radius * Math.cos(apb);
+							text.y = plan.radius * Math.sin(apb);
+							text.textBaseline = 'alphabetic';
+							// ap.addChild(text);
+
+							leftside = 0;
+							if (ap.x >= c.x) leftside = 1;
+							rightside = 1 - leftside;
+							for (color=0; color < HASH_COLOR.length; color++) {
+								if (overlap > HASH_COLOR[color].overlap) {
+									hash_color = HASH_COLOR[color].color;
+									break;
+								}
+							}
+
+							var hash = new createjs.Shape();
+							hash.puddleShape = 'hash';
+							hash.graphics.beginFill(hash_color).arc(0, 0, plan.radius -1, leftside * Math.PI + alpha - beta, leftside * Math.PI + alpha + beta - 1/plan.radius);
+							hash.graphics.beginFill(hash_color).arc(c.x - ap.x, c.y - ap.y, plan.radius -1, rightside * Math.PI + alpha - beta, rightside * Math.PI + alpha + beta - 1/plan.radius);
+							intersections.push(hash);
+
+							// update the intersections on the adjacent AP as well
+							if (!processing) drawIntersections(c, true);
+						}
+					}
+				}
+			}
+		});
+
+		for (j=0; j<ap.children.length; j++) {
+			ap.overlaps.removeAllChildren();
+		}
+		if (show_overlaps) {
+			for (j=0; j<intersections.length; j++) {
+				ap.overlaps.addChild(intersections[j]);
+			}
 		}
 	};
 
@@ -499,64 +559,6 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 		return totalAPs;
 	};
 
-	var drawIntersections = function(ap, processing) {
-		var c, d, r2, i, j, rsq, overlap, apb, alpha, beta, color;
-		var hash_color, leftside, rightside;
-		var intersections = [];
-		_.each(stage.children, function(child) {
-			if (child.layer_type === 'ap') {
-				for (i=0; i<child.children.length; i++) {
-					if (child.children[i] !== ap) {
-						c = child.children[i];
-						d = Math.sqrt(Math.pow(c.x - ap.x, 2) + Math.pow(c.y - ap.y, 2));
-						if (d < plan.radius *2) {
-							r2 = 2 * plan.radius;
-							rsq = Math.pow(plan.radius, 2);
-							overlap = ((2 * rsq * Math.acos(d/r2) - d/2 * Math.sqrt(4*rsq - d*d)) / (2 * rsq * Math.acos(0)) * 100).toFixed(0);
-
-							var text = new createjs.Text('' + overlap + '%', '12px Arial', DISTANCE_TEXT_RGB);
-							alpha = Math.atan((ap.y - c.y)/(ap.x - c.x));
-							beta  = Math.acos(Math.sqrt(Math.pow(ap.x - c.x, 2) + Math.pow(ap.y - c.y, 2)) / 2 /plan.radius);
-							apb = alpha + beta;
-							text.x = plan.radius * Math.cos(apb);
-							text.y = plan.radius * Math.sin(apb);
-							text.textBaseline = 'alphabetic';
-							// ap.addChild(text);
-
-							leftside = 0;
-							if (ap.x >= c.x) leftside = 1;
-							rightside = 1 - leftside;
-							for (color=0; color < HASH_COLOR.length; color++) {
-								if (overlap > HASH_COLOR[color].overlap) {
-									hash_color = HASH_COLOR[color].color;
-									break;
-								}
-							}
-
-							var hash = new createjs.Shape();
-							hash.puddleShape = 'hash';
-							hash.graphics.beginFill(hash_color).arc(0, 0, plan.radius -1, leftside * Math.PI + alpha - beta, leftside * Math.PI + alpha + beta - 1/plan.radius);
-							hash.graphics.beginFill(hash_color).arc(c.x - ap.x, c.y - ap.y, plan.radius -1, rightside * Math.PI + alpha - beta, rightside * Math.PI + alpha + beta - 1/plan.radius);
-							intersections.push(hash);
-
-							// update the intersections on the adjacent AP as well
-							if (!processing) drawIntersections(c, true);
-						}
-					}
-				}
-			}
-		});
-
-		for (j=0; j<ap.children.length; j++) {
-			ap.overlaps.removeAllChildren();
-		}
-		if (show_overlaps) {
-			for (j=0; j<intersections.length; j++) {
-				ap.overlaps.addChild(intersections[j]);
-			}
-		}
-	};
-
 	this.addAP = function(x, y, signal_radius) {
 		if (is_dragging) {
 			is_dragging = false;
@@ -620,7 +622,7 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 			_.map(layers[i].children, ap => ap.children[4].text = `AP ${ap_index++}`);
 		}
 		plan.ap_index = ap_index;
-	}
+	};
 
 	this.deleteSelectedAP = function() {
 		if (!selectedAP) return;
@@ -705,6 +707,19 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 			if (child.layer_type === 'ap') {
 				for (var i=0; i<child.children.length; i++) {
 					drawIntersections(child.children[i]);
+				}
+			}
+		});
+		update = true;
+	};
+
+	this.toggleRadius = function(off) {
+		show_radius = !show_radius;
+		if (off === 'off') show_radius = false;
+		_.each(stage.children, function(child) {
+			if (child.layer_type === 'ap') {
+				for (var i=0; i<child.children.length; i++) {
+					child.children[i].children[0].visible = show_radius;
 				}
 			}
 		});
@@ -852,7 +867,7 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 
 		for (var i=0; i<layers_length; i++) {
 			if (layers[i].layer_type !== 'ap') continue;
-			layers[i].visible = false;
+			// layers[i].visible = false;
 			/*jshint -W083 */
 			_.each(layers[i].children, function(ap2) {
 				points.push({

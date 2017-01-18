@@ -118,7 +118,9 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
                 $scope.settings.show_distances = true;
                 Drawing.toggleOverlaps();
                 Drawing.toggleDistances();
+                Drawing.toggleRadius();
             } else {
+                Drawing.toggleRadius();
                 Drawing.heatmap();
             }
         };
