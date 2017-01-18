@@ -57,14 +57,15 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 
 	var show_overlaps = true;
 	var show_distances = true;
-	var canvasMarginW = 80;
+	var show_radius = true;
+	var canvasMarginW = 40;
 	var canvasMarginH = 40;
 
 	var AP_CIRCLE_STROKE_RGB = '#888';
 	var AP_CIRCLE_RGBA = 'rgba(180, 220, 255, 0.6)';
 	var AP_CIRCLE_RGBA_OPAQUE = 'rgba(200, 200, 255, 0.2)';
 	var AP_TEXT_RGB = '#fff';
-	var AP_BUBBLE_RGB = '#000';
+	var AP_BUBBLE_RGB = 'rgba(0, 0, 0, 0.8)';
 	var DISTANCE_STROKE_RGB = '#444';
 	var DISTANCE_TEXT_RGB = '#aaa';
 	var DISTANCE_BUBBLE_RGB = '#fff';
@@ -181,8 +182,9 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 		bubble.scaleX = bubble.scaleY = text.scaleX;
 		bubble.name = 'bubble';
 		text.regX = textBounds.width / 2;
+		text.regY = -25;
 		bubble.regX = text.regX + 5;
-		bubble.regY = 3 + textBounds.height;
+		bubble.regY = -23 + textBounds.height;
 
 		return bubble;
 	}
@@ -711,6 +713,19 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 		update = true;
 	};
 
+	this.toggleRadius = function(off) {
+		show_radius = !show_radius;
+		if (off === 'off') show_radius = false;
+		_.each(stage.children, function(child) {
+			if (child.layer_type === 'ap') {
+				for (var i=0; i<child.children.length; i++) {
+					child.children[i].children[0].visible = show_radius;
+				}
+			}
+		});
+		update = true;
+	};
+
 	this.scale = function(percent) {
 		if (!percent) return;
 		plan.stage_scale = percent;
@@ -852,7 +867,7 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 
 		for (var i=0; i<layers_length; i++) {
 			if (layers[i].layer_type !== 'ap') continue;
-			layers[i].visible = false;
+			// layers[i].visible = false;
 			/*jshint -W083 */
 			_.each(layers[i].children, function(ap2) {
 				points.push({
