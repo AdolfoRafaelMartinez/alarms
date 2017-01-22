@@ -38,7 +38,15 @@ module.exports = function(app) {
                         }
                     });
 
-                    res.json('/uploads/' + filename);
+                    res.json({
+                        files: [{
+                            deleteType: 'DELETE',
+                            deleteUrl: '/uploads/' + filename,
+                            thumbnailUrl: '/uploads/' + filename,
+                            url: '/uploads/' + filename,
+                            name: filename
+                        }]
+                    });
 
                 } else {
                     return res.json('Error: File not uploaded');
