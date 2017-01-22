@@ -17,8 +17,8 @@ module.exports = {
 				'public/lib/bootstrap/dist/css/bootstrap-theme.css',
 				'public/lib/angular-material/angular-material.css',
 				'public/lib/jQueryFileUpload/css/style.css',
-				'public/lib/jQueryFileUpload/css/jquery.fileupload.css',
-				'public/lib/jQueryFileUpload/css/jquery.fileupload-ui.css',
+				'public/lib/blueimp-file-upload/css/jquery.fileupload.css',
+				'public/lib/blueimp-file-upload/css/jquery.fileupload-ui.css',
 			],
 			js: [
 				'public/lib/angular/angular.js',
@@ -35,13 +35,14 @@ module.exports = {
                 'public/lib/easeljs/lib/easeljs-NEXT.combined.js',
                 'public/lib/caman/dist/caman.full.min.js',
 
-                'public/lib/blueimp/JavaScript-Load-Image/js/load-image.all.min.js',
-                'public/lib/blueimp/JavaScript-Load-Image/js/lib/jquery.Jcrop.js',
-                'public/lib/blueimp/JavaScript-Canvas-To-Blob/js/canvas-to-blob.min.js',
-
-                'public/lib/ngFileUpload/js/uuid.js',
-                'public/lib/ngFileUpload/js/xhr_post.js',
-                'public/lib/ngFileUpload/js/ng_file_upload.js'
+				'public/lib/blueimp-file-upload/js/vendor/jquery.ui.widget.js',
+                'public/lib/blueimp-load-image/js/load-image.all.min.js',
+                'public/lib/blueimp-canvas-to-blob/js/canvas-to-blob.min.js',
+                'public/lib/blueimp-file-upload/js/jquery.fileupload.js',
+                'public/lib/blueimp-file-upload/js/jquery.fileupload-process.js',
+                'public/lib/blueimp-file-upload/js/jquery.fileupload-image.js',
+                'public/lib/blueimp-file-upload/js/jquery.fileupload-validate.js',
+                'public/lib/blueimp-file-upload/js/jquery.fileupload-angular.js'
 			]
 		},
 		css: [

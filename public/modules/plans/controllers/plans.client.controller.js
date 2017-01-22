@@ -65,6 +65,11 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
             Drawing.deleteSelectedAP();
         };
 
+        $scope.apProperties = function() {
+            console.console('apProperties');
+            $scope.ap_properties = true;
+        };
+
         $scope.deleteWall = function() {
             Drawing.deleteSelectedWall();
         };

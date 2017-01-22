@@ -43,7 +43,6 @@ angular.module('core').service('contextMenu', ['$timeout',
         }
 
         function close() {
-          console.log('closing', menuElement);
           window.gMenu = menuElement;
           menuElement.removeClass('open');
           opened = false;
@@ -55,7 +54,7 @@ angular.module('core').service('contextMenu', ['$timeout',
 
         function handleKeyUpEvent(event) {
             if (opened && event.keyCode === 27) {
-                console.log('keyUp', event);
+				// ESCAPE
                 close();
             }
         }

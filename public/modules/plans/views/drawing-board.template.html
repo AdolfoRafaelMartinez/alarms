@@ -1,29 +1,35 @@
 <canvas style="position: absolute; left: 20px; right: 20px; z-index: 1"></canvas>
 
-<div class="dropdown position-fixed" id="context_menu" style="position: absolute; z-index: 10000;">
-  <ul class="dropdown-menu" role="menu" id="apMenu">
-    <li>
-      <a class="pointer" role="menuitem" tabindex="1" ng-click="deleteAP()">
-          Delete AP
-      </a>
-    </li>
-    <li>
-      <a class="pointer" role="menuitem" tabindex="2" ng-click="apProperties()">
-         AP Properties
-      </a>
-    </li>
-  </ul>
-  <ul class="dropdown-menu" role="menu" id="wallMenu">
-    <li>
-      <a class="pointer" role="menuitem" tabindex="1" ng-click="deleteWall()">
-          Delete Wall
-      </a>
-    </li>
-    <li>
-      <a class="pointer" role="menuitem" tabindex="2" ng-click="wallProperties()">
-         Wall Properties
-      </a>
-    </li>
-  </ul>
+<div class="position-fixed" id="context_menu" style="position: absolute; z-index: 10000;">
+    <div class="dropdown">
+        <ul class="dropdown-menu" role="menu" ng-if="!ap_properties" id="apMenu">
+            <li>
+                <a class="pointer" role="menuitem" tabindex="1" ng-click="deleteAP()">
+                    Delete AP
+                </a>
+            </li>
+            <li>
+                <a class="pointer" role="menuitem" tabindex="2" ng-click="apProperties()">
+                    AP Properties
+                </a>
+            </li>
+        </ul>
+        <ul class="dropdown-menu" role="menu" id="wallMenu">
+            <li>
+                <a class="pointer" role="menuitem" tabindex="1" ng-click="deleteWall()">
+                    Delete Wall
+                </a>
+            </li>
+            <li>
+                <a class="pointer" role="menuitem" tabindex="2" ng-click="wallProperties()">
+                    Wall Properties
+                </a>
+            </li>
+        </ul>
+        <div ng-if="ap_properties">
+            <div class="group"> <a href ng-click="ap_properties != ap_properties">&lt;&lt; Back</a> </div>
+            <div>
+            </div>
+        </div>
+    </div>
 </div>
-
