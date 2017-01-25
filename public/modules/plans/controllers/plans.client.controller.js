@@ -66,7 +66,7 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
         };
 
         $scope.apProperties = function() {
-            console.console('apProperties');
+            console.log('apProperties');
             $scope.ap_properties = true;
         };
 

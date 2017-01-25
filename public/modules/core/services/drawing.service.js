@@ -382,6 +382,7 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 		}
 
 		function mouseup(evt) {
+			console.log('mouseup', evt);
 			ap_clicked = false;
 		}
 
@@ -412,6 +413,7 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 	};
 
 	this.touchEnd = function(e) {
+		console.log('touchEnd', contextMenu, e);
 		contextMenu.disabled = false;
 		if (e.button !== 2 && !is_dragging) {
 			if (mouse_last_click.x === e.x && mouse_last_click.y === e.y) {
