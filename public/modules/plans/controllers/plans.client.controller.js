@@ -1,7 +1,7 @@
 'use strict';
 
-angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '$state', '$stateParams', '$location', 'Authentication', 'Drawing', '$timeout', '$http', 'Plans',
-    function($scope, $rootScope, $state, $stateParams, $location, Authentication, Drawing, $timeout, $http, Plans) {
+angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '$state', '$stateParams', '$location', 'Authentication', 'Drawing', '$timeout', '$http', 'Plans', 'contextMenu',
+    function($scope, $rootScope, $state, $stateParams, $location, Authentication, Drawing, $timeout, $http, Plans, contextMenu) {
 
 		$scope.authentication = Authentication;
 
@@ -55,6 +55,15 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
                 }
         };
 
+        $scope.menu = {
+            mode: 'ap'
+        };
+        Drawing.setupMenu($scope.menu);
+
+        $scope.closeMenu = function() {
+            contextMenu.close();
+        };
+
         $scope.selectWallType = function() {
             Drawing.selectWallType($scope.wall_types[$scope.wall_type]);
         };
@@ -65,9 +74,8 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
             Drawing.deleteSelectedAP();
         };
 
-        $scope.apProperties = function() {
-            console.log('apProperties');
-            $scope.ap_properties = true;
+        $scope.getCurrentAP = function() {
+            $scope.ap = Drawing.getCurrentAP();
         };
 
         $scope.deleteWall = function() {

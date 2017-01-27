@@ -1,40 +1,45 @@
-<canvas style="position: absolute; left: 20px; right: 20px; z-index: 1"></canvas>
+<canvas ng-right-click="getCurrentAP()" style="position: absolute; left: 20px; right: 20px; z-index: 1"></canvas>
 
-<div class="position-fixed" id="context_menu" style="position: absolute; z-index: 10000;">
-    <div class="dropdown">
-        <ul class="dropdown-menu" role="menu" id="apMenu" ng-if="mode == 'default'">
-            <li>
-                <a class="pointer" role="menuitem" tabindex="1" ng-click="deleteAP()">
-                    Delete AP
-                </a>
-            </li>
-            <li>
-                <a class="pointer" role="menuitem" tabindex="2" ng-click="apProperties()">
-                    AP Properties
-                </a>
-            </li>
-        </ul>
-        <ul class="dropdown-menu" role="menu" id="wallMenu" ng-if="mode == 'wall'">
-            <li>
-                <a class="pointer" role="menuitem" tabindex="1" ng-click="deleteWall()">
-                    Delete Wall
-                </a>
-            </li>
-            <li>
-                <a class="pointer" role="menuitem" tabindex="2" ng-click="wallProperties()">
-                    Wall Properties
-                </a>
-            </li>
-        </ul>
-        <ul class="dropdown-menu" role="menu" id="propertiesMenu" ng-if="mode == 'properties'">
-            <li>
-                <div class="group"> <a href ng-click="ap_properties != ap_properties">&lt;&lt; Back</a> </div>
-            </li>
-            <li>
-                <div>
-                    <input type="text" ng-model="apProperties.brand" class="formControl" placeholder="brand name" />
+<div class="position-fixed ui-widget-content" id="context_menu" style="position: absolute; z-index: 10000;">
+    <div class="panel panel-info">
+        <div class="panel-heading ui-widget-header">
+            <div class="panel-title">
+                AP <span class="label label-info" ng-bind="ap.inventory.number"></span>
+                <div><a href ng-click="closeMenu()"><i class="panel-control-icon glyphicon glyphicon-remove"></i></a></div>
+            </div>
+        </div>
+
+        <div class="panel-body dropdown" ng-if="menu.mode == 'wall'">
+            <ul class="dropdown-menu">
+                <li>
+                    <a class="pointer" role="menuitem" tabindex="1" ng-click="deleteWall()">
+                        Delete Wall
+                    </a>
+                </li>
+                <li>
+                    <a class="pointer" role="menuitem" tabindex="2" ng-click="wallProperties()">
+                        Wall Properties
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="panel-body" ng-if="menu.mode == 'ap'">
+            <form>
+                <div class="form-group">
+                    <input type="text" ng-model="ap.inventory.name" class="formControl" placeholder="e.g. AP-hall-01..." />
                 </div>
-            </li>
-        </ul>
+                <div class="form-group">
+                    <input type="text" ng-model="ap.inventory.brand" class="form-control" placeholder="brand name..." />
+                </div>
+                <div class="form-group">
+                    <input type="text" ng-model="ap.inventory.model" class="form-control" placeholder="model number..." />
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary" ng-click="save()">Save</button>
+                    <button class="btn btn-danger pull-right" role="menuitem" tabindex="1" ng-click="deleteAP()"> Delete AP </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>

@@ -54,6 +54,32 @@ canvas {
 
 #context_menu {
     display: none;
+	border-radius: 8px;
+    z-index: 10000;
+    -webkit-box-shadow: 2px 2px 15px 5px rgba(10,10,10,.5);
+    box-shadow: 2px 2px 15px 5px rgba(10,10,10,.5);
+}
+
+#context_menu .panel {
+	min-width: 400px;
+	margin-bottom: 0;
+	border-radius: 8px;
+}
+
+#context_menu .panel-heading {
+	cursor: move;
+	padding: 5px;
+    position: relative;
+    border-top-right-radius: 0;
+    border-top-left-radius: 0;
+}
+
+#context_menu .panel-title div {
+	float: right;
+}
+
+#context_menu .dropdown-menu {
+	display: block;
 }
 
 #context_menu.open {
@@ -74,14 +100,14 @@ canvas {
 }
 input:focus     { outline:none; }
 .group label          {
-  color:#999; 
+  color:#999;
   font-size:18px;
   font-weight:normal;
   position:absolute;
   pointer-events:none;
   left:5px;
   top:10px;
-  transition:0.2s ease all; 
+  transition:0.2s ease all;
 }
 
 /* active state */
@@ -93,18 +119,18 @@ input:focus     { outline:none; }
 .bar  { position:relative; display:block; width:300px; }
 .bar:before, .bar:after   {
   content:'';
-  height:2px; 
+  height:2px;
   width:0;
-  bottom:1px; 
+  bottom:1px;
   position:absolute;
-  background:#5264AE; 
-  transition:0.2s ease all; 
+  background:#5264AE;
+  transition:0.2s ease all;
 }
 .bar:before {
   left:50%;
 }
 .bar:after {
-  right:50%; 
+  right:50%;
 }
 
 /* active state */
@@ -113,9 +139,9 @@ input:focus     { outline:none; }
 }
 .highlight {
   position:absolute;
-  height:60%; 
-  width:100px; 
-  top:25%; 
+  height:60%;
+  width:100px;
+  top:25%;
   left:0;
   pointer-events:none;
   opacity:0.5;

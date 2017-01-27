@@ -382,7 +382,6 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 		}
 
 		function mouseup(evt) {
-			console.log('mouseup', evt);
 			ap_clicked = false;
 		}
 
@@ -413,7 +412,6 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 	};
 
 	this.touchEnd = function(e) {
-		console.log('touchEnd', contextMenu, e);
 		contextMenu.disabled = false;
 		if (e.button !== 2 && !is_dragging) {
 			if (mouse_last_click.x === e.x && mouse_last_click.y === e.y) {
@@ -505,7 +503,11 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 		stage.addChild(coverage);
 
 		createjs.Ticker.addEventListener('tick', tick);
-		contextMenu.setup();
+		contextMenu.setup(this.menu);
+	};
+
+	this.setupMenu = function(menu) {
+		this.menu = menu;
 	};
 
 	this.startCalibration = function(cb) {
@@ -604,12 +606,16 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 		container.addChild(ap);
 		container.addChild(overlaps);
 
-		var text = new createjs.Text('AP ' + plan.ap_index++, '12px Arial', AP_TEXT_RGB);
+		var apNumber = plan.ap_index++;
+		var text = new createjs.Text(apNumber, '12px Arial', AP_TEXT_RGB);
 		text.scaleX = text.scaleY = 100 / plan.stage_scale;
 		text.textBaseline = 'alphabetic';
 
 		var bubble = addBubble(text, AP_BUBBLE_RGB);
 		ap.pbubble = bubble;
+		ap.inventory = {
+			number: apNumber
+		};
 		container.addChild(bubble);
 		container.addChild(text);
 
@@ -622,11 +628,19 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 
 	this.reIndexAPs = function() {
 		var ap_index = 1;
-		for (var i=0; i<layers.length; i++) {
-			if (layers[i].layer_type !== 'ap') continue;
-			_.map(layers[i].children, ap => ap.children[4].text = `AP ${ap_index++}`);
-		}
+		_.each(layers, layer => {
+			if (layer.layer_type === 'ap') {
+				_.map(layer.children, ap => {
+					ap.children[4].text = ap_index;
+					_.set(ap, 'inventory.number', ap_index++);
+				});
+			}
+		});
 		plan.ap_index = ap_index;
+	};
+
+	this.getCurrentAP = function() {
+		return selectedAP;
 	};
 
 	this.deleteSelectedAP = function() {

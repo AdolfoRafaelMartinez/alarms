@@ -11,8 +11,10 @@ module.exports = {
 				'public/lib/jQueryFileUpload/css/style.css',
 				'public/lib/blueimp-file-upload/css/jquery.fileupload.css',
 				'public/lib/blueimp-file-upload/css/jquery.fileupload-ui.css',
+				'public/lib/lobipanel/dist/css/lobipanel.min.css'
 			],
 			js: [
+				'public/lib/bootstrap/dist/js/bootstrap.min.js',
 				'public/lib/angular/angular.js',
 				'public/lib/angular-resource/angular-resource.js',
 				'public/lib/angular-cookies/angular-cookies.js',
@@ -34,7 +36,9 @@ module.exports = {
                 'public/lib/blueimp-file-upload/js/jquery.fileupload-process.js',
                 'public/lib/blueimp-file-upload/js/jquery.fileupload-image.js',
                 'public/lib/blueimp-file-upload/js/jquery.fileupload-validate.js',
-                'public/lib/blueimp-file-upload/js/jquery.fileupload-angular.js'
+                'public/lib/blueimp-file-upload/js/jquery.fileupload-angular.js',
+
+				'public/lib/lobipanel/dist/js/lobipanel.min.js'
 			]
 		},
 		css: 'public/dist/application.min.css',
