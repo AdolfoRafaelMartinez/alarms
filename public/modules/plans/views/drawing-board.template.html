@@ -1,5 +1,46 @@
-<canvas ng-right-click="getCurrentAP()" style="position: absolute; left: 20px; right: 20px; z-index: 1"></canvas>
+<div class="overlay-sheet loading" ng-hide="planReady"><spinner active=1></spinner></div>
+<canvas ng-right-click="getCurrentAP()" style="position: absolute; left: 20px; right: 40px; z-index: 1"></canvas>
 
+<!-- plan properties -->
+<div class="panel-body overlay-sheet" ng-show="plan_properties">
+    <form>
+        <div class="form-group row">
+            <label class="col-sm-2 form-control-label">Client</label>
+            <div class="col-sm-10"><input type="text" ng-model="plan.details.client" class="form-control" placeholder="client name ..." /></div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 form-control-label">Project</label>
+            <div class="col-sm-10"><input type="text" ng-model="plan.details.project" class="form-control" placeholder="project ..." /></div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 form-control-label">Site</label>
+            <div class="col-sm-10"><input type="text" ng-model="plan.details.site" class="form-control" placeholder="site ..." /></div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 form-control-label">Floors</label>
+            <div class="col-sm-10"><input type="text" ng-model="plan.details.floors" class="form-control" placeholder="## ..." /></div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 form-control-label">Address</label>
+            <div class="col-sm-10"><input type="text" ng-model="plan.details.address" class="form-control" placeholder="address  ..." /></div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 form-control-label">City</label>
+            <div class="col-sm-10"><input type="text" ng-model="plan.details.city" class="form-control" placeholder="city  ..." /></div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 form-control-label">Zipcode</label>
+            <div class="col-sm-10"><input type="text" ng-model="plan.details.zipcode" class="form-control" placeholder="zipcode  ..." /></div>
+        </div>
+        <div class="form-group row">
+            <div class="col-sm-12">
+                <button type="submit" class="btn btn-primary" ng-click="savePlan()">Save</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- context menu -->
 <div class="position-fixed ui-widget-content" id="context_menu" style="position: absolute; z-index: 10000;">
     <div class="panel panel-info">
         <div class="panel-heading ui-widget-header">
@@ -26,20 +67,26 @@
 
         <div class="panel-body" ng-if="menu.mode == 'ap'">
             <form>
-                <div class="form-group">
-                    <input type="text" ng-model="ap.inventory.name" class="formControl" placeholder="e.g. AP-hall-01..." />
+                <div class="form-group row">
+                    <label class="col-sm-2 form-control-label">Name</label>
+                    <div class="col-sm-10"><input type="text" ng-model="ap.inventory.name" class="form-control" placeholder="e.g. AP-hall-01..." /></div>
                 </div>
-                <div class="form-group">
-                    <input type="text" ng-model="ap.inventory.brand" class="form-control" placeholder="brand name..." />
+                <div class="form-group row">
+                    <label class="col-sm-2 form-control-label">Brand</label>
+                    <div class="col-sm-10"><input type="text" ng-model="ap.inventory.brand" class="form-control" placeholder="name..." /></div>
                 </div>
-                <div class="form-group">
-                    <input type="text" ng-model="ap.inventory.model" class="form-control" placeholder="model number..." />
+                <div class="form-group row">
+                    <label class="col-sm-2 form-control-label">Model</label>
+                    <div class="col-sm-10"><input type="text" ng-model="ap.inventory.model" class="form-control" placeholder="number..." /></div>
                 </div>
-                <div class="form-group">
-                    <button type="submit" class="btn btn-primary" ng-click="save()">Save</button>
-                    <button class="btn btn-danger pull-right" role="menuitem" tabindex="1" ng-click="deleteAP()"> Delete AP </button>
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <button type="submit" class="btn btn-primary" ng-click="saveAP()">Save</button>
+                        <button class="btn btn-danger pull-right" role="menuitem" tabindex="1" ng-click="deleteAP()"> Delete AP </button>
+                    </div>
                 </div>
             </form>
         </div>
+
     </div>
 </div>

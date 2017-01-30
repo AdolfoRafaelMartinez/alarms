@@ -14,3 +14,23 @@
 .drawing {
     background: url("http://farm8.static.flickr.com/6058/6430440053_0083658254_b.jpg");
 }
+
+.overlay-sheet {
+    position: absolute;
+    z-index: 10;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background: url("http://farm8.static.flickr.com/6058/6430440053_0083658254_b.jpg");
+    transition: all linear 0.2s;
+}
+
+.overlay-sheet.ng-hide {
+    top: 400px;
+}
+
+.overlay-sheet.loading {
+    background-color: white;
+    z-index: 11;
+}

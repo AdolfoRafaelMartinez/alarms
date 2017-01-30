@@ -58,7 +58,7 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 	var show_overlaps = true;
 	var show_distances = true;
 	var show_radius = true;
-	var canvasMarginW = 40;
+	var canvasMarginW = 80;
 	var canvasMarginH = 40;
 
 	var AP_CIRCLE_STROKE_RGB = '#888';

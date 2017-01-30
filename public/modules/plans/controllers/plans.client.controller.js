@@ -22,6 +22,7 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
         };
 
         $scope.icons = {
+            loading: iconset.loading,
             save: iconset.save,
             pan: iconset.pan,
             ap: iconset.ap,
@@ -62,6 +63,10 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
 
         $scope.closeMenu = function() {
             contextMenu.close();
+        };
+
+        $scope.planProperties = function() {
+            $scope.menu.mode = 'plan';
         };
 
         $scope.selectWallType = function() {
@@ -225,6 +230,7 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
                 Drawing.initBoard($scope.settings.signal_radius);
                 Drawing.scale(100);
                 $scope.updateSignalStrength();
+                $scope.planReady = true;
             }.bind(Drawing), 200);
         };
 
@@ -290,6 +296,9 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
                 $scope.settings = $scope.plan.settings;
                 $scope.flooplan_name = $scope.plan.title;
                 Drawing.loadPlan($stateParams.planId, $scope.plan.stage, $scope.settings.signal_radius, $scope.updateControls);
+                $timeout(() => {
+                    $scope.planReady = true;
+                }, 1100);
             });
 		};
 

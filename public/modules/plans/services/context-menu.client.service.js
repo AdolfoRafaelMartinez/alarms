@@ -16,6 +16,13 @@ angular.module('core').service('contextMenu', ['$timeout',
 		function open(event) {
 			menuElement.addClass('open');
 
+			if (!event) {
+				event = {
+					pageX: 0,
+					pageY: 0
+				};
+			}
+
 			var doc = $(document)[0].documentElement;
 			var docLeft = (window.pageXOffset || doc.scrollLeft) - (doc.clientLeft || 0);
 			var docTop = (window.pageYOffset || doc.scrollTop) - (doc.clientTop || 0);
@@ -92,6 +99,7 @@ angular.module('core').service('contextMenu', ['$timeout',
         };
 
         this.setup = function(menu) {
+			if (this.menu) return;
             this.menu = menu;
 			$timeout(() => {
 				$(angular.element('canvas')[0]).bind('contextmenu', function(event) {
