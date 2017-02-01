@@ -1,14 +1,16 @@
 <md-list>
     <md-item>
-        <div flex="10" style="padding: 1em 0.5em;">
+        <div flex="10" class="side-details">
             <a href class="pull-right" ng-click="plan_properties = !plan_properties"><ng-md-icon icon="settings"></ng-md-icon></a>
-            Client: {{ plan.details.client }}<br />
-            Project: {{ plan.details.project }}<br />
-            Site: {{ plan.details.site }}<br />
-            {{ plan.details.address }}<br />
-            {{ plan.details.city }}, {{ plan.details.zipcode }}<br />
-            Floors: {{ plan.details.floors }}<br />
-            AP count: {{ getTotalAPs() }}
+            {{ plan.details.client || '(project details not set)' }}<br />
+            <span>Project:</span> {{ plan.details.project }}<br />
+            <span>Site:</span> {{ plan.details.site }}<br />
+            <div ng-if="plan.details.address">
+                {{ plan.details.address }}<br />
+                {{ plan.details.city }}, {{ plan.details.zipcode }}<br />
+            </div>
+            <span>Floors:</span> {{ plan.details.floors || 'N/A' }}<br />
+            <span>AP count:</span> {{ getTotalAPs() }}
         </div>
         <div flex="10">
             <input type="text" required ng-model="flooplan_name" />

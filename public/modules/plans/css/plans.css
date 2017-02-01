@@ -1,5 +1,5 @@
 .position-fixed {
-  position: fixed;
+    position: fixed;
 }
 
 .pointer {
@@ -33,4 +33,17 @@
 .overlay-sheet.loading {
     background-color: white;
     z-index: 11;
+}
+
+.plan-properties {
+    max-width: 640px;
+}
+
+.side-details {
+    padding: 1em 0.5em;
+    font-style: bold;
+}
+
+.side-details span {
+    font-style: normal;
 }

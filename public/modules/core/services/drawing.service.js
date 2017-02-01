@@ -415,7 +415,7 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 		contextMenu.disabled = false;
 		if (e.button !== 2 && !is_dragging) {
 			if (mouse_last_click.x === e.x && mouse_last_click.y === e.y) {
-				var x = (e.x - stage.x - canvas.offsetParent.offsetLeft - canvasMarginW) * 100 / plan.stage_scale;
+				var x = (e.x - stage.x - canvas.offsetParent.offsetLeft - canvasMarginW/2) * 100 / plan.stage_scale;
 				var y = (e.y - stage.y - canvas.offsetParent.offsetTop - canvasMarginH/2) * 100 / plan.stage_scale;
 				if (mouse_mode === 'wall') {
 					contextMenu.disabled = true;
@@ -770,7 +770,8 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 		var self = this;
 		var img = new Image();
 		var defer = $q.defer();
-		img.src = url.replace('public/', '');
+		img.setAttribute('crossOrigin', 'anonymous');
+		img.src = url.replace('public/', '').replace('http://bitlion.com:3000', '');
 		img.onload = function(event) {
 			var t = event.target;
 			var f = new createjs.Bitmap(t);

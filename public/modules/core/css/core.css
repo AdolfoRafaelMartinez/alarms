@@ -2,6 +2,15 @@
 	margin-top: 50px;
 }
 
+.content a:focus, .content ng-md-icon:focus {
+	border: none;
+	outline: none;
+}
+
+.ptop5 {
+	padding-top: 5px;
+}
+
 section > div > div {
     padding: 0 2em;
 }
@@ -47,11 +56,21 @@ canvas {
 
 .controls {
     padding: 0 20px 20px;
-	background: #acf;
+	background: #444;
+	color: white;
 }
 
 .controls canvas {
     margin: 0 20px;
+}
+
+.controls input {
+	color: white;
+	background: #555;
+	border: 1px solid #333;
+	margin: 2px;
+	padding: 4px;
+	font-size: x-small;
 }
 
 #context_menu {
@@ -59,6 +78,8 @@ canvas {
 	border-radius: 8px;
     z-index: 10000;
     -webkit-box-shadow: 2px 2px 15px 5px rgba(10,10,10,.5);
+    -moz-box-shadow: 2px 2px 15px 5px rgba(10,10,10,.5);
+    -o-box-shadow: 2px 2px 15px 5px rgba(10,10,10,.5);
     box-shadow: 2px 2px 15px 5px rgba(10,10,10,.5);
 }
 
@@ -100,8 +121,7 @@ canvas {
   border:none;
   border-bottom:1px solid #757575;
 }
-input:focus     { outline:none; }
-.group label          {
+.group label {
   color:#999;
   font-size:18px;
   font-weight:normal;

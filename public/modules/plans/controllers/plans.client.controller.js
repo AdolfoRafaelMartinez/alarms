@@ -200,6 +200,7 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
                 $scope.icons.save = iconset.loading;
                 $scope.plan.$update(function(response) {
                     $scope.icons.save = iconset.done;
+                    $scope.plan_properties = false;
                     $timeout(function() {
                         $scope.icons.save = iconset.save;
                     }, 3000);

@@ -32,6 +32,10 @@ var PlanSchema = new Schema({
         type: Schema.Types.Mixed,
         default: ''
     },
+    details: {
+        type: Schema.Types.Mixed,
+        default: ''
+    },
 	user: {
 		type: Schema.ObjectId,
 		ref: 'User'
