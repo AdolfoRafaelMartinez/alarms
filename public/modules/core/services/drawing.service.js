@@ -58,7 +58,7 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 	var show_overlaps = true;
 	var show_distances = true;
 	var show_radius = true;
-	var canvasMarginW = 40;
+	var canvasMarginW = 80;
 	var canvasMarginH = 40;
 
 	var AP_CIRCLE_STROKE_RGB = '#888';
@@ -153,7 +153,7 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 	function drawDistanceObject(obj) {
 		obj.pdistance = getDistance(obj.ap_start, obj.ap_end);
 		if (obj.pdistance < DISTANCE_CUT_OFF) {
-			obj.graphics.clear().setStrokeStyle(1).beginStroke(DISTANCE_STROKE_RGB)
+			obj.pline.graphics.clear().setStrokeStyle(1).beginStroke(DISTANCE_STROKE_RGB)
 			.moveTo(obj.p_start.x, obj.p_start.y)
 			.lineTo(obj.p_end.x, obj.p_end.y);
 			obj.ptext.text = obj.pdistance.toFixed(2) + ' ft';
@@ -168,7 +168,7 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 		} else {
 			obj.ptext.visible = false;
 			obj.pbubble.visible = false;
-			obj.graphics.clear();
+			obj.pline.graphics.clear();
 			obj.ptext.text = '';
 		}
 	}
@@ -190,7 +190,7 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 	}
 
 	var addDistances = function(ap) {
-		var children, i, d, m, layers_length = layers.length;
+		var children, i, d, c, m, layers_length = layers.length;
 		var fontsize = 12;
 		for (i=0; i<layers_length; i++) {
 			if (layers[i].layer_type !== 'ap') continue;
@@ -198,33 +198,36 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 			/*jshint -W083 */
 			_.each(layers[i].children, function(ap2) {
 				if (ap !== ap2) {
+					c = new createjs.Container();
 					m = new createjs.Shape();
 					d = getDistance(ap2, ap);
 					if (d < DISTANCE_CUT_OFF) {
 						m.graphics.setStrokeStyle(1).beginStroke(DISTANCE_STROKE_RGB).moveTo(ap.x, ap.y).lineTo(ap2.x, ap2.y);
 					}
-					m.name = getNewName();
-					m.p_start   = {x: ap.x, y: ap.y};
-					m.ap_start  = ap;
-					m.p_end     = {x: ap2.x, y: ap2.y};
-					m.ap_end    = ap2;
-					m.pdistance = d;
-					ap.distances.push(m);
-					ap2.distances.push(m);
-					distances.addChild(m);
+					c.name = getNewName();
+					c.p_start   = {x: ap.x, y: ap.y};
+					c.ap_start  = ap;
+					c.p_end     = {x: ap2.x, y: ap2.y};
+					c.ap_end    = ap2;
+					c.pdistance = d;
+					c.pline = m;
+					c.addChild(m);
+					ap.distances.push(c);
+					ap2.distances.push(c);
+					distances.addChild(c);
 
 					var text = new createjs.Text(d.toFixed(2) + ' ft', fontsize + 'px Arial', DISTANCE_TEXT_RGB);
-					text.x = m.p_start.x + (m.p_end.x - m.p_start.x) /2 - 10;
-					text.y = m.p_start.y + (m.p_end.y - m.p_start.y) /2 - 10;
+					text.x = c.p_start.x + (c.p_end.x - c.p_start.x) /2 - 10;
+					text.y = c.p_start.y + (c.p_end.y - c.p_start.y) /2 - 10;
 					text.textBaseline = 'alphabetic';
 					text.name = 'value';
 					text.scaleX = text.scaleY = 100/plan.stage_scale;
-					m.ptext = text;
+					c.ptext = text;
 
 					var bubble = addBubble(text, DISTANCE_BUBBLE_RGB);
-					m.pbubble = bubble;
-					distances.addChild(bubble);
-					distances.addChild(text);
+					c.pbubble = bubble;
+					c.addChild(bubble);
+					c.addChild(text);
 
 					if (d > DISTANCE_CUT_OFF) {
 						text.visible = false;
@@ -412,7 +415,7 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 		contextMenu.disabled = false;
 		if (e.button !== 2 && !is_dragging) {
 			if (mouse_last_click.x === e.x && mouse_last_click.y === e.y) {
-				var x = (e.x - stage.x - canvas.offsetParent.offsetLeft - canvasMarginW) * 100 / plan.stage_scale;
+				var x = (e.x - stage.x - canvas.offsetParent.offsetLeft - canvasMarginW/2) * 100 / plan.stage_scale;
 				var y = (e.y - stage.y - canvas.offsetParent.offsetTop - canvasMarginH/2) * 100 / plan.stage_scale;
 				if (mouse_mode === 'wall') {
 					contextMenu.disabled = true;
@@ -500,7 +503,11 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 		stage.addChild(coverage);
 
 		createjs.Ticker.addEventListener('tick', tick);
-		contextMenu.setup();
+		contextMenu.setup(this.menu);
+	};
+
+	this.setupMenu = function(menu) {
+		this.menu = menu;
 	};
 
 	this.startCalibration = function(cb) {
@@ -599,12 +606,16 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 		container.addChild(ap);
 		container.addChild(overlaps);
 
-		var text = new createjs.Text('AP ' + plan.ap_index++, '12px Arial', AP_TEXT_RGB);
+		var apNumber = plan.ap_index++;
+		var text = new createjs.Text(apNumber, '12px Arial', AP_TEXT_RGB);
 		text.scaleX = text.scaleY = 100 / plan.stage_scale;
 		text.textBaseline = 'alphabetic';
 
 		var bubble = addBubble(text, AP_BUBBLE_RGB);
 		ap.pbubble = bubble;
+		ap.inventory = {
+			number: apNumber
+		};
 		container.addChild(bubble);
 		container.addChild(text);
 
@@ -617,11 +628,19 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 
 	this.reIndexAPs = function() {
 		var ap_index = 1;
-		for (var i=0; i<layers.length; i++) {
-			if (layers[i].layer_type !== 'ap') continue;
-			_.map(layers[i].children, ap => ap.children[4].text = `AP ${ap_index++}`);
-		}
+		_.each(layers, layer => {
+			if (layer.layer_type === 'ap') {
+				_.map(layer.children, ap => {
+					ap.children[4].text = ap_index;
+					_.set(ap, 'inventory.number', ap_index++);
+				});
+			}
+		});
 		plan.ap_index = ap_index;
+	};
+
+	this.getCurrentAP = function() {
+		return selectedAP;
 	};
 
 	this.deleteSelectedAP = function() {
@@ -751,7 +770,8 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 		var self = this;
 		var img = new Image();
 		var defer = $q.defer();
-		img.src = url.replace('public/', '');
+		img.setAttribute('crossOrigin', 'anonymous');
+		img.src = url.replace('public/', '').replace('http://bitlion.com:3000', '');
 		img.onload = function(event) {
 			var t = event.target;
 			var f = new createjs.Bitmap(t);

@@ -18,9 +18,10 @@ module.exports = {
 				'public/lib/angular-material/angular-material.css',
 				'public/lib/jQueryFileUpload/css/style.css',
 				'public/lib/blueimp-file-upload/css/jquery.fileupload.css',
-				'public/lib/blueimp-file-upload/css/jquery.fileupload-ui.css',
+				'public/lib/blueimp-file-upload/css/jquery.fileupload-ui.css'
 			],
 			js: [
+				'public/lib/bootstrap/dist/js/bootstrap.min.js',
 				'public/lib/angular/angular.js',
 				'public/lib/angular-resource/angular-resource.js',
 				'public/lib/angular-cookies/angular-cookies.js',

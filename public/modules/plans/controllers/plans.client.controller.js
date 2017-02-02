@@ -1,7 +1,11 @@
 'use strict';
 
-angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '$state', '$stateParams', '$location', 'Authentication', 'Drawing', '$timeout', '$http', 'Plans',
-    function($scope, $rootScope, $state, $stateParams, $location, Authentication, Drawing, $timeout, $http, Plans) {
+angular.module('plans')
+    .controller('PlansController',
+    ['$scope', '$rootScope', '$state', '$stateParams', '$location',
+        'Authentication', 'Drawing', '$timeout', '$http', 'Plans', 'contextMenu',
+    function($scope, $rootScope, $state, $stateParams, $location,
+        Authentication, Drawing, $timeout, $http, Plans, contextMenu) {
 
 		$scope.authentication = Authentication;
 
@@ -22,6 +26,7 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
         };
 
         $scope.icons = {
+            loading: iconset.loading,
             save: iconset.save,
             pan: iconset.pan,
             ap: iconset.ap,
@@ -55,6 +60,19 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
                 }
         };
 
+        $scope.menu = {
+            mode: 'ap'
+        };
+        Drawing.setupMenu($scope.menu);
+
+        $scope.closeMenu = function() {
+            contextMenu.close();
+        };
+
+        $scope.planProperties = function() {
+            $scope.menu.mode = 'plan';
+        };
+
         $scope.selectWallType = function() {
             Drawing.selectWallType($scope.wall_types[$scope.wall_type]);
         };
@@ -65,9 +83,8 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
             Drawing.deleteSelectedAP();
         };
 
-        $scope.apProperties = function() {
-            console.console('apProperties');
-            $scope.ap_properties = true;
+        $scope.getCurrentAP = function() {
+            $scope.ap = Drawing.getCurrentAP();
         };
 
         $scope.deleteWall = function() {
@@ -199,7 +216,10 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
         $scope.newPlan = function() {
             $scope.flooplan_name = '';
             $scope.plan = new Plans({
-                title: 'Untitled'
+                title: 'Untitled',
+                details: {
+                    contacts: []
+                }
             });
             $timeout(function() {
                 $scope.settings = {
@@ -217,6 +237,7 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
                 Drawing.initBoard($scope.settings.signal_radius);
                 Drawing.scale(100);
                 $scope.updateSignalStrength();
+                $scope.planReady = true;
             }.bind(Drawing), 200);
         };
 
@@ -281,13 +302,68 @@ angular.module('plans').controller('PlansController', ['$scope', '$rootScope', '
 			}, function() {
                 $scope.settings = $scope.plan.settings;
                 $scope.flooplan_name = $scope.plan.title;
+                if (typeof $scope.plan.details !== 'object') $scope.plan.details = {};
+                if (!$scope.plan.details.contacts) $scope.plan.details.contacts = [];
                 Drawing.loadPlan($stateParams.planId, $scope.plan.stage, $scope.settings.signal_radius, $scope.updateControls);
+                $timeout(() => {
+                    $scope.planReady = true;
+                }, 1100);
             });
 		};
 
         $scope.selectTool = function(mode) {
             $scope.mouse_mode = mode;
             Drawing.selectTool(mode);
+        };
+
+        $scope.addContact = function() {
+            $scope.pp_edit.contacts = true;
+            var newContact = {};
+            $scope.edit_prop = newContact;
+            if (!$scope.plan.details.contacts) $scope.plan.details.contacts = [];
+            $scope.plan.details.contacts.push(newContact);
+        };
+
+        $scope.removeContact = function(index) {
+            $scope.plan.details.contacts.splice(index, 1);
+            $scope.savePlan();
+        };
+
+        $scope.addController = function() {
+            $scope.pp_edit.controllers = true;
+            var newController = {};
+            $scope.edit_prop = newController;
+            if (!$scope.plan.details.controllers) $scope.plan.details.controllers = [];
+            $scope.plan.details.controllers.push(newController);
+        };
+
+        $scope.removeController = function(index) {
+            $scope.plan.details.controllers.splice(index, 1);
+            $scope.savePlan();
+        };
+
+        $scope.addLicense = function() {
+            $scope.pp_edit.licenses = true;
+            var newLicense = {};
+            $scope.edit_prop = newLicense;
+            if (!$scope.plan.details.licenses) $scope.plan.details.licenses = [];
+            $scope.plan.details.licenses.push(newLicense);
+        };
+
+        $scope.removeLicense = function(index) {
+            $scope.plan.details.licenses.splice(index, 1);
+            $scope.savePlan();
+        };
+
+        $scope.pp_edit = {};
+        $scope.toggleEdit = function(prop, obj) {
+            $scope.pp_edit[prop] = !$scope.pp_edit[prop];
+            if (obj) $scope.edit_prop = obj;
+        };
+
+        $scope.savePlanProperties = function() {
+            $scope.savePlan();
+            $scope.pp_edit = {};
         };
 	}
 ]);

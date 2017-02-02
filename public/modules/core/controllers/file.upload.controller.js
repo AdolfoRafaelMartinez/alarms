@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('core', ['blueimp.fileupload'])
+angular.module('core')
 .config([
     '$httpProvider', 'fileUploadProvider',
     function ($httpProvider, fileUploadProvider) {

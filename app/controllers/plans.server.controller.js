@@ -94,13 +94,11 @@ exports.update = function(req, res) {
 
     var plan_data = req.body;
     saveThumb(req.body.thumb)
-        .then(function(pic) {
+        .then(pic => {
             plan_data.thumb = pic.thumb;
             plan_data.screenshot = pic.file;
             plan = _.extend(plan, plan_data);
-        })
-        .then(function() {
-            plan.save(function(err) {
+            return plan.save(function(err) {
                 if (err) {
                     return res.status(400).send({
                         message: errorHandler.getErrorMessage(err)
@@ -108,6 +106,12 @@ exports.update = function(req, res) {
                 } else {
                     res.json(plan);
                 }
+            });
+        })
+        .catch(err => {
+            res.status(500).send({
+                message: errorHandler.getErrorMessage(err),
+                err: err
             });
         });
 };

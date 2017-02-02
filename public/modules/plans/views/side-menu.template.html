@@ -1,16 +1,23 @@
-  <md-list>
+<md-list>
     <md-item>
-        <div flex="10" class="group">
+        <div flex="10" class="side-details">
+            <a href class="pull-right" ng-click="plan_properties = !plan_properties"><ng-md-icon icon="settings"></ng-md-icon></a>
+            {{ plan.details.client || '(project details not set)' }}<br />
+            <span>Project:</span> {{ plan.details.project }}<br />
+            <span>Site:</span> {{ plan.details.site }}<br />
+            <div ng-if="plan.details.address">
+                {{ plan.details.address }}<br />
+                {{ plan.details.city }}, {{ plan.details.zipcode }}<br />
+            </div>
+            <span>Floors:</span> {{ plan.details.floors || 'N/A' }}<br />
+            <span>AP count:</span> {{ getTotalAPs() }}
+        </div>
+        <div flex="10">
             <input type="text" required ng-model="flooplan_name" />
-            <span class="highlight"></span>
-            <span class="bar"></span>
-            <label>File Name</label>
             <md-button ng-click="savePlan()" aria-label="Save plan"><ng-md-icon icon="{{ icons.save }}"></ng-md-icon> <span>Save</span></md-button>
         </div>
-        <div flex="10" style="background: #edf; border: 1px dashed #aaf; padding: 1em 0.5em;">AP count: {{ getTotalAPs() }}</div>
     </md-item>
     <md-item>
-        <div flex="10">Floorplans<hr /></div>
         <div flex="10">
             <form id="fileupload" action="/upload" method="POST" enctype="multipart/form-data" data-ng-controller="pjFileUploadController" data-file-upload="options" data-ng-class="{'fileupload-processing': processing() || loadingFiles}">
                 <span class="btn btn-success fileinput-button" ng-class="{disabled: disabled}">
@@ -37,11 +44,11 @@
                 <md-button ng-click="show_walls=false; selectTool('pan')" aria-label="pan-tool"><ng-md-icon icon="{{ icons.pan }}"></ng-md-icon></md-button>
                 <md-button ng-click="show_walls=false; selectTool('ap')" aria-label="ap-placement-tool"><ng-md-icon icon="{{ icons.ap }}"></ng-md-icon></md-button>
                 <md-button ng-click="show_walls= true; selectTool('wall')" aria-label="wall-placement-tool"><ng-md-icon icon="{{ icons.wall }}"></ng-md-icon></md-button>
-				<div ng-show="show_walls">
-					Wall type: <md-select role="application" ng-model="wall_type" ng-change="selectWallType()">
-						<md-option ng-value="wall_id" ng-repeat="(wall_id, wall_type) in wall_types">{{ wall_type.desc }}</md-option>
-					</md-select>
-				</div>
+                <div ng-show="show_walls">
+                    Wall type: <md-select role="application" ng-model="wall_type" ng-change="selectWallType()">
+                        <md-option ng-value="wall_id" ng-repeat="(wall_id, wall_type) in wall_types">{{ wall_type.desc }}</md-option>
+                    </md-select>
+                </div>
                 <h4>Show:</h4>
                 <hr />
                 <div flex="10">
@@ -58,8 +65,8 @@
     </md-item>
     <md-item ng-repeat="it in ul.layers">
         <md-button ng-click="ul.selectLayer(it)" ng-class="{'selected' : it === ul.selected }">
-          <md-icon md-svg-icon="{{it.icon}}" class="avatar"></md-icon>
-          {{it.name}}
+            <md-icon md-svg-icon="{{it.icon}}" class="avatar"></md-icon>
+            {{it.name}}
         </md-button>
     </md-item>
-  </md-list>
+</md-list>
