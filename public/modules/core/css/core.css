@@ -11,6 +11,14 @@
 	padding-top: 5px;
 }
 
+.red {
+	color: #a44;
+}
+
+.green {
+	color: #4a4;
+}
+
 section > div > div {
     padding: 0 2em;
 }

@@ -11,7 +11,11 @@
     vertical-align: text-top;
 }
 
-.drawing {
+.plan-property-item {
+    max-width: 640px;
+}
+
+.sheet-bg {
     background: url("http://farm8.static.flickr.com/6058/6430440053_0083658254_b.jpg");
 }
 
@@ -22,7 +26,6 @@
     right: 0;
     top: 0;
     bottom: 0;
-    background: url("http://farm8.static.flickr.com/6058/6430440053_0083658254_b.jpg");
     transition: all linear 0.2s;
 }
 
@@ -36,7 +39,7 @@
 }
 
 .plan-properties {
-    max-width: 640px;
+    max-width: 1240px;
 }
 
 .side-details {
@@ -46,4 +49,12 @@
 
 .side-details span {
     font-style: normal;
+}
+
+.max-800 {
+    max-width: 800px;
+}
+
+.add-item {
+    padding-bottom: 10px;
 }

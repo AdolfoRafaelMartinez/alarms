@@ -2,6 +2,7 @@
 	"adjoining-classes": false,
 	"box-model": false,
 	"box-sizing": false,
+	"ids": false,
 	"floats": false,
 	"font-sizes": false,
 	"important": false,

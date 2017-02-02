@@ -120,7 +120,6 @@ spinner, .spinner-content, .spinner-container {
   transition: opacity 500ms ease-in;
 }
 
-
 .spinner-active .spinner-container,
 .spinner-active-add .spinner-container,
 .spinner-active-add-active .spinner-container {
