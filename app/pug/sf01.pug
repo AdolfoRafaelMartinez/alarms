@@ -1,0 +1,148 @@
+doctype html
+html(lang="en")
+    head
+        meta(charset="utf-8")
+        title = WLAN Survey Design - Powered by puddleJump
+        link(href="/pdf-report/assets/reportv1.css" rel="stylesheet" type="text/css")
+        link(href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet")
+
+    body
+        div#container
+
+            // Cover Page
+            div.page
+                div.header
+                    div.headertitle
+                        h1 WLAN
+                            br
+                            SURVEY DESIGN
+                    img.clientlogo(src=plan.details.client.logo)
+                div.content
+                    div.halfleft
+                        p.details=plan.details.client.name
+                            br
+                            =plan.details.project
+                            br
+                            =plan.details.site
+                        div.cardtitleblue Project Details
+                    div.halfright
+                        p.details=plan.details.address
+                            br
+                            =`${plan.details.city} ${plan.details.state}, ${plan.details.zipcode}`
+                            br
+                            =plan.details.floors
+                        div.cardtitlegray Site Details
+                    div.full
+                        p.contacts
+                            each contact in plan.details.contacts
+                                =contact.position
+                                br
+                                =contact.name
+                                br
+                                =`${contact.phone} ${contact.email}`
+                        div.cardtitleblack Contacts
+                    div.halfleft
+                        p.details
+                            =plan.details.msp.name
+                            br
+                            Designer: =plan.details.designer.name
+                            br
+                            =today
+                        div.cardtitleblack Presented by
+                div.footer
+                    img.msplogo(src=plan.details.msp.logo)
+                    img.pjlogo(src='/pdf-report/assets/pbpj.png')
+
+            // BOM
+            div.page
+                div.header
+                    div.headertitle
+                        h2
+                            =plan.details.project
+                            br
+                            =plan.details.site
+                            Bill of Materials
+                    img.clientlogo(src=plan.details.client.logo)
+                div.content
+                    div.third
+                        p.aps=`# ${plan.stage.aps.length}`
+                        div.cardtitlegreen APs
+                    div.third
+                        p.ams=`# ${plan.stage.ams.length}`
+                        div.cardtitleblue AMs
+                    div.smallstack
+                        div.small
+                            p.mounts=`# ${plan.stage.aps.length}`
+                            div.cardtitlegray Mounts
+                        div.small
+                            p.sfps=`# ${plan.stage.aps.length}`
+                            div.cardtitleblack SFPs
+                    div.full
+
+                        each controller in plan.details.controllers
+                            p.controllers=`${controller.country} - ${controller.model}`
+                                if controller.ha
+                                    - HA
+                            p=controller.description
+
+                        div.cardtitledarkblue Controllers
+
+                    div.full
+                        p.licenses
+
+                            each lic in plan.details.licenses
+                                =lic.serial
+                                br
+
+                        div.cardtitledarkgreen Licenses
+
+                    div.full
+                        div.bom
+                            table.bom
+                                tr(valign='top')
+                                    th(width='120px' align='left') Part No.
+                                    th(width='422px' align='left') Description
+                                    th(width='50px' align='center') Qty
+
+                                each part in plan.details.parts
+                                    tr(valign='top')
+                                        td(align='left')=part.name
+                                        td=part.desc
+                                        td(align='center')=part.nr
+
+                div.footer
+                    img.msplogo(src=plan.details.msp.logo)
+                    img.pjlogo(src='/pdf-report/assets/pbpj.png')
+
+            // Floor plan
+            div.page
+                div.header
+                    div.headertitle
+                        h2
+                            =`${plan.details.project}`
+                            br
+                            =`${plan.details.site}`
+                            br
+                            =`${plan.details.building}`
+                    img.clientlogo(src=plan.details.client.logo)
+                div.content
+                    div.full
+                        img.floor(src='/pdf-report/plan-screenshot.png')
+                    div.full
+                        div.placements
+                            each ap, api in plan.stage.aps
+                                span.am=`${api}: ${ap.inventory.name}`
+                div.footer
+                    img.msplogo(src=plan.details.msp.logo)
+                    img.pjlogo(src='/pdf-report/assets/pbpj.png')
+
+
+            // THANK YOU page
+            div.page
+                div.tycontent(align='center')
+                    div.tycard
+                        p Thank you!
+                    div
+                        img(src=plan.details.msp.logo)
+                    div
+                        img(src='/pdf-report/assets/pJlogo.png')
