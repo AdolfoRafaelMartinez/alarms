@@ -2,9 +2,9 @@
 
 angular.module('plans')
     .controller('PlansController',
-    ['$scope', '$rootScope', '$state', '$stateParams', '$location',
+    ['$scope', '$rootScope', '$state', '$stateParams', '$location', 'pdfReporting',
         'Authentication', 'Drawing', '$timeout', '$http', 'Plans', 'contextMenu',
-    function($scope, $rootScope, $state, $stateParams, $location,
+    function($scope, $rootScope, $state, $stateParams, $location, pdfReporting,
         Authentication, Drawing, $timeout, $http, Plans, contextMenu) {
 
 		$scope.authentication = Authentication;
@@ -364,6 +364,10 @@ angular.module('plans')
         $scope.savePlanProperties = function() {
             $scope.savePlan();
             $scope.pp_edit = {};
+        };
+
+        $scope.report = function() {
+            pdfReporting.download();
         };
 	}
 ]);

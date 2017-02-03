@@ -39,7 +39,9 @@
         "$upload",
         "$",
         "h337",
-        "$scope"
+        "$scope",
+		"html2canvas",
+		"Canvas2Image"
 	],
 	"indent": 4, // Specify indentation spacing
 	"devel": true, // Allow development statements e.g. `console.log();`.
