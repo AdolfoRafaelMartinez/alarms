@@ -47,8 +47,10 @@
     "passport-local": "~1.0.0",
     "passport-twitter": "~1.0.2",
     "path": "^0.11.14",
+    "phantom-html2pdf": "^4.0.0",
     "pug": "^2.0.0-beta10",
     "q": "^1.4.1",
+    "shortid": "^2.2.6",
     "swig": "~1.4.1",
     "uuid": "^2.0.1"
   },

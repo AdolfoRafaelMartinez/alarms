@@ -342,19 +342,6 @@ angular.module('plans')
             $scope.savePlan();
         };
 
-        $scope.addLicense = function() {
-            $scope.pp_edit.licenses = true;
-            var newLicense = {};
-            $scope.edit_prop = newLicense;
-            if (!$scope.plan.details.licenses) $scope.plan.details.licenses = [];
-            $scope.plan.details.licenses.push(newLicense);
-        };
-
-        $scope.removeLicense = function(index) {
-            $scope.plan.details.licenses.splice(index, 1);
-            $scope.savePlan();
-        };
-
         $scope.pp_edit = {};
         $scope.toggleEdit = function(prop, obj) {
             $scope.pp_edit[prop] = !$scope.pp_edit[prop];

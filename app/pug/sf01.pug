@@ -3,7 +3,7 @@ html(lang="en")
     head
         meta(charset="utf-8")
         title = WLAN Survey Design - Powered by puddleJump
-        link(href="/pdf-report/assets/reportv1.css" rel="stylesheet" type="text/css")
+        link(href="../assets/reportv1.css" rel="stylesheet" type="text/css")
         link(href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet")
 
     body
@@ -31,7 +31,7 @@ html(lang="en")
                             =`${plan.details.city} ${plan.details.state}, ${plan.details.zipcode}`
                             br
                             =plan.details.floors
-                        div.cardtitlegray Site Details
+                        div.cardtitlegrey Site Details
                     div.full
                         p.contacts
                             each contact in plan.details.contacts
@@ -51,7 +51,7 @@ html(lang="en")
                         div.cardtitleblack Presented by
                 div.footer
                     img.msplogo(src=plan.details.msp.logo)
-                    img.pjlogo(src='/pdf-report/assets/pbpj.png')
+                    img.pjlogo(src=`${assetsDir}/pbpj.png`)
 
             // BOM
             div.page
@@ -73,7 +73,7 @@ html(lang="en")
                     div.smallstack
                         div.small
                             p.mounts=`# ${plan.stage.aps.length}`
-                            div.cardtitlegray Mounts
+                            div.cardtitlegrey Mounts
                         div.small
                             p.sfps=`# ${plan.stage.aps.length}`
                             div.cardtitleblack SFPs
@@ -112,7 +112,7 @@ html(lang="en")
 
                 div.footer
                     img.msplogo(src=plan.details.msp.logo)
-                    img.pjlogo(src='/pdf-report/assets/pbpj.png')
+                    img.pjlogo(src=`${assetsDir}/pbpj.png`)
 
             // Floor plan
             div.page
@@ -127,14 +127,14 @@ html(lang="en")
                     img.clientlogo(src=plan.details.client.logo)
                 div.content
                     div.full
-                        img.floor(src='/pdf-report/plan-screenshot.png')
+                        img.floor(src='../tmp/plan-screenshot.png')
                     div.full
                         div.placements
                             each ap, api in plan.stage.aps
                                 span.am=`${api}: ${ap.inventory.name}`
                 div.footer
                     img.msplogo(src=plan.details.msp.logo)
-                    img.pjlogo(src='/pdf-report/assets/pbpj.png')
+                    img.pjlogo(src=`${assetsDir}/pbpj.png`)
 
 
             // THANK YOU page
@@ -145,4 +145,4 @@ html(lang="en")
                     div
                         img(src=plan.details.msp.logo)
                     div
-                        img(src='/pdf-report/assets/pJlogo.png')
+                        img(src=`${assetsDir}/pJlogo.png`)
