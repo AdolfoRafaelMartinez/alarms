@@ -195,7 +195,7 @@
                                 <div class="form-group row">
                                     <div class="col-lg-12">
                                         <label class="form-control-label">Controller Present?</label>
-                                        <md-switch aria-label="controller present" ng-change="savePlanProperties()" ng-model="plan.details.ctrlPresent">
+                                        <md-switch aria-label="controller present" ng-change="checkController()" ng-model="plan.details.ctrlPresent">
                                             {{ plan.details.ctrlPresent ? 'YES' : 'No (Instant Cluster)' }}
                                         </md-switch>
                                     </div>
@@ -216,73 +216,64 @@
                                             <span ng-if="ctrl.ha"><i class="glyphicon glyphicon-ok-circle green"></i></span>
                                             <span ng-if="!ctrl.ha"><i class="glyphicon glyphicon-remove-circle red"></i></span>
                                         </div>
-                                        <div class="col-lg-12"><span>Licenses:</span></div>
-                                        <div class="col-lg-12">
-                                            <div class="row">
-                                                <div class="col-lg-3">• AP/AM:</div>
-                                                <div class="col-lg-7"><span ng-bind="ctrl.lic.ap.serial"></span></div>
-                                                <div class="col-lg-2"><span ng-bind="ctrl.lic.ap.qty"></span></div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-lg-3">• PEFNG:</div>
-                                                <div class="col-lg-7"><span ng-bind="ctrl.lic.pefng.serial"></span></div>
-                                                <div class="col-lg-2"><span ng-bind="ctrl.lic.pefng.qty"></span></div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-lg-3">• RFP:</div>
-                                                <div class="col-lg-7"><span ng-bind="ctrl.lic.rfp.serial"></span></div>
-                                                <div class="col-lg-2"><span ng-bind="ctrl.lic.rfp.qty"></span></div>
-                                            </div>
+                                        <div class="col-lg-12"><span>AP/AM Licenses:</span> <span ng-bind="ctrl.lic.ap.qty"></span></div>
+                                        <div class="col-lg-12"><span>PEFNG License:</span>
+                                            <span ng-if="ctrl.lic.pefng.present"><i class="glyphicon glyphicon-ok-circle green"></i></span>
+                                            <span ng-if="!ctrl.lic.pefng.present"><i class="glyphicon glyphicon-remove-circle red"></i></span>
+                                        </div>
+                                        <div class="col-lg-12"><span>RFP License:</span>
+                                            <span ng-if="ctrl.lic.rfp.present"><i class="glyphicon glyphicon-ok-circle green"></i></span>
+                                            <span ng-if="!ctrl.lic.rfp.present"><i class="glyphicon glyphicon-remove-circle red"></i></span>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="form-group edit-contact" ng-show="pp_edit['controllers'] || (plan.details.ctrlPresent && !plan.details.controllers[0])">
+                        <div class="form-group edit-contact" ng-show="pp_edit['controllers']">
                             <form>
                                 <div class="col-lg-12 plan-property-item">
                                     <div class="form-group row">
-                                        <label class="col-sm-2 ptop5 text-right form-control-label">Country Code</label>
-                                        <div class="col-sm-10"><input type="text" ng-model="edit_prop.country" class="form-control" placeholder="US / CA / JP etc..."/></div>
+                                        <label class="col-sm-6 ptop5 text-right form-control-label">Country Code</label>
+                                        <div class="col-sm-6"><input type="text" ng-model="edit_prop.country" class="form-control" placeholder="US / CA / JP etc..."/></div>
                                     </div>
                                     <div class="form-group row">
-                                        <label class="col-sm-2 ptop5 text-right form-control-label">Model</label>
-                                        <div class="col-sm-10"><input type="text" ng-model="edit_prop.model" class="form-control" placeholder="Model"/></div>
+                                        <label class="col-sm-6 ptop5 text-right form-control-label">Model</label>
+                                        <div class="col-sm-6"><input type="text" ng-model="edit_prop.model" class="form-control" placeholder="Model"/></div>
                                     </div>
                                     <div class="form-group row">
-                                        <label class="col-sm-2 ptop5 text-right form-control-label">Description</label>
-                                        <div class="col-sm-10"><input type="text" ng-model="edit_prop.description" class="form-control" placeholder="Description..."/></div>
+                                        <label class="col-sm-6 ptop5 text-right form-control-label">Description</label>
+                                        <div class="col-sm-6"><input type="text" ng-model="edit_prop.description" class="form-control" placeholder="Description..."/></div>
                                     </div>
                                     <div class="form-group row">
-                                        <label class="col-sm-2 ptop5 text-right form-control-label">HA</label>
-                                        <div class="col-sm-10">
+                                        <div class="col-sm-6 text-right"><label class="form-control-label">HA</label></div>
+                                        <div class="col-sm-6">
                                             <md-switch aria-label="HA" ng-model="edit_prop.ha">HA</md-switch>
                                         </div>
                                     </div>
                                     <div class="form-group row">
-                                        <label class="col-sm-2 ptop5 text-right form-control-label">Licenses</label>
-                                        <div class="col-sm-10">
-                                            <div class="form-group row">
-                                                <label class="col-sm-2 ptop5 text-right form-control-label">AP/AM:</label>
-                                                <div class="col-sm-8"><input type="text" ng-model="edit_prop.lic.ap.serial" class="form-control" placeholder="AP/AM license serial nr..."/></div>
-                                                <div class="col-sm-2"><input type="number" ng-model="edit_prop.lic.ap.qty" class="form-control tight" placeholder="qty" /></div>
-                                            </div>
-                                            <div class="form-group row">
-                                                <label class="col-sm-2 ptop5 text-right form-control-label">PEFNG:</label>
-                                                <div class="col-sm-8"><input type="text" ng-model="edit_prop.lic.pefng.serial" class="form-control" placeholder="PEFNG license serial nr..."/></div>
-                                                <div class="col-sm-2"><input type="number" ng-model="edit_prop.lic.pefng.qty" class="form-control tight" placeholder="qty" /></div>
-                                            </div>
-                                            <div class="form-group row">
-                                                <label class="col-sm-2 ptop5 text-right form-control-label">RFP:</label>
-                                                <div class="col-sm-8"><input type="text" ng-model="edit_prop.lic.rfp.serial" class="form-control" placeholder="RFP license serial nr..."/></div>
-                                                <div class="col-sm-2"><input type="number" ng-model="edit_prop.lic.rfp.qty" class="form-control tight" placeholder="qty" /></div>
-                                            </div>
+                                        <label class="col-sm-6 text-right form-control-label">AP/AM spares</label>
+                                        <div class="col-sm-6"><input type="number" ng-model="edit_prop.lic.ap.spares" class="form-control tight" placeholder="qty" /></div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <div class="col-sm-6 text-right"><label class="form-control-label">PEFNG License?</label></div>
+                                        <div class="col-sm-6">
+                                            <md-switch aria-label="PEFNG licences" ng-model="edit_prop.lic.pefng.present">
+                                                {{ edit_prop.lic.pefng.present ? 'Yes' : 'No' }}
+                                            </md-switch>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <div class="col-sm-6 text-right"><label class="form-control-label">RFP License?</label></div>
+                                        <div class="col-sm-6">
+                                            <md-switch aria-label="RFP licences" ng-model="edit_prop.lic.rfc.present">
+                                                {{ edit_prop.lic.rfp.present ? 'Yes' : 'No' }}
+                                            </md-switch>
                                         </div>
                                     </div>
                                     <div class="form-group row">
                                         <div class="col-sm-offset-2 col-sm-10">
-                                            <button type="submit" class="btn btn-primary" ng-click="savePlanProperties();">Save</button>
+                                            <button type="submit" class="btn btn-primary" ng-click="updateLicenses(); savePlanProperties();">Save</button>
                                             <button class="btn btn-default pull-right" ng-click="toggleEdit('controllers')">Cancel</button>
                                         </div>
                                     </div>

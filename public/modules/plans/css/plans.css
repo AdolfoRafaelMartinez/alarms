@@ -71,3 +71,7 @@
 .tight {
     padding: 6px;
 }
+
+md-switch {
+    margin: 0 15px;
+}

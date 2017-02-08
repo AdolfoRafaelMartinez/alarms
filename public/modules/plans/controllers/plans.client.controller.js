@@ -218,7 +218,16 @@ angular.module('plans')
             $scope.plan = new Plans({
                 title: 'Untitled',
                 details: {
-                    contacts: []
+                    contacts: [],
+                    stage: {
+                        aps: []
+                    },
+                    controllers: [{}],
+                    lic: {
+                        ap: {
+                            spares: 0
+                        }
+                    }
                 }
             });
             $timeout(function() {
@@ -331,10 +340,22 @@ angular.module('plans')
 
         $scope.addController = function() {
             $scope.pp_edit.controllers = true;
-            var newController = {};
+            var newController = {
+                lic: {
+                    ap: {}
+                }
+            };
             $scope.edit_prop = newController;
             if (!$scope.plan.details.controllers) $scope.plan.details.controllers = [];
             $scope.plan.details.controllers.push(newController);
+        };
+
+        $scope.checkController = function() {
+            if (!$scope.plan.details.controllers) {
+                $scope.addController();
+            } else {
+                $scope.savePlanProperties();
+            }
         };
 
         $scope.removeController = function(index) {
@@ -346,6 +367,10 @@ angular.module('plans')
         $scope.toggleEdit = function(prop, obj) {
             $scope.pp_edit[prop] = !$scope.pp_edit[prop];
             if (obj) $scope.edit_prop = obj;
+        };
+
+        $scope.updateLicenses = function() {
+            $scope.plan.details.controllers[0].lic.ap.qty = $scope.plan.stage.aps.length + $scope.plan.details.controllers[0].lic.ap.spares;
         };
 
         $scope.savePlanProperties = function() {
