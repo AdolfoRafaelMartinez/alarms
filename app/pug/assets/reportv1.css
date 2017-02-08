@@ -1,0 +1,382 @@
+/* puddleJump Reports v1 CSS - Optimized (hopefully) for Print*/
+
+/* Contents
+
+1. Color Reference
+2. Core Layout Styles
+3. Card Styles
+4. Unique Styles
+	4.1 Cover Page
+	4.2 BOM Page
+	4.3 Floorplan Pages
+	4.4 Thank You Page
+
+End Contents */
+
+/* 1. Color Reference
+
+Blue: #205299
+Dark Blue: #002050
+Green: #11a04c
+Dark Green: #005422
+Grey: #333333
+Light Grey: #cdc9c8
+Yellow: # d4cc26<-- We don't really use this yet, but just in case. It's sort of a living color scheme for now.
+Black: #000000 <-- Duh
+White: #ffffff <-- Duh
+
+End Section */
+
+/* 2. Core Layout */
+
+h1 {
+	font-size: 128px;
+}
+
+body {
+	font-family: 'Roboto', sans-serif;
+	font-size: 64px;
+	color: #333333;
+	margin: 0;
+	padding: 0;
+}
+
+#container {
+	width: 2800px;
+	height: 3380px;
+	margin: 0;
+	padding: 0;
+}
+
+.page {
+}
+
+.header {
+	height: 370px; /* Total header height is 108px */
+	padding: 36px; /* 9px is equivalent to 1/8th inch at standard resolution */
+}
+
+.headertitle {
+	float: left;
+}
+
+.headertitle h1, h2 {
+	margin: 0px;
+}
+
+.content {
+	height: 2560px; /* Remaining height for content. Top and bottom padding dictated by header and footer */
+	padding: 0px 36px 0px 36px; /* Left and right padding for consistency with page margins */
+}
+
+.content p {
+	padding: 36px;
+	margin: 0px;
+}
+.footer {
+	height: 200px; /* Total header height is 108px */
+	padding: 36px; /* 9px is equivalent to 1/8th inch at standard resolution */
+}
+
+.clientlogo {
+	width: 750px;
+	height: 300px;
+	float: right;
+}
+
+.msplogo {
+	float: left;
+	width: 660px;
+	height: 200px;
+}
+
+.pjlogo {
+	float: right;
+	width: 544px;
+	height: 120px;
+	padding-top: 80px;
+}
+
+/* End Section */
+
+/* 3. Card Styles */
+
+/* Class Examples
+
+	'full' : Tables
+	'half' : 'Project Details'
+	'third' : 'APs' and 'AMs'
+	'small' : 'Mounts' and 'SFPs'
+
+'half' has left and right versions
+'third' has left and right versions, and must be followed by 'small'
+
+End Class Examples*/
+
+.full {
+	width: 99.6%;
+	margin-top: 36px;
+	border: #cdc9c8 4px solid;
+	box-shadow: 0px 8px 16px 0px #cdc9c8;
+	float: left;
+}
+
+.halfleft {
+	width: 1210px;
+	margin-top: 36px;
+	border: #cdc9c8 4px solid;
+	box-shadow: 0px 8px 16px 0px #cdc9c8;
+	float: left;
+}
+
+.halfright {
+	width: 1210px;
+	margin-top: 36px;
+	border: #cdc9c8 4px solid;
+	box-shadow: 0px 8px 16px 0px #cdc9c8;
+	float: right;
+}
+
+.third {
+	width: 860px;
+	margin: 36px 36px 0px 0px;
+	border: #cdc9c8 4px solid;
+	box-shadow: 0px 8px 16px 0px #cdc9c8;
+	float: left;
+}
+
+.smallstack { /*Container to force stacking of small cards */
+	float: right;
+}
+
+.small {
+	width: 662px;
+	margin-top: 36px;
+	border: #cdc9c8 4px solid;
+	box-shadow: 0px 8px 16px 0px #cdc9c8;
+}
+
+.cardtitleblue {
+	width: 100%;
+	height: 100px;
+	background-color:#205299;
+	color: #ffffff;
+	text-align: right;
+	font-weight: bold;
+}
+
+.cardtitledarkblue {
+	width: 100%;
+	height: 100px;
+	background-color:#002050;
+	color: #ffffff;
+	text-align: right;
+	font-weight: bold;
+}
+
+.cardtitlegreen {
+	width: 100%;
+	height: 100px;
+	background-color:#11a04c;
+	color: #ffffff;
+	text-align: right;
+	font-weight: bold;
+}
+
+.cardtitledarkgreen {
+	width: 100%;
+	height: 100px;
+	background-color:#005422;
+	color: #ffffff;
+	text-align: right;
+	font-weight: bold;
+}
+
+.cardtitlegrey {
+	width: 100%;
+	height: 100px;
+	background-color:#333333;
+	color: #ffffff;
+	text-align: right;
+	font-weight: bold;
+}
+
+.cardtitleblack {
+	width: 100%;
+	height: 100px;
+	background-color:#000000;
+	color: #ffffff;
+	text-align: right;
+	font-weight: bold;
+}
+
+/* End Section */
+
+/* 4. Unique Styles */
+
+	/* 4.1 Cover Page */
+
+.details {
+	height: 450px;
+	background-image:url(tile1.png);
+}
+
+.contacts { /*Still working on getting the spacing right for this...*/
+	max-height: 450px;
+	background-image:url(tile1.png);
+	column-count: 3;
+	-webkit-column-count: 3;
+	-moz-column-count: 3;
+	column-fill: balance;
+	-webkit-column-fill: balance;
+	-moz-column-fill: balance;
+	font-size: 48px;
+	line-height: 60px;
+}
+
+	/* End Subsection */
+
+	/* 4.2 BOM Page */
+
+.aps {
+	height: 520px;
+	font-size: 400px;
+	font-weight: bold;
+	text-align: right;
+	color: #11a04c;
+	background: url(ap@4x.png);
+	background-repeat: no-repeat;
+}
+
+.ams {
+	height: 520px;
+	font-size: 400px;
+	font-weight: bold;
+	text-align: right;
+	color: #205299;
+	background: url(am@4x.png);
+	background-repeat: no-repeat;
+}
+
+.mounts {
+	background-image:url(tile1.png);
+	height: 152px;
+	text-align: right;
+	font-size: 150px;
+	font-weight: bold;
+	color: #333333;
+}
+
+.sfps {
+	background-image:url(tile1.png);
+	height: 152px;
+	text-align: right;
+	font-size: 150px;
+	font-weight: bold;
+	color: #000000;
+}
+
+.controllers {
+	background-image:url(tile1.png);
+	text-align: justify;
+}
+
+.licenses {
+	background-image:url(tile1.png);
+	column-count: 2;
+	-webkit-column-count: 2;
+	-moz-column-count: 2;
+	font-size: 56px;
+	line-height: 64px;
+	text-align: center;
+}
+
+.bom {
+	background-image:url(tile1.png);
+	height: 800px;
+	border-collapse: collapse;
+}
+
+.bom th {
+	background-color: #205299;
+	color: #ffffff;
+	font-size: 64px;
+	vertical-align: middle;
+	padding-left: 40px;
+}
+
+.bom td {
+	font-size: 48px;
+	vertical-align: middle;
+	border-bottom: 4px solid #cdc9c8;
+	border-right: 4px solid #cdc9c8;
+	padding-left: 40px;
+}
+
+	/* End Subsection */
+
+	/* 4.3 Floorplan Page */
+
+.floor {
+	max-width: 2470px;
+}
+
+.placements {
+	background-image:url(tile1.png);
+	height: 640px;
+	font-size: 44px;
+	column-count: 3;
+	-webkit-column-count: 3;
+	-moz-column-count: 3;
+}
+
+span.am {
+	background-image: url(ambullet@4x.png);
+	background-repeat: no-repeat;
+	background-position: 0px 12px;
+	line-height: 80px;
+	padding: 20px 20px 20px 16px;
+	margin-right: 20px;
+}
+
+span.ap {
+	background-image: url(apbullet@4x.png);
+	background-repeat: no-repeat;
+	background-position: 0px 12px;
+	line-height: 80px;
+	padding: 20px 20px 20px 16px;
+	margin-right: 20px;
+	color: #ffffff;
+}
+
+	/* End Subsection */
+
+	/* 4.4 Thank You Page */
+
+.tycontent {
+	padding-top: 840px; /* Left and right padding for consistency with page margins */
+	align-content: center;
+}
+
+.tycontent img {
+	padding-top: 200px;
+}
+
+.tycard {
+	width: 1840px;
+	height: 800px;
+	background-color: #205299;
+	background-image: url(tile2.png);
+	box-shadow: 0px 8px 16px 0px #cdc9c8;
+}
+
+.tycard p {
+	color: white;
+	text-align: center;
+	font-weight: bolder;
+	font-size: 240px;
+	padding-top: 200px;
+}
+	/* End Subsection */
+
+/* End Section */

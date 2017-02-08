@@ -24,8 +24,8 @@
     z-index: 10;
     left: 0;
     right: 0;
+    min-height: 100%;
     top: 0;
-    bottom: 0;
     transition: all linear 0.2s;
 }
 
@@ -57,4 +57,21 @@
 
 .add-item {
     padding-bottom: 10px;
+}
+
+.large {
+    font-size: 24px;
+    padding-top: 14px;
+}
+
+.small-logo {
+    max-width: 140px;
+}
+
+.tight {
+    padding: 6px;
+}
+
+md-switch {
+    margin: 0 15px;
 }

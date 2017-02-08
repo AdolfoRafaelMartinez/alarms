@@ -1,14 +1,17 @@
 'use strict';
 
-var mongoose = require('mongoose'),
-    uuid = require('uuid'),
-    gm = require('gm'),
-    fs = require('fs'),
-    errorHandler = require('./errors.server.controller'),
-    Plan = mongoose.model('Plan'),
-    _ = require('lodash'),
-    Q = require('q');
+const mongoose = require('mongoose');
+const uuid     = require('uuid');
+const gm       = require('gm');
+const fs       = require('fs');
+const _        = require('lodash');
+const Q        = require('q');
+const pug      = require('pug');
+const pdf      = require('phantom-html2pdf');
+const shortid  = require('shortid');
 
+const errorHandler = require('./errors.server.controller');
+const Plan = mongoose.model('Plan');
 
 function saveThumb(thumb) {
     var base64Data = thumb.replace(/^data:image\/png;base64,/, '');
@@ -210,6 +213,38 @@ exports.coverage = function(req, res) {
     });
 
     res.json(points);
+};
+
+exports.pdfReport = function(req, res) {
+    if (!req.plan.stage.ams) req.plan.stage.ams = [];
+    if (!req.plan.details.parts) req.plan.details.parts = [];
+    _.each(req.plan.stage.aps, (ap, i) => {
+        if (!_.get(ap, 'inventory.name')) _.set(ap, 'inventory.name', `AP${i}`);
+    });
+    pug.renderFile(`${__dirname}/../pug/sf01.pug`,
+        {
+            plan: req.plan,
+            today: new Date().toUTCString(),
+            assetsDir: `${__dirname}/../pug/assets`
+        }, (err, result) => {
+            let htmlFilename = `${__dirname}/../pug/tmp/${shortid.generate()}.html`;
+            let cssFilename = `${__dirname}/../pug/assets/reportv1.css`;
+            fs.writeFile(htmlFilename, result, function(err) {
+                pdf.convert({
+                    html: htmlFilename,
+                    dpi: 300,
+                    css: cssFilename,
+                    paperSize: {
+                        format: 'A4',
+                        orientation: 'portrait',
+                        border: '0',
+                        deleteOnAction: false
+                    }
+                }, function(err, result) {
+                    res.send(result.toStream());
+                });
+            });
+        });
 };
 
 /**

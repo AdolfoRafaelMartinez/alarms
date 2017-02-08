@@ -2,9 +2,9 @@
 
 angular.module('plans')
     .controller('PlansController',
-    ['$scope', '$rootScope', '$state', '$stateParams', '$location',
+    ['$scope', '$rootScope', '$state', '$stateParams', '$location', 'pdfReporting',
         'Authentication', 'Drawing', '$timeout', '$http', 'Plans', 'contextMenu',
-    function($scope, $rootScope, $state, $stateParams, $location,
+    function($scope, $rootScope, $state, $stateParams, $location, pdfReporting,
         Authentication, Drawing, $timeout, $http, Plans, contextMenu) {
 
 		$scope.authentication = Authentication;
@@ -218,7 +218,16 @@ angular.module('plans')
             $scope.plan = new Plans({
                 title: 'Untitled',
                 details: {
-                    contacts: []
+                    contacts: [],
+                    stage: {
+                        aps: []
+                    },
+                    controllers: [{}],
+                    lic: {
+                        ap: {
+                            spares: 0
+                        }
+                    }
                 }
             });
             $timeout(function() {
@@ -331,27 +340,26 @@ angular.module('plans')
 
         $scope.addController = function() {
             $scope.pp_edit.controllers = true;
-            var newController = {};
+            var newController = {
+                lic: {
+                    ap: {}
+                }
+            };
             $scope.edit_prop = newController;
             if (!$scope.plan.details.controllers) $scope.plan.details.controllers = [];
             $scope.plan.details.controllers.push(newController);
         };
 
+        $scope.checkController = function() {
+            if (!$scope.plan.details.controllers) {
+                $scope.addController();
+            } else {
+                $scope.savePlanProperties();
+            }
+        };
+
         $scope.removeController = function(index) {
             $scope.plan.details.controllers.splice(index, 1);
-            $scope.savePlan();
-        };
-
-        $scope.addLicense = function() {
-            $scope.pp_edit.licenses = true;
-            var newLicense = {};
-            $scope.edit_prop = newLicense;
-            if (!$scope.plan.details.licenses) $scope.plan.details.licenses = [];
-            $scope.plan.details.licenses.push(newLicense);
-        };
-
-        $scope.removeLicense = function(index) {
-            $scope.plan.details.licenses.splice(index, 1);
             $scope.savePlan();
         };
 
@@ -361,9 +369,17 @@ angular.module('plans')
             if (obj) $scope.edit_prop = obj;
         };
 
+        $scope.updateLicenses = function() {
+            $scope.plan.details.controllers[0].lic.ap.qty = $scope.plan.stage.aps.length + $scope.plan.details.controllers[0].lic.ap.spares;
+        };
+
         $scope.savePlanProperties = function() {
             $scope.savePlan();
             $scope.pp_edit = {};
+        };
+
+        $scope.report = function() {
+            pdfReporting.download();
         };
 	}
 ]);

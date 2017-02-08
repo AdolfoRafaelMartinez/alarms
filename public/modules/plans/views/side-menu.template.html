@@ -1,7 +1,10 @@
 <md-list>
     <md-item>
         <div flex="10" class="side-details">
-            <a href class="pull-right" ng-click="plan_properties = !plan_properties"><ng-md-icon icon="settings"></ng-md-icon></a>
+            <div class="pull-right">
+                <a href ng-click="plan_properties = !plan_properties"><ng-md-icon icon="settings"></ng-md-icon></a><br />
+                <a href ng-click="report()"><i class="glyphicon glyphicon-save-file large"></i></a>
+            </div>
             {{ plan.details.client || '(project details not set)' }}<br />
             <span>Project:</span> {{ plan.details.project }}<br />
             <span>Site:</span> {{ plan.details.site }}<br />
@@ -58,7 +61,7 @@
                     <md-switch flex ng-model="settings.show_overlaps" ng-change="toggleOverlaps()" aria-label="Show Overlaps">Overlaps</md-switch>
                 </div>
                 <div flex="10">
-                    <md-switch flex ng-model="settings.show_heatmap" ng-change="toggleHeatmap()" aria-label="Show Signal Coverage">Signal Coverage</md-switch>
+                    <md-switch flex ng-model="settings.show_heatmap" ng-change="toggleHeatmap()" aria-label="Print View">Print View</md-switch>
                 </div>
             </div>
         </div>

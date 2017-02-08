@@ -8,12 +8,14 @@ module.exports = function(app) {
         .get (users.requiresLogin, plans.list)
         .post(users.requiresLogin, plans.create);
 
+    app.route('/plans/:planId/coverage').post(users.requiresLogin, plans.hasAuthorization, plans.coverage);
+
+    app.route('/plans/:planId/pdf').get(users.requiresLogin, plans.hasAuthorization, plans.pdfReport);
+
 	app.route('/plans/:planId')
         .get   (users.requiresLogin, plans.hasAuthorization, plans.read)
         .put   (users.requiresLogin, plans.hasAuthorization, plans.update)
         .delete(users.requiresLogin, plans.hasAuthorization, plans.delete);
-
-    app.route('/plans/:planId/coverage').post(users.requiresLogin, plans.hasAuthorization, plans.coverage);
 
 	// Finish by binding the plan middleware
 	app.param('planId', plans.planByID);
