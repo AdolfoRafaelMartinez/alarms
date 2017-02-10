@@ -61,21 +61,22 @@ html(lang="en")
                             =plan.details.project
                             br
                             =plan.details.site
-                            Bill of Materials
+                        h3='Bill of Materials'
+
                     img.clientlogo(src=plan.details.client.logo)
                 div.content
                     div.third
-                        p.aps=`# ${plan.stage.aps.length}`
+                        p.aps=`${plan.stage.aps.length}`
                         div.cardtitlegreen APs
                     div.third
-                        p.ams=`# ${plan.stage.ams.length}`
+                        p.ams=`${plan.stage.ams.length}`
                         div.cardtitleblue AMs
                     div.smallstack
                         div.small
-                            p.mounts=`# ${plan.stage.aps.length}`
+                            p.mounts=`${plan.stage.aps.length}`
                             div.cardtitlegrey Mounts
                         div.small
-                            p.sfps=`# ${plan.stage.aps.length}`
+                            p.sfps=`${plan.stage.aps.length}`
                             div.cardtitleblack SFPs
                     div.full
 
@@ -88,11 +89,10 @@ html(lang="en")
                         div.cardtitledarkblue Controllers
 
                     div.full
-                        p.licenses
+                        div.licenses
 
                             each lic in plan.details.licenses
-                                =lic.serial
-                                br
+                                div=lic.serial
 
                         div.cardtitledarkgreen Licenses
 
@@ -100,9 +100,9 @@ html(lang="en")
                         div.bom
                             table.bom
                                 tr(valign='top')
-                                    th(width='120px' align='left') Part No.
-                                    th(width='422px' align='left') Description
-                                    th(width='50px' align='center') Qty
+                                    th(width='22%' align='left') Part No.
+                                    th(width='70%' align='left') Description
+                                    th(width='8%' align='center') Qty
 
                                 each part in plan.details.parts
                                     tr(valign='top')
@@ -131,7 +131,7 @@ html(lang="en")
                     div.full
                         div.placements
                             each ap, api in plan.stage.aps
-                                span.am=`${api}: ${ap.inventory.name}`
+                                span.am=`${api + 1}: ${ap.inventory.name}`
                 div.footer
                     img.msplogo(src=plan.details.msp.logo)
                     img.pjlogo(src=`${assetsDir}/pbpj.png`)

@@ -43,7 +43,7 @@ body {
 
 #container {
 	width: 2800px;
-	height: 3380px;
+	height: 3480px;
 	margin: 0;
 	padding: 0;
 }
@@ -65,8 +65,9 @@ body {
 }
 
 .content {
-	height: 2560px; /* Remaining height for content. Top and bottom padding dictated by header and footer */
+	height: 3280px; /* Remaining height for content. Top and bottom padding dictated by header and footer */
 	padding: 0px 36px 0px 36px; /* Left and right padding for consistency with page margins */
+    clear: both;
 }
 
 .content p {
@@ -133,7 +134,6 @@ End Class Examples*/
 	width: 1210px;
 	margin-top: 36px;
 	border: #cdc9c8 4px solid;
-	box-shadow: 0px 8px 16px 0px #cdc9c8;
 	float: right;
 }
 
@@ -141,7 +141,6 @@ End Class Examples*/
 	width: 860px;
 	margin: 36px 36px 0px 0px;
 	border: #cdc9c8 4px solid;
-	box-shadow: 0px 8px 16px 0px #cdc9c8;
 	float: left;
 }
 
@@ -153,7 +152,6 @@ End Class Examples*/
 	width: 662px;
 	margin-top: 36px;
 	border: #cdc9c8 4px solid;
-	box-shadow: 0px 8px 16px 0px #cdc9c8;
 }
 
 .cardtitleblue {
@@ -218,12 +216,12 @@ End Class Examples*/
 
 .details {
 	height: 450px;
-	background-image:url(tile1.png);
+	background-image:url(../assets/tile1.png);
 }
 
 .contacts { /*Still working on getting the spacing right for this...*/
 	max-height: 450px;
-	background-image:url(tile1.png);
+	background-image:url(../assets/tile1.png);
 	column-count: 3;
 	-webkit-column-count: 3;
 	-moz-column-count: 3;
@@ -244,7 +242,7 @@ End Class Examples*/
 	font-weight: bold;
 	text-align: right;
 	color: #11a04c;
-	background: url(ap@4x.png);
+	background: url(../assets/ap@4x.png);
 	background-repeat: no-repeat;
 }
 
@@ -254,12 +252,12 @@ End Class Examples*/
 	font-weight: bold;
 	text-align: right;
 	color: #205299;
-	background: url(am@4x.png);
+	background: url(../assets/am@4x.png);
 	background-repeat: no-repeat;
 }
 
 .mounts {
-	background-image:url(tile1.png);
+	background-image:url(../assets/tile1.png);
 	height: 152px;
 	text-align: right;
 	font-size: 150px;
@@ -268,7 +266,7 @@ End Class Examples*/
 }
 
 .sfps {
-	background-image:url(tile1.png);
+	background-image:url(../assets/tile1.png);
 	height: 152px;
 	text-align: right;
 	font-size: 150px;
@@ -277,24 +275,24 @@ End Class Examples*/
 }
 
 .controllers {
-	background-image:url(tile1.png);
+	background-image:url(../assets/tile1.png);
 	text-align: justify;
 }
 
 .licenses {
-	background-image:url(tile1.png);
-	column-count: 2;
-	-webkit-column-count: 2;
-	-moz-column-count: 2;
+	background-image:url(../assets/tile1.png);
 	font-size: 56px;
-	line-height: 64px;
-	text-align: center;
+}
+
+.licenses div {
+    display: inline-block;
+    margin: 0 2em;
 }
 
 .bom {
-	background-image:url(tile1.png);
-	height: 800px;
+	background-image:url(../assets/tile1.png);
 	border-collapse: collapse;
+    width: 100%;
 }
 
 .bom th {
@@ -322,7 +320,7 @@ End Class Examples*/
 }
 
 .placements {
-	background-image:url(tile1.png);
+	background-image:url(../assets/tile1.png);
 	height: 640px;
 	font-size: 44px;
 	column-count: 3;
@@ -331,7 +329,7 @@ End Class Examples*/
 }
 
 span.am {
-	background-image: url(ambullet@4x.png);
+	background-image: url(../assets/ambullet@4x.png);
 	background-repeat: no-repeat;
 	background-position: 0px 12px;
 	line-height: 80px;
@@ -340,7 +338,7 @@ span.am {
 }
 
 span.ap {
-	background-image: url(apbullet@4x.png);
+	background-image: url(../assets/apbullet@4x.png);
 	background-repeat: no-repeat;
 	background-position: 0px 12px;
 	line-height: 80px;
@@ -366,7 +364,7 @@ span.ap {
 	width: 1840px;
 	height: 800px;
 	background-color: #205299;
-	background-image: url(tile2.png);
+	background-image: url(../assets/tile2.png);
 	box-shadow: 0px 8px 16px 0px #cdc9c8;
 }
 

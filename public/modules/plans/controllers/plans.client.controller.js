@@ -379,7 +379,7 @@ angular.module('plans')
         };
 
         $scope.report = function() {
-            pdfReporting.download();
+            window.open(`/plans/${$scope.plan._id}/pdf`, '_blank');
         };
 	}
 ]);
