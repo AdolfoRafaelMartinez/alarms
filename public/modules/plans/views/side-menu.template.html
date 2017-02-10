@@ -5,7 +5,7 @@
                 <a href ng-click="plan_properties = !plan_properties"><ng-md-icon icon="settings"></ng-md-icon></a><br />
                 <a href ng-click="report()"><i class="glyphicon glyphicon-save-file large"></i></a>
             </div>
-            {{ plan.details.client || '(project details not set)' }}<br />
+            {{ plan.details.client.name || '(project details not set)' }}<br />
             <span>Project:</span> {{ plan.details.project }}<br />
             <span>Site:</span> {{ plan.details.site }}<br />
             <div ng-if="plan.details.address">
