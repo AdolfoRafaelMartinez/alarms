@@ -8,3 +8,4 @@ app/tests/coverage/
 app/pug/tmp/*
 .bower-*/
 .idea/
+tags

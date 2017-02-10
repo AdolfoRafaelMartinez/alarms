@@ -7,6 +7,7 @@ const fs       = require('fs');
 const _        = require('lodash');
 const Q        = require('q');
 const pug      = require('pug');
+const exec     = require('child_process').exec;
 const pdf      = require('phantom-html2pdf');
 const shortid  = require('shortid');
 
@@ -221,15 +222,35 @@ exports.pdfReport = function(req, res) {
     _.each(req.plan.stage.aps, (ap, i) => {
         if (!_.get(ap, 'inventory.name')) _.set(ap, 'inventory.name', `AP${i}`);
     });
-    pug.renderFile(`${__dirname}/../pug/sf01.pug`,
+
+    const PUGDIR = `${__dirname}/../pug`;
+    pug.renderFile(`${PUGDIR}/sf01.pug`,
         {
             plan: req.plan,
             today: new Date().toUTCString(),
-            assetsDir: `${__dirname}/../pug/assets`
+            assetsDir: `${PUGDIR}/assets`
         }, (err, result) => {
-            let htmlFilename = `${__dirname}/../pug/tmp/${shortid.generate()}.html`;
-            let cssFilename = `${__dirname}/../pug/assets/reportv1.css`;
-            fs.writeFile(htmlFilename, result, function(err) {
+            let fileid = shortid.generate();
+            let planPDFName = `${req.plan.details.project}.pdf`;
+            let htmlFilename = `${fileid}.html`;
+            let pdfFilename = `${fileid}.pdf`;
+            let htmlFullPath = `${PUGDIR}/tmp/${htmlFilename}`;
+            let cssFilename = `${PUGDIR}/assets/reportv1.css`;
+            fs.writeFile(htmlFullPath, result, function(err) {
+                exec(`cd ${PUGDIR}/tmp && wkhtmltopdf --print-media-type ${htmlFilename} ${pdfFilename}`, function(error, stdout, stderr) {
+                    console.log(`WKHTMLTOPDF ${htmlFullPath} ==> ${planPDFName}`);
+                    console.dir(stdout);
+                    console.dir(stderr);
+                    let file = fs.readFileSync(`${PUGDIR}/tmp/${pdfFilename}`, 'binary');
+                    res.writeHead(200, {
+                        'Content-Type': 'application/pdf',
+                        'Access-Control-Allow-Origin': '*'
+                        /* 'Content-Disposition': `attachment; filename=${planPDFName}` */
+                    });
+                    res.write(file, 'binary');
+                    res.end();
+                });
+                /*
                 pdf.convert({
                     html: htmlFilename,
                     dpi: 300,
@@ -243,6 +264,7 @@ exports.pdfReport = function(req, res) {
                 }, function(err, result) {
                     res.send(result.toStream());
                 });
+                */
             });
         });
 };
