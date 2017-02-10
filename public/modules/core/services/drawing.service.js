@@ -65,7 +65,7 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 	var AP_CIRCLE_RGBA = 'rgba(180, 220, 255, 0.6)';
 	var AP_CIRCLE_RGBA_OPAQUE = 'rgba(200, 200, 255, 0.2)';
 	var AP_TEXT_RGB = '#fff';
-	var AP_BUBBLE_RGB = 'rgba(0, 0, 0, 0.8)';
+	var AP_BUBBLE_RGB = 'rgba(0, 0, 100, 0.8)';
 	var DISTANCE_STROKE_RGB = '#444';
 	var DISTANCE_TEXT_RGB = '#aaa';
 	var DISTANCE_BUBBLE_RGB = '#fff';
@@ -182,9 +182,9 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 		bubble.scaleX = bubble.scaleY = text.scaleX;
 		bubble.name = 'bubble';
 		text.regX = textBounds.width / 2;
-		text.regY = -25;
+		text.regY = -15;
 		bubble.regX = text.regX + 5;
-		bubble.regY = -23 + textBounds.height;
+		bubble.regY = -13 + textBounds.height;
 
 		return bubble;
 	}
@@ -458,13 +458,13 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 		return false;
 	};
 
-	this.initBoard = function(r) {
+	this.initBoard = function(r, canvasIndex) {
 		mouse_mode = 'ap';
 		plan.radius = r;
 		plan.real_radius = r;
 		plan.ap_index = 1;
 		DISTANCE_CUT_OFF = r * 2;
-		canvas = document.getElementsByTagName('canvas')[0];
+		canvas = document.getElementsByTagName('canvas')[canvasIndex || 0];
 		canvas.width = canvas.parentElement.clientWidth - canvasMarginW;
 		canvas.height = canvas.parentElement.clientHeight - canvasMarginH;
 		canvas.style.width = (canvas.parentElement.clientWidth - canvasMarginW) + 'px';
@@ -835,9 +835,20 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 		return json;
 	};
 
-	this.getThumb = function() {
-		return stage.toDataURL();
-	};
+    this.centerStage = () => {
+        let cw = canvas.width;
+        let ch = canvas.height;
+        let stageBounds = stage.getBounds();
+        let sw = cw / stageBounds.width;
+        let sh = ch / stageBounds.height;
+        this.scale(100 * (Math.min(sw, sh) - 0.05));
+        stage.x = stage.y = 20;
+        update = true;
+    };
+
+	this.getThumb = () => {
+        return stage.toDataURL();
+    };
 
 	this.loadPlan = function(plan_id, data, signal_radius, updateControls) {
 		this.updateControls = updateControls;
