@@ -8,17 +8,15 @@ const _        = require('lodash');
 const Q        = require('q');
 const pug      = require('pug');
 const exec     = require('child_process').exec;
-const pdf      = require('phantom-html2pdf');
 const shortid  = require('shortid');
 
 const errorHandler = require('./errors.server.controller');
 const Plan = mongoose.model('Plan');
 
-function saveThumb(thumb) {
+function saveThumb(thumb, pid) {
     var base64Data = thumb.replace(/^data:image\/png;base64,/, '');
-    var guid = uuid.v4();
-    var filename = guid + '.png';
-    var thumbname = guid + '-thumb.jpg';
+    var filename = pid + '.png';
+    var thumbname = pid + '-thumb.jpg';
     var path = __dirname + '/../../public/uploads/';
     var deferred = Q.defer();
     fs.writeFile(path + filename, base64Data, 'base64', function(err) {
@@ -48,7 +46,7 @@ function saveThumb(thumb) {
 exports.create = function(req, res) {
     var plan_data = req.body;
 
-    saveThumb(req.body.thumb)
+    saveThumb(req.body.thumb, req.body._id)
         .then(function(pic) {
             plan_data.thumb = pic.thumb;
             var plan = new Plan(plan_data);
@@ -97,7 +95,7 @@ exports.update = function(req, res) {
 	var plan = req.plan;
 
     var plan_data = req.body;
-    saveThumb(req.body.thumb)
+    saveThumb(req.body.thumb, req.body._id)
         .then(pic => {
             plan_data.thumb = pic.thumb;
             plan_data.screenshot = pic.file;
@@ -218,6 +216,7 @@ exports.coverage = function(req, res) {
 
 exports.pdfReport = function(req, res) {
     if (!req.plan.stage.ams) req.plan.stage.ams = [];
+    if (!req.plan.details) req.plan.details = {};
     if (!req.plan.details.parts) req.plan.details.parts = [];
     _.each(req.plan.stage.aps, (ap, i) => {
         if (!_.get(ap, 'inventory.name')) _.set(ap, 'inventory.name', `AP${i}`);
@@ -238,33 +237,14 @@ exports.pdfReport = function(req, res) {
             let cssFilename = `${PUGDIR}/assets/reportv1.css`;
             fs.writeFile(htmlFullPath, result, function(err) {
                 exec(`cd ${PUGDIR}/tmp && wkhtmltopdf --print-media-type ${htmlFilename} ${pdfFilename}`, function(error, stdout, stderr) {
-                    console.log(`WKHTMLTOPDF ${htmlFullPath} ==> ${planPDFName}`);
-                    console.dir(stdout);
-                    console.dir(stderr);
                     let file = fs.readFileSync(`${PUGDIR}/tmp/${pdfFilename}`, 'binary');
                     res.writeHead(200, {
                         'Content-Type': 'application/pdf',
                         'Access-Control-Allow-Origin': '*'
-                        /* 'Content-Disposition': `attachment; filename=${planPDFName}` */
                     });
                     res.write(file, 'binary');
                     res.end();
                 });
-                /*
-                pdf.convert({
-                    html: htmlFilename,
-                    dpi: 300,
-                    css: cssFilename,
-                    paperSize: {
-                        format: 'A4',
-                        orientation: 'portrait',
-                        border: '0',
-                        deleteOnAction: false
-                    }
-                }, function(err, result) {
-                    res.send(result.toStream());
-                });
-                */
             });
         });
 };

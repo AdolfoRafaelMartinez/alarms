@@ -127,7 +127,7 @@ html(lang="en")
                     img.clientlogo(src=plan.details.client.logo)
                 div.content
                     div.full
-                        img.floor(src='../tmp/plan-screenshot.png')
+                        img.floor(src=`../../../public/uploads/${plan.thumb.replace('-thumb.jpg', '.png')}`)
                     div.full
                         div.placements
                             each ap, api in plan.stage.aps

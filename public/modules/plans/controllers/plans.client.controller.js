@@ -195,14 +195,14 @@ angular.module('plans')
             $scope.plan.settings = $scope.settings;
 
             if (!$scope.plan._id) {
-                $scope.plan.$save(function(response) {
+                return $scope.plan.$save(function(response) {
                     $location.path('plans/' + response._id);
                 }, function(errorResponse) {
                     $scope.error = errorResponse.data.message;
                 });
             } else {
                 $scope.icons.save = iconset.loading;
-                $scope.plan.$update(function(response) {
+                return $scope.plan.$update(function(response) {
                     $scope.icons.save = iconset.done;
                     $timeout(function() {
                         $scope.icons.save = iconset.save;
@@ -379,7 +379,20 @@ angular.module('plans')
         };
 
         $scope.report = function() {
-            window.open(`/plans/${$scope.plan._id}/pdf`, '_blank');
+            let planView = false;
+            if (!$scope.settings.show_heatmap) {
+                $scope.settings.show_heatmap = true;
+                $scope.toggleHeatmap();
+                planView = true;
+            }
+            Drawing.centerStage();
+            $timeout(() => {
+                $scope.savePlan();
+                $scope.plan.$promise.then(() => {
+                    if (planView) $scope.toggleHeatmap();
+                    window.open(`/plans/${$scope.plan._id}/pdf`, '_blank');
+                });
+            }, 500);
         };
 	}
 ]);

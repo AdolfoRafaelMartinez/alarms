@@ -316,7 +316,7 @@ End Class Examples*/
 	/* 4.3 Floorplan Page */
 
 .floor {
-	max-width: 2470px;
+    width: 100%;
 }
 
 .placements {
