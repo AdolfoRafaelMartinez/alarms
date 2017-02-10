@@ -798,6 +798,14 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 		return defer.promise;
 	};
 
+    function initStage() {
+        if (!plan.stage) plan.stage = {};
+		plan.stage.x = stage.x;
+		plan.stage.y = stage.y;
+		plan.stage.regX = stage.regX;
+		plan.stage.regY = stage.regY;
+    };
+
 	this.toJSON = function() {
 		plan.stage.x = stage.x;
 		plan.stage.y = stage.y;
@@ -855,7 +863,7 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 		$timeout(function() {
 			plan = data.plan;
 			plan._id = plan_id;
-			var stage_scale = plan.stage.stage_scale;
+			var stage_scale = _.get(plan, 'stage.stage_scale');
 			this.initBoard(signal_radius);
 			this.scale(100);
 			if (data.floorplan) {
@@ -868,10 +876,10 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 				$timeout(this.toggleOverlaps, 0);
 			}
 
-			stage.x = data.plan.stage.x;
-			stage.y = data.plan.stage.y;
-			stage.regX = data.plan.stage.regX;
-			stage.regY = data.plan.stage.regY;
+			stage.x = _.get(data.plan, 'stage.x');
+			stage.y = _.get(data.plan, 'stage.y');
+			stage.regX = _.get(data.plan, 'stage.regX');
+			stage.regY = _.get(data.plan, 'stage.regY');
 
 			_.each(data.aps, function(ap) {
 				this.addAP(ap.x, ap.y, signal_radius);
@@ -887,6 +895,7 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 			}.bind(this));
 			$timeout(function() {
 				this.updateSignalStrength(signal_radius);
+                if (!plan.stage) initStage();
 			}.bind(this), 1000);
 		}.bind(this), 100);
 
