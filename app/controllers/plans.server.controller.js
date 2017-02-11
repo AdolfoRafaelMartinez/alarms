@@ -218,6 +218,7 @@ exports.pdfReport = function(req, res) {
     if (!req.plan.stage.ams) req.plan.stage.ams = [];
     if (!req.plan.details) req.plan.details = {};
     if (!req.plan.details.parts) req.plan.details.parts = [];
+    if (!req.plan.details.licenses) req.plan.details.licenses = [];
     _.each(req.plan.stage.aps, (ap, i) => {
         if (!_.get(ap, 'inventory.name')) _.set(ap, 'inventory.name', `AP${i}`);
     });
