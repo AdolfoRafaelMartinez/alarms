@@ -379,20 +379,24 @@ angular.module('plans')
         };
 
         $scope.report = function() {
-            let planView = false;
             if (!$scope.settings.show_heatmap) {
                 $scope.settings.show_heatmap = true;
                 $scope.toggleHeatmap();
-                planView = true;
             }
             Drawing.centerStage();
+
             $timeout(() => {
                 $scope.savePlan();
                 $scope.plan.$promise.then(() => {
-                    if (planView) $scope.toggleHeatmap();
-                    window.open(`/plans/${$scope.plan._id}/pdf`, '_blank');
+                    if ($scope.settings.show_heatmap) {
+                        $scope.settings.show_heatmap = false;
+                        $scope.toggleHeatmap();
+                    }
+                    $timeout(() => {
+                        window.open(`/plans/${$scope.plan._id}/pdf`, '_blank');
+                    }, 0);
                 });
-            }, 500);
+            }, 100);
         };
 	}
 ]);

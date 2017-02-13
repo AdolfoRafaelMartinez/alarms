@@ -41,8 +41,7 @@
         "h337",
         "$scope",
 		"html2canvas",
-		"Canvas2Image",
-		"_"
+		"Canvas2Image"
 	],
 	"indent": 4, // Specify indentation spacing
 	"devel": true, // Allow development statements e.g. `console.log();`.
