@@ -5,7 +5,6 @@ angular.module('plans').directive('ngRightClick', ['$parse',
         return function(scope, element, attrs) {
             var fn = $parse(attrs.ngRightClick);
             element.bind('contextmenu', function(event) {
-                event.preventDefault();
                 scope.$apply(function() {
                     fn(scope, {$event:event});
                 });
