@@ -218,9 +218,11 @@ exports.pdfReport = function(req, res) {
     if (!req.plan.stage.ams) req.plan.stage.ams = [];
     if (!req.plan.details) req.plan.details = {};
     if (!req.plan.details.parts) req.plan.details.parts = [];
-    if (!req.plan.details.licenses) req.plan.details.licenses = [];
     _.each(req.plan.stage.aps, (ap, i) => {
         if (!_.get(ap, 'inventory.name')) _.set(ap, 'inventory.name', `AP${i}`);
+    });
+    _.each(req.plan.stage.ams, (am, i) => {
+        if (!_.get(am, 'inventory.name')) _.set(am, 'inventory.name', `AM${i}`);
     });
 
     const PUGDIR = `${__dirname}/../pug`;
@@ -230,6 +232,7 @@ exports.pdfReport = function(req, res) {
             today: new Date().toUTCString(),
             assetsDir: `${PUGDIR}/assets`
         }, (err, result) => {
+            console.dir(err);
             let fileid = shortid.generate();
             let planPDFName = `${req.plan.details.project}.pdf`;
             let htmlFilename = `${fileid}.html`;

@@ -804,7 +804,7 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 		plan.stage.y = stage.y;
 		plan.stage.regX = stage.regX;
 		plan.stage.regY = stage.regY;
-    };
+    }
 
 	this.toJSON = function() {
 		plan.stage.x = stage.x;

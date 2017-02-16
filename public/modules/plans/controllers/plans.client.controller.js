@@ -370,7 +370,7 @@ angular.module('plans')
         };
 
         $scope.updateLicenses = function() {
-            $scope.plan.details.controllers[0].lic.ap.qty = $scope.plan.stage.aps.length + $scope.plan.details.controllers[0].lic.ap.spares;
+            $scope.plan.details.controllers[0].lic.ap.qty = $scope.plan.stage.aps.length;
         };
 
         $scope.savePlanProperties = function() {

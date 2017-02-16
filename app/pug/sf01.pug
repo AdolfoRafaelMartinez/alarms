@@ -19,20 +19,24 @@ html(lang="en")
                     img.clientlogo(src=plan.details.client.logo)
                 div.content
                     div.halfleft
+                        div.cardtitleblue
+                            span Project Details
                         p.details=plan.details.client.name
                             br
                             =plan.details.project
                             br
                             =plan.details.site
-                        div.cardtitleblue Project Details
                     div.halfright
+                        div.cardtitlegrey
+                            span Site Details
                         p.details=plan.details.address
                             br
                             =`${plan.details.city} ${plan.details.state}, ${plan.details.zipcode}`
                             br
                             =plan.details.floors
-                        div.cardtitlegrey Site Details
                     div.full
+                        div.cardtitleblack
+                            span Contacts
                         p.contacts
                             each contact in plan.details.contacts
                                 =contact.position
@@ -40,15 +44,15 @@ html(lang="en")
                                 =contact.name
                                 br
                                 =`${contact.phone} ${contact.email}`
-                        div.cardtitleblack Contacts
                     div.halfleft
+                        div.cardtitleblack
+                            span Presented by
                         p.details
                             =plan.details.msp.name
                             br
                             Designer: =plan.details.designer.name
                             br
                             =today
-                        div.cardtitleblack Presented by
                 div.footer
                     img.msplogo(src=plan.details.msp.logo)
                     img.pjlogo(src=`${assetsDir}/pbpj.png`)
@@ -66,35 +70,43 @@ html(lang="en")
                     img.clientlogo(src=plan.details.client.logo)
                 div.content
                     div.third
+                        div.cardtitlegreen
+                            span APs
                         p.aps=`${plan.stage.aps.length}`
-                        div.cardtitlegreen APs
                     div.third
+                        div.cardtitleblue
+                            span AMs
                         p.ams=`${plan.stage.ams.length}`
-                        div.cardtitleblue AMs
                     div.smallstack
                         div.small
+                            div.cardtitlegrey
+                                span Mounts
                             p.mounts=`${plan.stage.aps.length}`
-                            div.cardtitlegrey Mounts
                         div.small
+                            div.cardtitleblack
+                                span SFPs
                             p.sfps=`${plan.stage.aps.length}`
-                            div.cardtitleblack SFPs
                     div.full
+                        div.cardtitledarkblue
+                            span Controllers
 
-                        each controller in plan.details.controllers
-                            p.controllers=`${controller.country} - ${controller.model}`
-                                if controller.ha
+                        each ctrl in plan.details.controllers
+                            p.controllers=`${ctrl.country} - ${ctrl.model}`
+                                if ctrl.ha
                                     - HA
-                            p=controller.description
-
-                        div.cardtitledarkblue Controllers
+                            p=ctrl.description
 
                     div.full
+                        div.cardtitledarkgreen
+                            span Licenses
                         div.licenses
 
-                            each lic in plan.details.licenses
-                                div=lic.serial
-
-                        div.cardtitledarkgreen Licenses
+                            each ctrl in plan.details.controllers
+                                div=`${ctrl.lic.ap.qty} LIC-AP`
+                                if ctrl.lic.pefng
+                                    div PEFNG
+                                if ctrl.lic.rfc
+                                    div RFC
 
                     div.full
                         div.bom
@@ -130,8 +142,15 @@ html(lang="en")
                         img.floor(src=`../../../public/uploads/${plan.thumb.replace('-thumb.jpg', '.png')}`)
                     div.full
                         div.placements
-                            each ap, api in plan.stage.aps
-                                span.am=`${api + 1}: ${ap.inventory.name}`
+                            dl
+                                each am, ami in plan.stage.ams
+                                    div.am
+                                        dt=`${ami + 1}:`
+                                        dd=`${am.inventory.name}`
+                                each ap, api in plan.stage.aps
+                                    div.ap
+                                        dt=`${api + 1}:`
+                                        dd=`${ap.inventory.name}`
                 div.footer
                     img.msplogo(src=plan.details.msp.logo)
                     img.pjlogo(src=`${assetsDir}/pbpj.png`)

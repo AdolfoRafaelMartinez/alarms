@@ -80,15 +80,15 @@ body {
 }
 
 .clientlogo {
-	width: 750px;
-	height: 300px;
+	max-width: 750px;
+	max-height: 300px;
 	float: right;
 }
 
 .msplogo {
 	float: left;
-	width: 660px;
-	height: 200px;
+	max-width: 660px;
+	max-height: 200px;
 }
 
 .pjlogo {
@@ -161,6 +161,7 @@ End Class Examples*/
 	color: #ffffff;
 	text-align: right;
 	font-weight: bold;
+    padding-top: 10px;
 }
 
 .cardtitledarkblue {
@@ -170,6 +171,7 @@ End Class Examples*/
 	color: #ffffff;
 	text-align: right;
 	font-weight: bold;
+    padding-top: 10px;
 }
 
 .cardtitlegreen {
@@ -179,6 +181,7 @@ End Class Examples*/
 	color: #ffffff;
 	text-align: right;
 	font-weight: bold;
+    padding-top: 10px;
 }
 
 .cardtitledarkgreen {
@@ -188,6 +191,7 @@ End Class Examples*/
 	color: #ffffff;
 	text-align: right;
 	font-weight: bold;
+    padding-top: 10px;
 }
 
 .cardtitlegrey {
@@ -197,6 +201,7 @@ End Class Examples*/
 	color: #ffffff;
 	text-align: right;
 	font-weight: bold;
+    padding-top: 10px;
 }
 
 .cardtitleblack {
@@ -206,6 +211,16 @@ End Class Examples*/
 	color: #ffffff;
 	text-align: right;
 	font-weight: bold;
+    padding-top: 10px;
+}
+
+.cardtitleblue span,
+.cardtitledarkblue span,
+.cardtitleblack span,
+.cardtitlegrey span,
+.cardtitledarkgreen span,
+.cardtitlegreen span {
+    padding: 5px 20px;
 }
 
 /* End Section */
@@ -328,24 +343,31 @@ End Class Examples*/
 	-moz-column-count: 3;
 }
 
-span.am {
-	background-image: url(../assets/ambullet@4x.png);
-	background-repeat: no-repeat;
-	background-position: 0px 12px;
-	line-height: 80px;
-	padding: 20px 20px 20px 16px;
-	margin-right: 20px;
+.placements div {
+    display: inline-block;
+    padding: 10px 40px;
 }
 
-span.ap {
-	background-image: url(../assets/apbullet@4x.png);
-	background-repeat: no-repeat;
-	background-position: 0px 12px;
-	line-height: 80px;
-	padding: 20px 20px 20px 16px;
-	margin-right: 20px;
-	color: #ffffff;
+.placements .ap dt {
+    border: 8px solid #248;
 }
+
+.placements .am dt {
+    border: 8px solid #284;
+}
+
+.placements dt {
+    border-radius: 10px;
+    float: left;
+    padding: 5px 20px;
+}
+
+.placements dd {
+    float: left;
+    padding: 13px 0;
+    margin-left: 30px;
+}
+
 
 	/* End Subsection */
 
