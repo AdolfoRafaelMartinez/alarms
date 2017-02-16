@@ -68,11 +68,18 @@ module.exports = function(grunt) {
 		uglify: {
 			production: {
 				options: {
-					mangle: false
+                    mangle: false
 				},
-				files: {
-					'public/dist/application.min.js': 'public/dist/application.js'
-				}
+				src: [
+                    'public/config.js',
+                    'public/application.js',
+                    'public/modules/*/*module.js',
+                    'public/modules/*/config/*.js',
+                    'public/modules/*/directives/*.js',
+                    'public/modules/*/services/*.js',
+                    'public/modules/*/controllers/*.js'
+                ],
+                dest: 'public/dist/application.min.js'
 			}
 		},
 		cssmin: {
