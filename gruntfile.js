@@ -68,7 +68,8 @@ module.exports = function(grunt) {
 		uglify: {
 			production: {
 				options: {
-                    mangle: false
+                    mangle: true,
+                    compress: { unsafe: true }
 				},
 				src: [
                     'public/config.js',
