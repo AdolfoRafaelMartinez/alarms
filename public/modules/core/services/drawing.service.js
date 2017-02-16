@@ -356,6 +356,7 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 		function mousemove(evt) {
 			if (evt.nativeEvent.button === 2) return;
 			if (mouse_mode !== 'ap') return;
+            if (!ap.offset) return;
 			ap.x = evt.stageX * 100 / plan.stage_scale + ap.offset.x;
 			ap.y = evt.stageY * 100 / plan.stage_scale + ap.offset.y;
 			var i, l = names.length;

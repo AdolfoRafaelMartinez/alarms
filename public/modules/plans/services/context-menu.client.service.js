@@ -99,7 +99,6 @@ angular.module('core').service('contextMenu', ['$timeout',
         };
 
         this.setup = function(menu) {
-			if (this.menu) return;
             this.menu = menu;
 			$timeout(() => {
 				$(angular.element('canvas')[0]).bind('contextmenu', function(event) {
