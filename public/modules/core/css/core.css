@@ -27,6 +27,11 @@ section > div > div {
     cursor: pointer;
 }
 
+.navbar-brand img {
+    max-height: 33px;
+    margin-top: -5px;
+}
+
 .list-group-item {
     display: inline-block;
     margin: 10px;

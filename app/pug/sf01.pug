@@ -15,11 +15,11 @@ html(lang="en")
                     div.headertitle
                         h1 WLAN
                             br
-                            SURVEY DESIGN
+                            ='SURVEY DESIGN'
                     img.clientlogo(src=plan.details.client.logo)
                 div.content
                     div.halfleft
-                        div.cardtitleblue
+                        div.cardtitlefull.blue
                             span Project Details
                         p.details=plan.details.client.name
                             br
@@ -27,7 +27,7 @@ html(lang="en")
                             br
                             =plan.details.site
                     div.halfright
-                        div.cardtitlegrey
+                        div.cardtitlefull.green
                             span Site Details
                         p.details=plan.details.address
                             br
@@ -35,7 +35,7 @@ html(lang="en")
                             br
                             =plan.details.floors
                     div.full
-                        div.cardtitleblack
+                        div.cardtitlefull.grey
                             span Contacts
                         p.contacts
                             each contact in plan.details.contacts
@@ -45,7 +45,7 @@ html(lang="en")
                                 br
                                 =`${contact.phone} ${contact.email}`
                     div.halfleft
-                        div.cardtitleblack
+                        div.cardtitlefull.black
                             span Presented by
                         p.details
                             =plan.details.msp.name
@@ -70,24 +70,24 @@ html(lang="en")
                     img.clientlogo(src=plan.details.client.logo)
                 div.content
                     div.third
-                        div.cardtitlegreen
+                        div.cardtitlefull.green
                             span APs
                         p.aps=`${plan.stage.aps.length}`
                     div.third
-                        div.cardtitleblue
+                        div.cardtitlefull.blue
                             span AMs
                         p.ams=`${plan.stage.ams.length}`
                     div.smallstack
                         div.small
-                            div.cardtitlegrey
+                            div.cardtitlefull.grey
                                 span Mounts
                             p.mounts=`${plan.stage.aps.length}`
                         div.small
-                            div.cardtitleblack
+                            div.cardtitlefull.black
                                 span SFPs
                             p.sfps=`${plan.stage.aps.length}`
                     div.full
-                        div.cardtitledarkblue
+                        div.cardtitlefull.darkblue
                             span Controllers
 
                         each ctrl in plan.details.controllers
@@ -97,7 +97,7 @@ html(lang="en")
                             p=ctrl.description
 
                     div.full
-                        div.cardtitledarkgreen
+                        div.cardtitlefull.darkgreen
                             span Licenses
                         div.licenses
 
