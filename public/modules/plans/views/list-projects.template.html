@@ -1,0 +1,42 @@
+<section data-ng-init="findProjects()">
+  <div class="page-header">
+    <input type="text" class="form-control" ng-model="search" ng-change="findProjects()" ng-model-options="{debounce: 500}" placeholder="search..." />
+  </div>
+  <div class="list-group">
+    <a data-ng-repeat="project in projects" ng-href="/project/{{ project._id }}" class="list-group-item">
+      <small class="list-group-item-text">
+        Created on
+        <span data-ng-bind="project.created | date:'mediumDate'"></span>
+      </small>
+      <img ng-src="{{ project.thumb }}" />
+      <h4 class="list-group-item-heading" data-ng-bind="project.title"></h4>
+    </a>
+  </div>
+
+  <div class="list-group" ng-if="show['sites']">
+    <a data-ng-repeat="site in sites" ng-click="showSite(site)" class="list-group-item">
+      <small class="list-group-item-text">
+        Created on
+        <span data-ng-bind="site.created | date:'mediumDate'"></span>
+      </small>
+      <img ng-src="/uploads/{{ site.thumb }}" />
+      <h4 class="list-group-item-heading" data-ng-bind="site.name"></h4>
+    </a>
+  </div>
+
+  <div class="list-group" ng-if="show['buildings']">
+    <a data-ng-repeat="bldg in buildings" ng-click="showBuilding(bldg)" class="list-group-item">
+      <small class="list-group-item-text">
+        Created on
+        <span data-ng-bind="bldg.created | date:'mediumDate'"></span>
+      </small>
+      <img ng-src="/uploads/{{ bldg.thumb }}" />
+      <h4 class="list-group-item-heading" data-ng-bind="bldg.name"></h4>
+    </a>
+  </div>
+
+  <div class="alert alert-warning text-center" data-ng-if="plans.$resolved && !plans.length">
+    No plans yet, do you want to <a href="/#!/plans/create">create one</a>?
+  </div>
+
+</section>

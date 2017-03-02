@@ -7,6 +7,10 @@
 	outline: none;
 }
 
+.fullsize {
+  width: 100%;
+}
+
 .ptop5 {
 	padding-top: 7px;
 }
@@ -34,7 +38,15 @@ section > div > div {
 
 .list-group-item {
     display: inline-block;
-    margin: 10px;
+    margin: 0 10px;
+    width:340px;
+    height:205px;
+    overflow: hidden;
+}
+
+a.list-group-item:hover, button.list-group-item:hover, a.list-group-item:focus, button.list-group-item:focus {
+  background-color: #d5d5d5;
+  opacity: 1;
 }
 
 .md-whiteframe-z2 {

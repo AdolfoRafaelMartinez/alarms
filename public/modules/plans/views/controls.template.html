@@ -37,4 +37,11 @@
             <button class="btn btn-xs btn-info" ng-if="calibration_done" ng-click="completeCalibration()">Done</button>
         </div>
     </div>
+
+    <div class="floors">
+      <a href ng-repeat="p in plans" ng-click="showPlan(p)" ng-class="{'shadowItem': p != plan}">
+        <img ng-src="/uploads/{{ p.thumb }}" />
+        <small>Floor {{ p.floor }}</small>
+      </a>
+    </div>
 </div>

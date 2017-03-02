@@ -64,7 +64,7 @@
     padding-top: 14px;
 }
 
-.small-logo {
+.small-logo, .small-logo img {
     max-width: 140px;
 }
 
@@ -74,4 +74,44 @@
 
 md-switch {
     margin: 0 15px;
+}
+
+plan-list img {
+  max-width: 160px;
+  max-height: 160px;
+  float: right;
+}
+
+plan-list img.fullsize {
+  max-width: inherit;
+  max-height: inherit;
+}
+
+plan-list div.list-group {
+  cursor: pointer;
+}
+
+.shadowItem {
+  opacity: 0.5;
+  filter: blur(1px);
+  filter: grayscale(100%);
+}
+
+.floors {
+  margin: 5px 10px;
+}
+
+.floors > a {
+  float: left;
+  text-align: center;
+  margin-right: 10px;
+  color: white;
+}
+
+.floors > a:hover {
+  color: #ddf;
+}
+
+.floors img {
+  display: block;
 }
