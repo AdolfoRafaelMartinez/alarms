@@ -1,9 +1,10 @@
+/* global angular, $upload, _ */
 'use strict'
 
 angular.module('plans')
   .controller('PlansController', [
-    '$scope', '$rootScope', '$state', '$stateParams', '$location', 'pdfReporting', 'Authentication', 'Drawing', '$timeout', '$http', 'Projects', 'Plans', 'contextMenu',
-    function ($scope, $rootScope, $state, $stateParams, $location, pdfReporting, Authentication, Drawing, $timeout, $http, Projects, Plans, contextMenu) {
+    '$scope', '$rootScope', '$state', '$stateParams', '$location', 'pdfReporting', 'Authentication', 'Drawing', '$timeout', '$http', 'Projects', 'Plans', 'contextMenu', '$q',
+    function ($scope, $rootScope, $state, $stateParams, $location, pdfReporting, Authentication, Drawing, $timeout, $http, Projects, Plans, contextMenu, $q) {
       $scope.authentication = Authentication
 
       $scope.UNITS_STEP_FEET = 8
@@ -57,6 +58,7 @@ angular.module('plans')
         }
       }
 
+      $scope.selected = {}
       $scope.state = {}
 
       $scope.menu = {
@@ -212,29 +214,126 @@ angular.module('plans')
         }
       }
 
-      $scope.newProject = function () {
-        $scope.project = new Projects({
-          title: 'Untitled'
-        })
+      $scope.new = {}
+      $scope.showCreate = (item) => {
+        if (!$scope.new[item]) {
+          $scope.new[item] = {}
+          $scope.selected[item] = null
+        }
+      }
+
+      $scope.cancelCreate = ($event, item) => {
+        $scope.new[item] = null
+        $event.stopPropagation()
+      }
+
+      $scope.toggleOrphans = function() {
+        if (!$scope.show_orphans) {
+          $scope.find()
+        }
+        $scope.show_orphans = !$scope.show_orphans
+      }
+
+      function addProject (resource) {
+        $scope.projects.push(resource)
+        $scope.selected.project = resource
+        $scope.new.site = { created: new Date() }
+      }
+
+      function handleError (error) {
+        $scope.error = error.data.message
+      }
+
+      $scope.sort = {
+        projects: 'title',
+        sites: 'title',
+        buildings: 'title'
+      }
+
+      $scope.selected = {}
+
+      $scope.create = ($event, item) => {
+        switch (item) {
+          case 'project':
+            var p = new Projects($scope.new.project)
+            p.$save(addProject, handleError)
+            $scope.sort.projects = '-created'
+            break
+
+          case 'site':
+            $scope.selected.site = {
+              created: new Date(),
+              name: $scope.new.site.name,
+              buildings: [],
+              new: true
+            }
+            $scope.selected.project.sites.push($scope.selected.site)
+            $scope.sort.site = '-created'
+            $scope.new.building = { created: new Date() }
+            $scope.selected.project.$save(project => {
+              $scope.selected.site = _.find(project.sites, s => s.new)
+              delete $scope.selected.site.new
+            })
+            break
+
+          case 'building':
+            $scope.selected.building = {
+              created: new Date(),
+              name: $scope.new.building.name,
+              new: true
+            }
+            $scope.selected.site.buildings.push($scope.selected.building)
+            $scope.sort.building = '-created'
+            var siteId = $scope.selected.site._id
+            $scope.selected.project.$save(project => {
+              console.log('after save', project, $scope.selected)
+              $scope.selected.site = _.find(project.sites, s => s._id === siteId)
+              $scope.selected.building = _.find($scope.selected.site.buildings, b => b.new)
+              delete $scope.selected.building.new
+              $scope.createPlanAndLoad($scope.selected.building)
+            })
+            break
+        }
+        $scope.new[item] = null
+        $event.stopPropagation()
+      }
+
+      var planSkeleton = {
+        title: 'Untitled',
+        created: new Date(),
+        details: {
+          contacts: [],
+          stage: {
+            aps: []
+          },
+          controllers: [{}],
+          lic: {
+            ap: {
+              spares: 0
+            }
+          }
+        },
+        settings: {
+          signal_radius_meters: 10,
+          signal_radius_feet: 32,
+          scale: 29,
+          show_heatmap: false,
+          show_overlaps: true,
+          show_distances: true,
+          signal_radius: 32,
+          units: 'ft'
+        },
+        stage: {
+          walls: [],
+          aps: [],
+          floorplan: '',
+          plan: {}
+        }
       }
 
       $scope.newPlan = function () {
         $scope.flooplan_name = ''
-        $scope.plan = new Plans({
-          title: 'Untitled',
-          details: {
-            contacts: [],
-            stage: {
-              aps: []
-            },
-            controllers: [{}],
-            lic: {
-              ap: {
-                spares: 0
-              }
-            }
-          }
-        })
+        $scope.plan = new Plans(planSkeleton)
         $timeout(function () {
           $scope.settings = {
             units: 'ft',
@@ -256,27 +355,25 @@ angular.module('plans')
         }.bind(Drawing), 200)
       }
 
-      $scope.createProject = function (project) {
-        /*
-        var p = new Project(project)
-        p.$save(function (response) {
-        }, function (error) {
-          $scope.error = error.data.message
-        })
-        */
-      }
-
-      $scope.create = function () {
-        var plan = new Plans({
-          title: this.title,
-          content: this.content
-        })
-        plan.$save(function (response) {
-          $location.path(`projects/${$scope.bldg._id}/${response._id}`)
-
-          $scope.title = ''
-          $scope.content = ''
-        }, function (errorResponse) {
+      $scope.createPlanAndLoad = function (building) {
+        var plan = new Plans(planSkeleton)
+        var promises = []
+        plan.$save(response => {
+          console.log('plan', plan)
+          plan.stage._id = response._id
+          promises.push(plan.$update())
+          if (building) {
+            if (!building.plans) building.plans = []
+            building.plans.push({
+              _id: response._id
+            })
+            delete building.new
+            promises.push($scope.selected.project.$save())
+          }
+          $q.all(promises).then(() => {
+            $location.path(`building/${building._id}`)
+          })
+        }, errorResponse => {
           $scope.error = errorResponse.data.message
         })
       }
@@ -301,7 +398,7 @@ angular.module('plans')
         var plan = $scope.plan
 
         plan.$update(function () {
-          $location.path(`projects/${$scope.bldg._id}/${plan._id}`)
+          $location.path(`building/${$scope.bldg._id}/${plan._id}`)
         }, function (errorResponse) {
           $scope.error = errorResponse.data.message
         })
@@ -323,7 +420,6 @@ angular.module('plans')
 
       $scope.findProjects = function () {
         $scope.projects = Projects.query({search: $scope.search})
-        console.log('finding projects', $scope.projects)
       }
 
       $scope.findOneProject = function () {
@@ -332,6 +428,10 @@ angular.module('plans')
         }, function () {
           console.log('project loaded')
         })
+      }
+
+      $scope.showBuilding = (building) => {
+        $location.path(`building/${building._id}`)
       }
 
       $scope.showPlan = (plan) => {
@@ -353,13 +453,31 @@ angular.module('plans')
         }))
       }
 
+      $scope.getFloorCount = project => {
+        if (!_.get(project, 'sites')) return 0
+        return _.reduce(project.sites, (count, site) => {
+          if (!_.get(site, 'buildings')) return 0
+          return count + _.reduce(site.buildings, (count, bldg) => {
+            return count + _.size(bldg.plans)
+          }, 0)
+        }, 0)
+      }
+
+      $scope.getBuildingCount = project => {
+        if (!_.get(project, 'sites')) return 0
+        return _.reduce(project.sites, (count, site) => {
+          return count + _.size(site.buildings)
+        }, 0)
+      }
+
       $scope.getBuilding = () => {
         $scope.project = Projects.getByBuilding({
           buildingId: $stateParams.bldgID
         }, function () {
-          _.each($scope.project.sites, site => {
-            var b = _.find(site.buildings, {_id: $stateParams.bldgID})
-            if (b) $scope.building = b
+          var building
+          _.each($scope.project.sites, s => {
+            building = _.find(s.buildings, b => b._id === $stateParams.bldgID)
+            if (building) $scope.building = building
           })
           $scope.plans = []
           _.each($scope.building.plans, initFloor)
@@ -444,14 +562,5 @@ angular.module('plans')
           })
         }, 100)
       }
-
-      $scope.selectProject = function (project) {
-        $scope.selectedProject = project
-      }
-
-      $scope.selectSite = function (site) {
-        $scope.selectedSite = site
-      }
-
     }
   ])

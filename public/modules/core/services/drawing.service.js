@@ -862,7 +862,7 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 	this.loadPlan = function(plan_id, data, signal_radius, updateControls) {
 		this.updateControls = updateControls;
 		$timeout(function() {
-			plan = data.plan;
+			// plan = data.plan;
 			plan._id = plan_id;
 			var stage_scale = _.get(plan, 'stage.stage_scale');
 			this.initBoard(signal_radius);

@@ -1,52 +1,125 @@
 <section data-ng-init="findProjects()">
-  <div class="page-header">
-    <input type="text" class="form-control" ng-model="search" ng-change="findProjects()" ng-model-options="{debounce: 500}" placeholder="search..." />
+  <div class="page-header row">
+    <div class="col-md-6">
+      <input type="text" class="form-control" ng-model="search" placeholder="search..." />
+    </div>
+    <div class="col-md-6 text-right">
+      <button class="btn btn-primary" ng-click="toggleOrphans()">Show Orphan Floorplans</button>
+    </div>
   </div>
 
-  <div class="list-group">
-    <a ng-click="state['create-project'] = true" class="list-group-item">
-      <img ng-src="http://placehold.it/320x185?text=Create" class="fullsize" />
-    </a>
-    <a data-ng-repeat="project in projects" ng-click="selectProject(project)"
-      class="list-group-item"
-      ng-class="{'shadowItem': selectedProject && project != selectedProject}"
-    >
+  <div class="orphan-plans" ng-if="show_orphans">
+    <a data-ng-repeat="plan in plans" data-ng-href="#!/plans/{{plan._id}}" class="list-group-item">
       <small class="list-group-item-text">
         Created on
-        <span data-ng-bind="project.created | date:'mediumDate'"></span>
+        <span data-ng-bind="plan.created | date:'mediumDate'"></span>
       </small>
-      <img ng-src="{{ project.thumb }}" />
-      <h4 class="list-group-item-heading" data-ng-bind="project.title"></h4>
+      <img ng-src="/uploads/{{ plan.thumb }}" />
+      <h4 class="list-group-item-heading" data-ng-bind="plan.title"></h4>
     </a>
+    <div class="alert alert-warning text-center" data-ng-if="plans.$resolved && !plans.length">
+      No orphan plans.
+    </div>
   </div>
 
-  <div class="list-group" ng-if="selectedProject">
-    <h2>Sites <a href ng-click="createSite()" class="btn btn-default">New Site</a></h2>
-    <a data-ng-repeat="site in selectedProject.sites" ng-click="selectSite(site)" 
-      class="list-group-item"
-      ng-class="{'shadowItem': selectedSite && site != selectedSite}"
-    >
-      <small class="list-group-item-text">
-        Created on
-        <span data-ng-bind="site.created | date:'mediumDate'"></span><br />
-        <span>Buildings: </span><span data-ng-bind="site.buildings.length"></span>
-      </small>
-      <img ng-src="/uploads/{{ site.thumb }}" />
-      <h4 class="list-group-item-heading" data-ng-bind="site.name"></h4>
-    </a>
+  <div class="list-group projects" ng-class="{'v1': show_orphans}">
+    <h2>Projects <span ng-show="projects.length">({{ projects.length }})</span></h2>
+    <div>
+      <div ng-click="showCreate('project')" class="list-group-item create-new" ng-class="{'shadowItem': selected.project}">
+        <span ng-if="!new.project">Create</span>
+        <div ng-show="new.project">
+          <form>
+            <div class="form-group"> <input type="text" class="form-control" placeholder="Project name..." focus-me="{{ new.project }}" ng-model="new.project.title" /> </div>
+            <button type="submit" class="btn btn-primary" ng-click="create($event, 'project')">Create</button>
+            <button class="btn btn-danger" ng-click="cancelCreate($event, 'project')">Cancel</button>
+          </form>
+        </div>
+      </div>
+      <div data-ng-repeat="project in projects | filter: search | orderBy: sort.projects"
+        ng-click="selected.project = project"
+        class="list-group-item" role="button"
+        ng-class="{'shadowItem': selected.project && project != selected.project, 'selectedItem': project == selected.project}"
+      >
+        <div class="topright text-right">
+          <a href ng-click="askDeleteProject(project)"><i class="glyphicon glyphicon-trash"></i></a>
+        </div>
+        <img ng-if="project.thumb" ng-src="{{ project.thumb }}" />
+        <img ng-if="!project.thumb" ng-src="/modules/core/img/brand/frog.png" />
+        <h3 class="list-group-item-heading" data-ng-bind="project.title"></h3>
+        <small class="list-group-item-text">
+          Created on
+          <span data-ng-bind="project.created | date:'mediumDate'"></span>
+        </small><br />
+        <span>Sites: {{ project.sites.length }}</span><br />
+        <span>Buildings: {{ getBuildingCount(project) }}</span><br />
+        <span>Floors: {{ getFloorCount(project) }}</span><br />
+      </div>
+    </div>
   </div>
 
-  <div class="list-group" ng-if="selectedSite">
-    <h2>Buildings <a href ng-click="createBuilding()" class="btn btn-default">New Building</a></h2>
-    <a data-ng-repeat="bldg in selectedSite.buildings" ng-href="/#!/building/{{ bldg._id }}" class="list-group-item">
-      <small class="list-group-item-text">
-        Created on
-        <span data-ng-bind="bldg.created | date:'mediumDate'"></span><br />
-        <span>Floors: </span><span data-ng-bind="bldg.plans.length"></span>
-      </small>
-      <img ng-src="/uploads/{{ bldg.thumb }}" />
-      <h4 class="list-group-item-heading" data-ng-bind="bldg.name"></h4>
-    </a>
+  <div class="list-group sites" ng-class="{'v1': show_orphans}">
+    <h2>Sites <span ng-show="selected.project.sites.length">({{ selected.project.sites.length }})</span></h2>
+    <div>
+      <div ng-click="showCreate('site')" class="list-group-item create-new"
+        ng-class="{'shadowItem': selected.site, 'selected': new.site}">
+        <span ng-if="!new.site">Create</span>
+        <div ng-show="new.site">
+          <form>
+            <div class="form-group"> <input type="text" class="form-control" placeholder="Site name..." focus-me="{{ new.site }}" ng-model="new.site.name" /> </div>
+            <button type="submit" class="btn btn-primary" ng-click="create($event, 'site')">Create</button>
+            <button class="btn btn-danger" ng-click="cancelCreate($event, 'site')">Cancel</button>
+          </form>
+        </div>
+      </div>
+      <div data-ng-repeat="site in selected.project.sites | filter: search | orderBy: sort.sites" 
+        ng-click="selected.site = site" 
+        class="list-group-item"
+        ng-class="{'shadowItem': selected.site && site != selected.site, 'selectedItem': site == selected.site}"
+      >
+        <div class="topright text-right">
+          <a href ng-click="askDeleteSite(site)"><i class="glyphicon glyphicon-trash"></i></a>
+        </div>
+        <img ng-if="site.thumb" ng-src="/uploads/{{ site.thumb }}" />
+        <img ng-if="!site.thumb" ng-src="/modules/core/img/brand/frog.png" />
+        <h3 class="list-group-item-heading" data-ng-bind="site.name"></h3>
+        <small class="list-group-item-text">
+          Created on
+          <span data-ng-bind="site.created | date:'mediumDate'"></span><br />
+          <span>Buildings: </span><span data-ng-bind="site.buildings.length"></span>
+        </small>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-group buildings" ng-class="{'v1': show_orphans}">
+    <h2>Buildings <span ng-show="selected.site.buildings.length">({{ selected.site.buildings.length }})</span></h2>
+    <div>
+      <div ng-click="showCreate('building')" class="list-group-item create-new" 
+        ng-class="{'shadowItem': selected.building, 'selected': new.building}"
+        >
+        <span ng-if="!new.building">Create</span>
+        <div ng-show="new.building">
+          <form>
+            <div class="form-group"> <input type="text" class="form-control" placeholder="building name..." focus-me="{{ new.building }}" ng-model="new.building.name" /> </div>
+            <button class="btn btn-primary" ng-click="create($event, 'building')">Create</button>
+            <button class="btn btn-danger" ng-click="cancelCreate($event, 'building')">Cancel</button>
+          </form>
+        </div>
+      </div>
+      <div data-ng-repeat="bldg in selected.site.buildings | filter: search | orderBy: sort.buildings" class="list-group-item" ng-click="showBuilding(bldg)">
+        <div class="topright text-right">
+          <a href ng-click="askDeleteBuilding(bldg)"><i class="glyphicon glyphicon-trash"></i></a>
+        </div>
+        <img ng-if="bldg.thumb" ng-src="/uploads/{{ bldg.thumb }}" />
+        <img ng-if="!bldg.thumb" ng-src="/modules/core/img/brand/frog.png" />
+        <h3 class="list-group-item-heading" data-ng-bind="bldg.name"></h3>
+        <small class="list-group-item-text">
+          Created on
+          <span data-ng-bind="bldg.created | date:'mediumDate'"></span><br />
+          <span>Floors: </span><span data-ng-bind="bldg.plans.length"></span>
+        </small>
+      </div>
+    </div>
   </div>
 
   <div class="alert alert-warning text-center" data-ng-if="plans.$resolved && !plans.length">

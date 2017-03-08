@@ -2,10 +2,6 @@
     position: fixed;
 }
 
-.pointer {
-    cursor: pointer;
-}
-
 .md-button ng-md-icon {
     line-height: 30px;
     vertical-align: text-top;
@@ -76,9 +72,38 @@ md-switch {
     margin: 0 15px;
 }
 
+plan-list .search {
+  width: 50%;
+}
+
+plan-list h2 {
+  font-family: 'Play', sans-serif;
+  font-size: 30px;
+  border-bottom: 1px solid #444;
+  border-top: 1px solid #444;
+  padding: 10px;
+  margin-bottom: 0;
+  margin-top: 0;
+}
+
+plan-list h3 {
+  font-family: 'Play', sans-serif;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 5px;
+  width: 90%;
+}
+
+plan-list, plan-list section {
+  background: url('/modules/core/img/artwork/light-horizontal.jpg');
+  background-size: cover;
+  height: calc(100% - 60px);
+  display: block;
+}
+
 plan-list img {
-  max-width: 160px;
-  max-height: 160px;
+  margin-top: 30px;
+  max-width: 50%;
+  max-height: 80%;
   float: right;
 }
 
@@ -87,8 +112,146 @@ plan-list img.fullsize {
   max-height: inherit;
 }
 
-plan-list div.list-group {
-  cursor: pointer;
+plan-list .dashboard {
+  height: 100%;
+  display: block;
+}
+
+plan-list .create-new {
+  font-family: 'Play', sans-serif;
+  padding: 20% 0 0 5px;
+  text-align: center;
+}
+
+plan-list .create-new span {
+  text-transform: uppercase;
+  color: #888;
+  font-size: 20pt;
+}
+
+plan-list .create-new > div {
+  width: 88%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+plan-list .create-new > div input {
+  font-size: larger;
+  border: 0;
+  border-bottom: 1px solid #aaa;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+plan-list .create-new > div input:focus {
+  outline: none;
+  box-shadow: none;
+  border: 0;
+  border-bottom: 1px solid #aaa;
+}
+
+plan-list .page-header {
+  border: 0;
+  margin: 40px 20px 20px 0;
+}
+
+plan-list .page-header input {
+  background: #222;
+  color: white;
+  border: 1px solid #222;
+  border-radius: 15px;
+}
+
+plan-list div.projects {
+  border-left: 1px solid #444;
+}
+
+plan-list .orphan-plans {
+  height: 200px;
+  overflow-x: auto;
+  margin: 10px 0;
+  padding-left: 10px;
+  border-radius: 20px;
+  border: 4px solid #344;
+}
+
+plan-list .orphan-plans .list-group-item {
+  width: 250px;
+  height: 155px;
+}
+
+plan-list .list-group {
+  background: rgba(0, 0, 0, 0.5);
+  margin: 0;
+  float: left;
+  text-align: center;
+  color: white;
+  width: 33%;
+  padding: 0;
+  border-right: 1px solid #444;
+  border-bottom: 1px solid #444;
+  height: calc(100% - 20px);
+  display: block;
+  /*
+  background: -moz-linear-gradient(left, #9cd3cd 0%, #ffffff 100%);
+  background: -webkit-linear-gradient(left, #9cd3cd 0%,#ffffff 100%);
+  background: linear-gradient(to right, #9cd3cd 0%,#ffffff 100%);
+  */
+}
+
+plan-list div.v1 {
+  height: calc(100% - 200px)
+}
+
+plan-list .list-group > div {
+  padding-top: 20px;
+  height: calc(100% - 55px);
+  display: block;
+  overflow-y: auto;
+}
+
+plan-list .projects {
+  /* background: url('/modules/core/img/artwork/triangle.jpg') no-repeat;
+  background-size: cover; */
+}
+
+plan-list .sites {
+  /* background: url('/modules/core/img/artwork/triangle.jpg') no-repeat;
+  background-size: cover; */
+}
+
+plan-list .buildings {
+  /* background: url('/modules/core/img/artwork/triangle.jpg') no-repeat;
+  background-size: cover; */
+}
+
+.list-group-item {
+    display: inline-block;
+    color: black;
+    text-align: left;
+    margin: 10px;
+    width: 45%;
+    min-width: 250px;
+    height: 155px;
+    overflow: hidden;
+    opacity: 0.85;
+    border-radius: 20px;
+}
+
+plan-list .list-group-item:last-child {
+    border-radius: 20px;
+    margin-bottom: 10px;
+}
+
+.list-group-item:hover, .list-group-item:focus, .list-group-item.selected {
+  background-color: white;
+  opacity: 1;
+  filter: grayscale(0);
+}
+
+.selectedItem {
+  opacity: 1;
+  filter: none;
 }
 
 .shadowItem {
@@ -114,4 +277,50 @@ plan-list div.list-group {
 
 .floors img {
   display: block;
+}
+
+md-sidenav {
+  background: black;
+}
+
+md-sidenav svg path {
+  fill: #ddd;
+}
+
+md-sidenav input {
+  background: #444;
+  border: 1px solid #666;
+  padding: 4px 10px;
+}
+
+.controls {
+  padding: 20px;
+  background: #111;
+  color: white;
+}
+
+.controls canvas {
+    margin: 0 20px;
+}
+
+.controls input {
+	color: white;
+	background: #555;
+	border: 1px solid #333;
+	margin: 2px;
+	padding: 4px;
+	font-size: x-small;
+}
+
+.controls > div > div {
+  margin-right: 10px;
+}
+
+.controls hr {
+  margin-bottom: 5px;
+}
+
+.drawing {
+  background: white;
+  color: black;
 }

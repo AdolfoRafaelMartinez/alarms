@@ -5,9 +5,7 @@ const gm       = require('gm')
 const fs       = require('fs')
 const _        = require('lodash')
 const Q        = require('q')
-const pug      = require('pug')
 const exec     = require('child_process').exec
-const shortid  = require('shortid')
 
 const errorHandler = require('./errors.server.controller')
 const Project = mongoose.model('Project')
@@ -100,6 +98,12 @@ exports.update = function(req, res) {
       project_data.thumb = pic.thumb
       project_data.screenshot = pic.file
       project = _.extend(project, project_data)
+      _.each(project.sites, site => {
+        if (!site._id) site._id = mongoose.Types.ObjectId().toString()
+        _.each(site.buildings, b => {
+          if (!b._id) b._id = mongoose.Types.ObjectId().toString()
+        })
+      })
       return project.save(function(err) {
         if (err) {
           return res.status(400).send({
@@ -142,7 +146,7 @@ exports.list = function(req, res) {
   let query
   if (req.query.buildingId) {
     let search = {
-      'sites.buildings._id': mongoose.Types.ObjectId(req.query.buildingId)
+      'sites.buildings._id': req.query.buildingId
     }
     query = Project.findOne(search)
   }

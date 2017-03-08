@@ -14,11 +14,13 @@ const errorHandler = require('./errors.server.controller');
 const Plan = mongoose.model('Plan');
 
 function saveThumb(thumb, pid) {
+    var deferred = Q.defer();
+    if (!thumb) return Q.when({pic: 'none.jpg'})
+
     var base64Data = thumb.replace(/^data:image\/png;base64,/, '');
     var filename = pid + '.png';
     var thumbname = pid + '-thumb.jpg';
     var path = __dirname + '/../../public/uploads/';
-    var deferred = Q.defer();
     fs.writeFile(path + filename, base64Data, 'base64', function(err) {
         if (err) {
             console.log('error filename', err);
