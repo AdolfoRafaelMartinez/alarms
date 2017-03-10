@@ -37,6 +37,7 @@ module.exports = {
         'public/lib/caman/dist/caman.full.min.js',
 
         'public/lib/angular-dragdrop/src/angular-dragdrop.js',
+        'public/lib/angular-modal-service/dst/angular-modal-service.js',
 
         'public/lib/blueimp-file-upload/js/vendor/jquery.ui.widget.js',
         'public/lib/blueimp-load-image/js/load-image.all.min.js',

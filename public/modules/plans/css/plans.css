@@ -119,7 +119,7 @@ plan-list .dashboard {
 
 plan-list .create-new {
   font-family: 'Play', sans-serif;
-  padding: 20% 0 0 5px;
+  padding: 45px 0 0 5px;
   text-align: center;
 }
 
@@ -176,8 +176,8 @@ plan-list .orphan-plans {
 }
 
 plan-list .orphan-plans .list-group-item {
-  width: 250px;
-  height: 155px;
+  width: 220px;
+  height: 135px;
 }
 
 plan-list .list-group {
@@ -229,10 +229,11 @@ plan-list .buildings {
     display: inline-block;
     color: black;
     text-align: left;
+    font-size: small;
     margin: 10px;
     width: 45%;
     min-width: 220px;
-    height: 145px;
+    height: 135px;
     overflow: hidden;
     opacity: 0.85;
     border-radius: 20px;
@@ -322,5 +323,9 @@ md-sidenav input {
 
 .drawing {
   background: white;
+  color: black;
+}
+
+.modal {
   color: black;
 }

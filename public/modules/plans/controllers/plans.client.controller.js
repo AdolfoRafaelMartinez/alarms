@@ -3,8 +3,8 @@
 
 angular.module('plans')
   .controller('PlansController', [
-    '$scope', '$rootScope', '$state', '$stateParams', '$location', 'pdfReporting', 'Authentication', 'Drawing', '$timeout', '$http', 'Projects', 'Plans', 'contextMenu', '$q',
-    function ($scope, $rootScope, $state, $stateParams, $location, pdfReporting, Authentication, Drawing, $timeout, $http, Projects, Plans, contextMenu, $q) {
+    '$scope', '$rootScope', '$state', '$stateParams', '$location', 'pdfReporting', 'Authentication', 'Drawing', '$timeout', '$http', 'Projects', 'Plans', 'contextMenu', '$q', 'ModalService',
+    function ($scope, $rootScope, $state, $stateParams, $location, pdfReporting, Authentication, Drawing, $timeout, $http, Projects, Plans, contextMenu, $q, ModalService) {
       $scope.authentication = Authentication
 
       $scope.UNITS_STEP_FEET = 8
@@ -551,6 +551,53 @@ angular.module('plans')
       $scope.savePlanProperties = function () {
         $scope.savePlan()
         $scope.pp_edit = {}
+      }
+
+      $scope.askDeleteProject = function (project) {
+        ModalService.showModal({
+          templateUrl: 'deleteModal.html',
+          controller: 'deleteModalController',
+          inputs: { item: `project: ${project.title}` }
+        })
+          .then(function (modal) {
+            modal.element.modal()
+            modal.close.then(function (answer) {
+              if (answer) {
+                $scope.new = {}
+                $scope.selected = {}
+                project.$delete().then($scope.findProjects)
+              }
+            })
+          })
+      }
+
+      $scope.askDeleteSite = function (site) {
+        ModalService.showModal({
+          templateUrl: 'deleteModal.html',
+          controller: 'deleteModalController',
+          inputs: { item: `site: ${site.name}` }
+        })
+          .then(function (modal) {
+            modal.element.modal()
+            modal.close.then(function (answer) {
+              if (answer) {
+                $scope.new = {}
+                delete $scope.selected.site
+                delete $scope.selected.building
+                _.remove($scope.selected.project.sites, s => s._id === site._id)
+                $scope.selected.project.$update()
+              }
+            })
+          })
+      }
+
+      $scope.selectProject = project => {
+        $scope.selected = {project: project}
+      }
+
+      $scope.selectSite = site => {
+        $scope.selected.site = site
+        delete $scope.selected.building
       }
 
       $scope.report = function () {
