@@ -1,7 +1,6 @@
 'use strict';
 
 const mongoose = require('mongoose');
-const uuid     = require('uuid');
 const gm       = require('gm');
 const fs       = require('fs');
 const _        = require('lodash');
@@ -16,6 +15,7 @@ const Plan = mongoose.model('Plan');
 function saveThumb(thumb, pid) {
     var deferred = Q.defer();
     if (!thumb) return Q.when({pic: 'none.jpg'})
+    if (thumb.substr(0, 5) !== 'data:') return Q.when()
 
     var base64Data = thumb.replace(/^data:image\/png;base64,/, '');
     var filename = pid + '.png';
@@ -99,8 +99,10 @@ exports.update = function(req, res) {
     var plan_data = req.body;
     saveThumb(req.body.thumb, req.body._id)
         .then(pic => {
-            plan_data.thumb = pic.thumb;
-            plan_data.screenshot = pic.file;
+            if (pic) {
+              plan_data.thumb = pic.thumb;
+              plan_data.screenshot = pic.file;
+            }
             plan = _.extend(plan, plan_data);
             return plan.save(function(err) {
                 if (err) {
@@ -151,6 +153,22 @@ exports.list = function(req, res) {
 		}
 	});
 };
+
+/**
+ * List of Orphan Plans
+ */
+exports.orphans = function(req, res) {
+	Plan.find({user: req.user.id, building: {$exists: false}}).limit(200).sort('-created').populate('user', 'displayName').exec(function(err, plans) {
+		if (err) {
+			return res.status(400).send({
+				message: errorHandler.getErrorMessage(err)
+			});
+		} else {
+			res.json(plans);
+		}
+	});
+};
+
 
 exports.blueFloorPlan = function(req, res, next) {
 	Plan.findById(req.id).populate('user', 'displayName').exec(function(err, plan) {

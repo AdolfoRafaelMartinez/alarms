@@ -9,7 +9,7 @@ module.exports = function (app) {
 
   app.route('/projects/:projectId')
     .get   (users.requiresLogin, projects.hasAuthorization, projects.read)
-    .post  (users.requiresLogin, projects.hasAuthorization, projects.update)
+    .put   (users.requiresLogin, projects.hasAuthorization, projects.update)
     .delete(users.requiresLogin, projects.hasAuthorization, projects.delete)
 
   // Finish by binding the project middleware

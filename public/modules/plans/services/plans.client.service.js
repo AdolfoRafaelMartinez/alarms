@@ -8,7 +8,12 @@ angular.module('plans').factory('Plans', ['$resource',
 		}, {
 			update: {
 				method: 'PUT'
-			}
+			},
+      orphans: {
+        method: 'GET',
+        url: 'orphan-plans',
+        isArray: true
+      }
 		});
 	}
 ]);

@@ -8,9 +8,12 @@ module.exports = function(app) {
         .get (users.requiresLogin, plans.list)
         .post(users.requiresLogin, plans.create);
 
-    app.route('/plans/:planId/coverage').post(users.requiresLogin, plans.hasAuthorization, plans.coverage);
+	app.route('/orphan-plans')
+        .get (users.requiresLogin, plans.orphans)
 
-    app.route('/plans/:planId/pdf').get(users.requiresLogin, plans.hasAuthorization, plans.pdfReport);
+  app.route('/plans/:planId/coverage').post(users.requiresLogin, plans.hasAuthorization, plans.coverage);
+
+  app.route('/plans/:planId/pdf').get(users.requiresLogin, plans.hasAuthorization, plans.pdfReport);
 
 	app.route('/plans/:planId')
         .get   (users.requiresLogin, plans.hasAuthorization, plans.read)

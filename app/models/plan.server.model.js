@@ -1,45 +1,40 @@
-'use strict';
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
 
-/**
- * Module dependencies.
- */
-var mongoose = require('mongoose'),
-	Schema = mongoose.Schema;
+const PlanSchema = new Schema({
+  created: {
+    type: Date,
+    default: Date.now
+  },
+  title: {
+    type: String,
+    default: 'new plan',
+    trim: true,
+    required: 'Title cannot be blank'
+  },
+  thumb: {
+    type: String,
+    default: null
+  },
+  stage: {
+    type: Schema.Types.Mixed,
+    default: ''
+  },
+  building: {
+    type: String
+  },
+  settings: {
+    type: Schema.Types.Mixed,
+    default: ''
+  },
+  details: {
+    type: Schema.Types.Mixed,
+    default: ''
+  },
+  user: {
+    type: Schema.ObjectId,
+    ref: 'User'
+  }
+})
 
-/**
- * Article Schema
- */
-var PlanSchema = new Schema({
-	created: {
-		type: Date,
-		default: Date.now
-	},
-    title: {
-        type: String,
-        default: 'new plan',
-        trim: true,
-		required: 'Title cannot be blank'
-    },
-    thumb: {
-        type: String,
-        default: null
-    },
-	stage: {
-		type: Schema.Types.Mixed,
-		default: ''
-	},
-    settings: {
-        type: Schema.Types.Mixed,
-        default: ''
-    },
-    details: {
-        type: Schema.Types.Mixed,
-        default: ''
-    },
-	user: {
-		type: Schema.ObjectId,
-		ref: 'User'
-	}
-});
-
-mongoose.model('Plan', PlanSchema);
+mongoose.model('Plan', PlanSchema)

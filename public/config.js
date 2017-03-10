@@ -4,7 +4,7 @@
 var ApplicationConfiguration = (function() {
 	// Init module configuration options
 	var applicationModuleName = 'puddlejump';
-	var applicationModuleVendorDependencies = ['ngResource', 'ngCookies',  'ngAnimate',  'ngTouch',  'ngSanitize',  'ngMaterial', 'ngMdIcons', 'ui.router', 'ui.bootstrap', 'ui.utils', 'blueimp.fileupload', 'spinner'];
+	var applicationModuleVendorDependencies = ['ngResource', 'ngCookies',  'ngAnimate',  'ngTouch',  'ngSanitize',  'ngMaterial', 'ngMdIcons', 'ui.router', 'ui.bootstrap', 'ui.utils', 'blueimp.fileupload', 'spinner', 'ngDragDrop'];
 
 	// Add a new vertical module
 	var registerModule = function(moduleName, dependencies) {

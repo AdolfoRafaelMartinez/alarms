@@ -227,9 +227,9 @@ angular.module('plans')
         $event.stopPropagation()
       }
 
-      $scope.toggleOrphans = function() {
+      $scope.toggleOrphans = function () {
         if (!$scope.show_orphans) {
-          $scope.find()
+          $scope.find(true)
         }
         $scope.show_orphans = !$scope.show_orphans
       }
@@ -270,7 +270,7 @@ angular.module('plans')
             $scope.selected.project.sites.push($scope.selected.site)
             $scope.sort.site = '-created'
             $scope.new.building = { created: new Date() }
-            $scope.selected.project.$save(project => {
+            $scope.selected.project.$update(project => {
               $scope.selected.site = _.find(project.sites, s => s.new)
               delete $scope.selected.site.new
             })
@@ -285,12 +285,11 @@ angular.module('plans')
             $scope.selected.site.buildings.push($scope.selected.building)
             $scope.sort.building = '-created'
             var siteId = $scope.selected.site._id
-            $scope.selected.project.$save(project => {
+            $scope.selected.project.$update(project => {
               console.log('after save', project, $scope.selected)
               $scope.selected.site = _.find(project.sites, s => s._id === siteId)
               $scope.selected.building = _.find($scope.selected.site.buildings, b => b.new)
               delete $scope.selected.building.new
-              $scope.createPlanAndLoad($scope.selected.building)
             })
             break
         }
@@ -359,7 +358,6 @@ angular.module('plans')
         var plan = new Plans(planSkeleton)
         var promises = []
         plan.$save(response => {
-          console.log('plan', plan)
           plan.stage._id = response._id
           promises.push(plan.$update())
           if (building) {
@@ -368,7 +366,7 @@ angular.module('plans')
               _id: response._id
             })
             delete building.new
-            promises.push($scope.selected.project.$save())
+            promises.push($scope.selected.project.$update())
           }
           $q.all(promises).then(() => {
             $location.path(`building/${building._id}`)
@@ -414,8 +412,8 @@ angular.module('plans')
         }
       }
 
-      $scope.find = function () {
-        $scope.plans = Plans.query({search: $scope.search})
+      $scope.find = function (orphans) {
+        $scope.plans = orphans ? Plans.orphans() : Plans.query({search: $scope.search})
       }
 
       $scope.findProjects = function () {
@@ -431,7 +429,13 @@ angular.module('plans')
       }
 
       $scope.showBuilding = (building) => {
-        $location.path(`building/${building._id}`)
+        if (!building.plans) $scope.createPlanAndLoad($scope.selected.building)
+        else $location.path(`building/${building._id}`)
+      }
+
+      $scope.gotoPlan = (plan) => {
+        console.log('plan')
+        $location.path(`plans/${plan._id}`)
       }
 
       $scope.showPlan = (plan) => {
@@ -471,17 +475,24 @@ angular.module('plans')
       }
 
       $scope.getBuilding = () => {
-        $scope.project = Projects.getByBuilding({
-          buildingId: $stateParams.bldgID
-        }, function () {
-          var building
-          _.each($scope.project.sites, s => {
-            building = _.find(s.buildings, b => b._id === $stateParams.bldgID)
-            if (building) $scope.building = building
+        if ($stateParams.planID) {
+          $scope.plan = Plans.get({planId: $stateParams.planID}, function () {
+            $scope.plans = []
+            initFloor($scope.plan)
           })
-          $scope.plans = []
-          _.each($scope.building.plans, initFloor)
-        })
+        } else {
+          $scope.project = Projects.getByBuilding({
+            buildingId: $stateParams.bldgID
+          }, function () {
+            var building
+            _.each($scope.project.sites, s => {
+              building = _.find(s.buildings, b => b._id === $stateParams.bldgID)
+              if (building) $scope.building = building
+            })
+            $scope.plans = []
+            _.each($scope.building.plans, initFloor)
+          })
+        }
       }
 
       $scope.selectTool = function (mode) {
@@ -561,6 +572,17 @@ angular.module('plans')
             }, 0)
           })
         }, 100)
+      }
+
+      $scope.onOrphanDrop = function (event, ui) {
+        var plan = ui.draggable.scope().plan
+        var bldg = $(event.target).scope().bldg
+        if (!bldg.plans) bldg.plans = []
+        bldg.plans.push({_id: plan._id, floor: plan.title})
+        _.remove($scope.plans, p => p._id === plan._id)
+        plan.building = bldg._id
+        $scope.selected.project.$update()
+        plan.$update()
       }
     }
   ])

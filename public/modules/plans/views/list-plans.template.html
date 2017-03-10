@@ -9,14 +9,14 @@
   </div>
 
   <div class="orphan-plans" ng-if="show_orphans">
-    <a data-ng-repeat="plan in plans" data-ng-href="#!/plans/{{plan._id}}" class="list-group-item">
+    <div data-ng-repeat="plan in plans" class="list-group-item" data-drag="true" jqyoui-draggable="{animate: true}" data-jqyoui-options="{helper: 'clone', revert: 'invalid'}" ng-click="gotoPlan(plan)">
       <small class="list-group-item-text">
         Created on
         <span data-ng-bind="plan.created | date:'mediumDate'"></span>
       </small>
       <img ng-src="/uploads/{{ plan.thumb }}" />
-      <h4 class="list-group-item-heading" data-ng-bind="plan.title"></h4>
-    </a>
+      <span class="list-group-item-heading" data-ng-bind="plan.title"></span>
+    </div>
     <div class="alert alert-warning text-center" data-ng-if="plans.$resolved && !plans.length">
       No orphan plans.
     </div>
@@ -106,7 +106,7 @@
           </form>
         </div>
       </div>
-      <div data-ng-repeat="bldg in selected.site.buildings | filter: search | orderBy: sort.buildings" class="list-group-item" ng-click="showBuilding(bldg)">
+      <div data-ng-repeat="bldg in selected.site.buildings | filter: search | orderBy: sort.buildings" class="list-group-item" ng-click="showBuilding(bldg)" data-drop="true" jqyoui-droppable="{onDrop: 'onOrphanDrop'}">
         <div class="topright text-right">
           <a href ng-click="askDeleteBuilding(bldg)"><i class="glyphicon glyphicon-trash"></i></a>
         </div>
@@ -120,10 +120,6 @@
         </small>
       </div>
     </div>
-  </div>
-
-  <div class="alert alert-warning text-center" data-ng-if="plans.$resolved && !plans.length">
-    No plans yet, do you want to <a href="/#!/plans/create">create one</a>?
   </div>
 
 </section>

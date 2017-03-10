@@ -9,6 +9,10 @@ angular.module('plans').config(['$stateProvider',
         url: '/plans',
         templateUrl: 'modules/plans/views/list-plans.client.view.html'
       })
+      .state('plan', {
+        url: '/plans/:planID',
+        templateUrl: 'modules/plans/views/view-plan.client.view.html'
+      })
       .state('building', {
         url: '/building/:bldgID',
         templateUrl: 'modules/plans/views/view-plan.client.view.html'
