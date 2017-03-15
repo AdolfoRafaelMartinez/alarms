@@ -3,8 +3,8 @@
 
 angular.module('plans')
   .controller('PlansController', [
-    '$scope', '$rootScope', '$state', '$stateParams', '$location', 'pdfReporting', 'Authentication', 'Drawing', '$timeout', '$http', 'Projects', 'Plans', 'contextMenu', '$q', 'ModalService',
-    function ($scope, $rootScope, $state, $stateParams, $location, pdfReporting, Authentication, Drawing, $timeout, $http, Projects, Plans, contextMenu, $q, ModalService) {
+    '$scope', '$rootScope', '$state', '$stateParams', '$location', 'pdfReporting', 'Authentication', 'Drawing', '$timeout', '$http', 'Projects', 'Plans', 'Buildings', 'contextMenu', '$q', 'ModalService',
+    function ($scope, $rootScope, $state, $stateParams, $location, pdfReporting, Authentication, Drawing, $timeout, $http, Projects, Plans, Buildings, contextMenu, $q, ModalService) {
       $scope.authentication = Authentication
 
       $scope.UNITS_STEP_FEET = 8
@@ -194,6 +194,7 @@ angular.module('plans')
         $scope.plan.thumb = Drawing.getThumb()
         $scope.plan.stage = Drawing.toJSON()
         $scope.plan.settings = $scope.settings
+        /* TODO: update plan titles in building */
 
         if (!$scope.plan._id) {
           return $scope.plan.$save(function (response) {
@@ -273,6 +274,7 @@ angular.module('plans')
             $scope.selected.project.$update(project => {
               $scope.selected.site = _.find(project.sites, s => s.new)
               delete $scope.selected.site.new
+              updateProject()
             })
             break
 
@@ -290,6 +292,7 @@ angular.module('plans')
               $scope.selected.site = _.find(project.sites, s => s._id === siteId)
               $scope.selected.building = _.find($scope.selected.site.buildings, b => b.new)
               delete $scope.selected.building.new
+              updateProject()
             })
             break
         }
@@ -591,6 +594,27 @@ angular.module('plans')
           })
       }
 
+      $scope.askDeleteBuilding = function (building) {
+        ModalService.showModal({
+          templateUrl: 'deleteModal.html',
+          controller: 'deleteModalController',
+          inputs: { item: `building: ${building.name}` }
+        })
+          .then(function (modal) {
+            modal.element.modal()
+            modal.close.then(function (answer) {
+              if (answer) {
+                $scope.new = {}
+                var b = Buildings(building)
+                b.$delete().then(() => {
+                  delete $scope.selected.building
+                  _.remove($scope.selected.site.buildings, s => s._id === building._id)
+                })
+              }
+            })
+          })
+      }
+
       $scope.selectProject = project => {
         $scope.selected = {project: project}
       }
@@ -621,6 +645,13 @@ angular.module('plans')
         }, 100)
       }
 
+      function updateProject() {
+        $scope.selected.project.$update(project => {
+          $scope.selected.site = _.find(project.sites, s => s._id === $scope.selected.site._id)
+          $scope.selected.building = _.find($scope.selected.site.buildings, b => b._id === $scope.selected.building._id)
+        })
+      }
+
       $scope.onOrphanDrop = function (event, ui) {
         var plan = ui.draggable.scope().plan
         var bldg = $(event.target).scope().bldg
@@ -628,7 +659,7 @@ angular.module('plans')
         bldg.plans.push({_id: plan._id, floor: plan.title})
         _.remove($scope.plans, p => p._id === plan._id)
         plan.building = bldg._id
-        $scope.selected.project.$update()
+        updateProject()
         plan.$update()
       }
     }

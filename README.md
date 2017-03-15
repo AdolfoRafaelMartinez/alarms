@@ -12,6 +12,9 @@ This version of PuddleJump was built using the [mean stack](http://meanjs.org). 
 
 
 ## Prerequisites
+PRODUCTION Requirements:
+* GraphicsMagick
+
 Make sure you have installed all these prerequisites on your development machine.
 * Node.js - [Download & Install Node.js](http://www.nodejs.org/download/) and the npm package manager, if you encounter any problems, you can also use this [GitHub Gist](https://gist.github.com/isaacs/579814) to install Node.js.
 * MongoDB - [Download & Install MongoDB](http://www.mongodb.org/downloads), and make sure it's running on the default port (27017).

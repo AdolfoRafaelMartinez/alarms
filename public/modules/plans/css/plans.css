@@ -232,7 +232,7 @@ plan-list .buildings {
     font-size: small;
     margin: 10px;
     width: 45%;
-    min-width: 220px;
+    min-width: 200px;
     height: 135px;
     overflow: hidden;
     opacity: 0.85;
