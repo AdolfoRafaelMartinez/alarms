@@ -68,8 +68,7 @@ module.exports = function(grunt) {
 		uglify: {
 			production: {
 				options: {
-                    mangle: true,
-                    compress: { unsafe: true }
+                    mangle: true
 				},
 				src: [
                     'public/config.js',
@@ -83,6 +82,27 @@ module.exports = function(grunt) {
                 dest: 'public/dist/application.min.js'
 			}
 		},
+    replace: {
+      production: {
+        src: [
+          'public/dist/application.min.js',
+          'public/modules/**/*.html'
+        ],
+        overwrite: true,
+        replacements: [
+          {from: 'plans', to: '畳'}
+        ]
+      },
+      dev: {
+        src: [
+          'public/modules/**/*.html'
+        ],
+        overwrite: true,
+        replacements: [
+          {from: '畳', to: 'plans'}
+        ]
+      }
+    },
 		cssmin: {
 			combine: {
 				files: {
@@ -172,7 +192,7 @@ module.exports = function(grunt) {
 	grunt.registerTask('lint', []);
 
 	// Build task(s).
-	grunt.registerTask('build', ['lint', 'loadConfig', 'uglify', 'cssmin']);
+	grunt.registerTask('build', ['lint', 'loadConfig', 'uglify', 'replace', 'cssmin']);
 
 	// Test task.
 	grunt.registerTask('test', ['env:test', 'mochaTest', 'karma:unit']);

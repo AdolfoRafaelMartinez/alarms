@@ -68,6 +68,7 @@
     "grunt-ng-annotate": "^3.0.0",
     "grunt-node-inspector": "*",
     "grunt-nodemon": "*",
+    "grunt-text-replace": "^0.4.0",
     "karma": "~0.12.0",
     "karma-chrome-launcher": "~0.1.2",
     "karma-coverage": "~0.2.0",

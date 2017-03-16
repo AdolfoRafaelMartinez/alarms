@@ -33,7 +33,6 @@
             restrict: 'E',
             link: link
         };
-
     }
 
     // template
