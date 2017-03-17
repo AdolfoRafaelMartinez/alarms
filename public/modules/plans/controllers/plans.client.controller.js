@@ -256,12 +256,14 @@ angular.module('plans')
       $scope.create = ($event, item) => {
         switch (item) {
           case 'project':
+            if (!$scope.new.project.title) break
             var p = new Projects($scope.new.project)
             p.$save(addProject, handleError)
             $scope.sort.projects = '-created'
             break
 
           case 'site':
+            if (!$scope.new.site.name) break
             $scope.selected.site = {
               created: new Date(),
               name: $scope.new.site.name,
@@ -269,7 +271,7 @@ angular.module('plans')
               new: true
             }
             $scope.selected.project.sites.push($scope.selected.site)
-            $scope.sort.site = '-created'
+            $scope.sort.sites = '-created'
             $scope.new.building = { created: new Date() }
             $scope.selected.project.$update(project => {
               $scope.selected.site = _.find(project.sites, s => s.new)
@@ -279,16 +281,16 @@ angular.module('plans')
             break
 
           case 'building':
+            if (!$scope.new.building.name) break
             $scope.selected.building = {
               created: new Date(),
               name: $scope.new.building.name,
               new: true
             }
             $scope.selected.site.buildings.push($scope.selected.building)
-            $scope.sort.building = '-created'
+            $scope.sort.buildings = '-created'
             var siteId = $scope.selected.site._id
             $scope.selected.project.$update(project => {
-              console.log('after save', project, $scope.selected)
               $scope.selected.site = _.find(project.sites, s => s._id === siteId)
               $scope.selected.building = _.find($scope.selected.site.buildings, b => b.new)
               delete $scope.selected.building.new

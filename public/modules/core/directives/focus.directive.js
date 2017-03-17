@@ -1,6 +1,6 @@
 'use strict'
 
-angular.module('core').directive('focusMe', [function ($timeout) {
+angular.module('core').directive('focusMe', ['$timeout', function ($timeout) {
   return {
     scope: { trigger: '@focusMe' },
     link: (scope, element) => {

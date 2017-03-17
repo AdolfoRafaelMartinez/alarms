@@ -59,6 +59,7 @@
     <h2>Sites <span ng-show="selected.project.sites.length">({{ selected.project.sites.length }})</span></h2>
     <div>
       <div ng-click="showCreate('site')" class="list-group-item create-new"
+        ng-show="selected.project"
         ng-class="{'shadowItem': selected.site, 'selected': new.site}">
         <span ng-if="!new.site">Create</span>
         <div ng-show="new.site">
@@ -92,6 +93,7 @@
     <h2>Buildings <span ng-show="selected.site.buildings.length">({{ selected.site.buildings.length }})</span></h2>
     <div>
       <div ng-click="showCreate('building')" class="list-group-item create-new" 
+        ng-show="selected.site"
         ng-class="{'shadowItem': selected.building, 'selected': new.building}"
         >
         <span ng-if="!new.building">Create</span>

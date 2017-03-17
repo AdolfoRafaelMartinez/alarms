@@ -192,7 +192,7 @@ module.exports = function(grunt) {
 	grunt.registerTask('lint', []);
 
 	// Build task(s).
-	grunt.registerTask('build', ['lint', 'loadConfig', 'uglify', 'replace', 'cssmin']);
+	grunt.registerTask('build', ['lint', 'loadConfig', 'uglify', 'cssmin']);
 
 	// Test task.
 	grunt.registerTask('test', ['env:test', 'mochaTest', 'karma:unit']);
