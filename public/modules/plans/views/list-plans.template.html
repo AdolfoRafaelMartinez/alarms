@@ -107,7 +107,7 @@
       </div>
       <div data-ng-repeat="bldg in selected.site.buildings | filter: search | orderBy: sort.buildings" class="list-group-item" ng-click="showBuilding(bldg)" data-drop="true" jqyoui-droppable="{onDrop: 'onOrphanDrop'}">
         <div class="topright text-right">
-          <a href ng-click="askDeleteBuilding(bldg)"><i class="glyphicon glyphicon-trash"></i></a>
+          <a href ng-click="askDeleteBuilding(bldg, $event)"><i class="glyphicon glyphicon-trash"></i></a>
         </div>
         <img ng-if="bldg.thumb" ng-src="/uploads/{{ bldg.thumb }}" />
         <img ng-if="!bldg.thumb" ng-src="/modules/core/img/brand/frog.png" />

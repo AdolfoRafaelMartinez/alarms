@@ -596,7 +596,8 @@ angular.module('plans')
           })
       }
 
-      $scope.askDeleteBuilding = function (building) {
+      $scope.askDeleteBuilding = function (building, $event) {
+        $event.stopPropagation()
         ModalService.showModal({
           templateUrl: 'deleteModal.html',
           controller: 'deleteModalController',

@@ -750,7 +750,8 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 		if (!percent) return;
 		plan.stage_scale = percent;
 		if (this.updateControls) this.updateControls('scale', Math.round(plan.stage_scale));
-		plan.stage_ppm = plan.floor_width_px / plan.floor_width;
+		// plan.stage_ppm = plan.floor_width_px / plan.floor_width;
+    plan.floor_width = plan.floor_width_px / plan.stage_ppm
 		stage.setTransform(stage.x, stage.y, percent/100, percent/100).update();
 		for (var i=0; i<distances.children.length; i++) {
 			if (~_.indexOf(['bubble', 'value'], distances.children[i].name)) {
@@ -799,13 +800,13 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 		return defer.promise;
 	};
 
-    function initStage() {
-        if (!plan.stage) plan.stage = {};
-		plan.stage.x = stage.x;
-		plan.stage.y = stage.y;
-		plan.stage.regX = stage.regX;
-		plan.stage.regY = stage.regY;
-    }
+  function initStage() {
+    if (!plan.stage) plan.stage = {};
+    plan.stage.x = stage.x;
+    plan.stage.y = stage.y;
+    plan.stage.regX = stage.regX;
+    plan.stage.regY = stage.regY;
+  }
 
 	this.toJSON = function() {
 		plan.stage.x = stage.x;
@@ -862,19 +863,16 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 	this.loadPlan = function(plan_id, data, signal_radius, updateControls) {
 		this.updateControls = updateControls;
 		$timeout(function() {
-			// plan = data.plan;
+			if (data.plan) plan = data.plan;
 			plan._id = plan_id;
 			var stage_scale = _.get(plan, 'stage.stage_scale');
 			this.initBoard(signal_radius);
-			this.scale(100);
 			if (data.floorplan) {
 				this.addFloorPlan(data.floorplan)
 				.then(function() {
 					if (data.plan && data.plan.stage_scale) this.scale(stage_scale);
+          else this.scale(100);
 				}.bind(this));
-				this.toggleOverlaps();
-				update = true;
-				$timeout(this.toggleOverlaps, 0);
 			}
 
 			stage.x = _.get(data.plan, 'stage.x');
@@ -886,7 +884,6 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 				this.addAP(ap.x, ap.y, signal_radius);
 			}.bind(this));
 			this.reIndexAPs();
-			this.updateSignalStrength(signal_radius);
 			_.each(data.walls, function(wall) {
 				current_wall = false;
 				this.wall_type = wall.wall_type;
@@ -895,9 +892,9 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 				}.bind(this));
 			}.bind(this));
 			$timeout(function() {
-				this.updateSignalStrength(signal_radius);
-                if (!plan.stage) initStage();
-			}.bind(this), 1000);
+        this.updateSignalStrength(plan.real_radius);
+        if (!plan.stage) initStage();
+			}.bind(this), 100);
 		}.bind(this), 100);
 
 	};
