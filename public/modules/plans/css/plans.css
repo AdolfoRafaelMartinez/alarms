@@ -94,8 +94,6 @@ plan-list h3 {
 }
 
 plan-list, plan-list section {
-  background: url('/modules/core/img/artwork/light-horizontal.jpg');
-  background-size: cover;
   height: calc(100% - 60px);
   display: block;
 }
@@ -152,7 +150,8 @@ plan-list .create-new > div input:focus {
 
 plan-list .page-header {
   border: 0;
-  margin: 40px 20px 20px 0;
+  margin: 50px 20px 0 0;
+  padding-top: 20px;
 }
 
 plan-list .page-header input {

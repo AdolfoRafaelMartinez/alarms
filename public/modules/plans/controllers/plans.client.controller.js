@@ -608,7 +608,7 @@ angular.module('plans')
             modal.close.then(function (answer) {
               if (answer) {
                 $scope.new = {}
-                var b = Buildings(building)
+                var b = new Buildings(building)
                 b.$delete().then(() => {
                   delete $scope.selected.building
                   _.remove($scope.selected.site.buildings, s => s._id === building._id)

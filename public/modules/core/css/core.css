@@ -2,8 +2,12 @@ body {
   font-family: 'Roboto', sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #000;
+  background-color: #222;
   color: #dedede;
+  background: url('/modules/core/img/artwork/solarized-darcula.jpg');
+  background-size: cover;
+}
+
 }
 
 ::-webkit-scrollbar-track
@@ -40,7 +44,7 @@ body {
 
 .fullsize {
   position: absolute;
-  top: 40px;
+  top: 0;
   bottom: 0;
   left: 0;
   right: 0;

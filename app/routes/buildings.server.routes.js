@@ -6,7 +6,7 @@ module.exports = function (app) {
   app.route('/buildings')
     .get(users.requiresLogin, buildings.list)
 
-  app.route('/buildings/:projectId')
+  app.route('/buildings/:buildingId')
     .delete(users.requiresLogin, buildings.hasAuthorization, buildings.delete)
 
   // Finish by binding the project middleware
