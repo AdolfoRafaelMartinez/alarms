@@ -5,6 +5,7 @@
 
     Marian Vasile -- dev -- @markvasile
     Ryan R. Hadley -- design, business -- @haddlescaddle
+    Prasanth Akundi -- design, UI
 
 # THANKS
 
@@ -12,5 +13,5 @@
 
 # TECHNOLOGY COLOPHON
 
-    HTML5, CSS3, AngularJS, Angular Material
+    HTML5, CSS3, AngularJS, Angular Material, Haskell
     jQuery, Modernizr

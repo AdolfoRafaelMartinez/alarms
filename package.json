@@ -57,6 +57,7 @@
   "devDependencies": {
     "grunt": "*",
     "grunt-concurrent": "*",
+    "grunt-contrib-copy": "^1.0.0",
     "grunt-contrib-csslint": "^0.3.1",
     "grunt-contrib-cssmin": "~0.10.0",
     "grunt-contrib-jshint": "~0.10.0",
