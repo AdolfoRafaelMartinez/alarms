@@ -119,6 +119,7 @@ plan-list .create-new {
   font-family: 'Play', sans-serif;
   padding: 45px 0 0 5px;
   text-align: center;
+  vertical-align: top;
 }
 
 plan-list .create-new span {

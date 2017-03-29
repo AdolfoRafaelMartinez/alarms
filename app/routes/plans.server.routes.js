@@ -11,7 +11,7 @@ module.exports = function(app) {
 	app.route('/orphan-plans')
         .get (users.requiresLogin, plans.orphans)
 
-  app.route('/plans/:planId/coverage').post(users.requiresLogin, plans.hasAuthorization, plans.coverage);
+  app.route('/plans/:planId/coverage').post(users.requiresLogin, plans.hasAuthorization, plans.heatmap);
 
   app.route('/plans/:planId/pdf').get(users.requiresLogin, plans.hasAuthorization, plans.pdfReport);
 

@@ -439,7 +439,6 @@ angular.module('plans')
       }
 
       $scope.gotoPlan = (plan) => {
-        console.log('plan')
         $location.path(`plans/${plan._id}`)
       }
 
@@ -458,6 +457,7 @@ angular.module('plans')
       function initFloor (bplan) {
         $scope.plans.push(Plans.get({planId: bplan._id}, plan => {
           plan.floor = bplan.floor
+          plan.stage.floorplan = plan.stage.floorplan.replace('http://pj.signalforest.com', '')
           if (!$scope.settings) $scope.showPlan(plan)
         }))
       }
@@ -554,6 +554,12 @@ angular.module('plans')
       }
 
       $scope.savePlanProperties = function () {
+        _.each($scope.plans, plan => {
+          _.each(_.omit($scope.plan.details, ['controllers', 'ctrlPresent']), (obj, key) => {
+            plan.details[key] = obj
+          })
+          plan.$update()
+        })
         $scope.savePlan()
         $scope.pp_edit = {}
       }
@@ -648,7 +654,7 @@ angular.module('plans')
         }, 100)
       }
 
-      function updateProject() {
+      function updateProject () {
         $scope.selected.project.$update(project => {
           $scope.selected.site = _.find(project.sites, s => s._id === $scope.selected.site._id)
           $scope.selected.building = _.find($scope.selected.site.buildings, b => b._id === $scope.selected.building._id)

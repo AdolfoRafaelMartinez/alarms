@@ -111,6 +111,11 @@ module.exports = function(db) {
 	// Setting the app router and static folder
 	app.use(express.static(path.resolve('./public')));
 
+  app.use(function(req, res, next) {
+    req.url = decodeURIComponent(req.url)
+    next()
+  })
+
 	// Globbing routing files
 	config.getGlobbedFiles('./app/routes/**/*.js').forEach(function(routePath) {
 		require(path.resolve(routePath))(app);
