@@ -18,12 +18,10 @@ function saveThumb (thumb, pid) {
   if (thumb.substr(0, 5) !== 'data:') return Q.when()
 
   var base64Data = thumb.replace(/^data:image\/png;base64,/, '')
-  console.log(base64Data)
   var filename = pid + '.png'
   var thumbname = pid + '-thumb.jpg'
   var path = __dirname + '/../../public/uploads/'
   fs.writeFile(path + filename, base64Data, 'base64', function (err) {
-    console.log('file written', path + filename)
     if (err) {
       console.log('error filename', err)
       deferred.reject('Error: Failed to write image to file.')
