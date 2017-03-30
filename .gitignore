@@ -4,6 +4,8 @@
 npm-debug.log
 node_modules/
 public/lib
+public/uploads/*
+public/ss/*
 app/tests/coverage/
 app/pug/tmp/*
 .bower-*/

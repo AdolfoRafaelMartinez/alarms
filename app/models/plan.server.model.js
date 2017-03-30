@@ -19,6 +19,10 @@ const PlanSchema = new Schema({
     type: String,
     default: null
   },
+  print: {
+    type: String,
+    default: null
+  },
   stage: {
     type: Schema.Types.Mixed,
     default: ''

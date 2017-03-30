@@ -1,7 +1,6 @@
 'use strict'
 
 const mongoose = require('mongoose')
-const gm = require('gm')
 const fs = require('fs')
 const _ = require('lodash')
 const Q = require('q')
@@ -12,31 +11,45 @@ const shortid = require('shortid')
 const errorHandler = require('./errors.server.controller')
 const Plan = mongoose.model('Plan')
 
-function saveThumb (thumb, pid) {
-  var deferred = Q.defer()
-  if (!thumb) return Q.when({pic: 'none.jpg'})
+function saveImages (print, thumb, pid) {
+  if (!thumb || !print) return Q.when({pic: 'none.jpg', thumb: 'none.jpg'})
   if (thumb.substr(0, 5) !== 'data:') return Q.when()
+  if (print.substr(0, 5) !== 'data:') return Q.when()
+
+  let thumbPromise = Q.defer()
+  let printPromise = Q.defer()
+  let promises = [ thumbPromise.promise, printPromise.promise ]
 
   var base64Data = thumb.replace(/^data:image\/png;base64,/, '')
+  var thumbname = pid + '-thumb.png'
+  var path = __dirname + '/../../public/ss/'
+  fs.writeFile(path + thumbname, base64Data, 'base64', function (err) {
+    if (err) {
+      console.log('error thumbname', err)
+      thumbPromise.reject('Error: Failed to write image to file.')
+    }
+    thumbPromise.resolve(thumbname)
+  })
+
+  base64Data = print.replace(/^data:image\/png;base64,/, '')
   var filename = pid + '.png'
-  var thumbname = pid + '-thumb.jpg'
-  var path = __dirname + '/../../public/uploads/'
+  path = __dirname + '/../../public/ss/'
   fs.writeFile(path + filename, base64Data, 'base64', function (err) {
     if (err) {
       console.log('error filename', err)
-      deferred.reject('Error: Failed to write image to file.')
+      printPromise.reject('Error: Failed to write image to file.')
     }
-    gm(path + filename).thumb(150, 100, path + thumbname, function (err) {
-      if (err) {
-        console.log('error thumb', err)
-        deferred.reject('Error: Failed to create plan thumbnail.')
-      }
-      deferred.resolve({
-        file: filename,
-        thumb: thumbname
-      })
-    })
+    printPromise.resolve(filename)
   })
+
+  var deferred = Q.defer()
+
+  Q.allSettled(promises).spread((thumb, print) => {
+    deferred.resolve({
+      thumb: thumb.value,
+      print: print.value
+    })
+  }).done()
 
   return deferred.promise
 }
@@ -47,9 +60,10 @@ function saveThumb (thumb, pid) {
 exports.create = function (req, res) {
   var plan_data = req.body
 
-  saveThumb(req.body.thumb, req.body._id)
-    .then(function (pic) {
-      plan_data.thumb = pic.thumb
+  saveImages(req.body.print, req.body.thumb, req.body._id)
+    .then(function (pics) {
+      plan_data.thumb = pics.thumb
+      plan_data.print = pics.print
       var plan = new Plan(plan_data)
       plan.user = req.user
       return plan
@@ -95,11 +109,11 @@ exports.update = function (req, res) {
   var plan = req.plan
 
   var plan_data = req.body
-  saveThumb(req.body.thumb, req.body._id)
-    .then(pic => {
-      if (pic) {
-        plan_data.thumb = pic.thumb
-        plan_data.screenshot = pic.file
+  saveImages(req.body.print, req.body.thumb, req.body._id)
+    .then(pics => {
+      if (pics) {
+        plan_data.thumb = pics.thumb
+        plan_data.print = pics.print
       }
       plan = _.extend(plan, plan_data)
       return plan.save(function (err) {

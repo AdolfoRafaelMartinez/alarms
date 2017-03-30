@@ -278,6 +278,8 @@ plan-list .list-group-item:last-child {
 
 .floors img {
   display: block;
+  max-width: 150px;
+  max-height: 100px;
 }
 
 md-sidenav {

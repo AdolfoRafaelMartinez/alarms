@@ -709,9 +709,10 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 		}
 	};
 
-	this.toggleDistances = function(off) {
+	this.toggleDistances = function(state) {
 		show_distances = !show_distances;
-		if (off === 'off') show_distances = false;
+		if (state === 'off') show_distances = false;
+		if (state === 'on') show_distances = true;
 		distances.visible = show_distances;
 		update = true;
 	};
@@ -720,9 +721,10 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 	* Overlaps are added as child for the AP container itself;
 	* the overlaps container is shown behind the main AP circle container
 	*/
-	this.toggleOverlaps = function(off) {
+	this.toggleOverlaps = function(state) {
 		show_overlaps = !show_overlaps;
-		if (off === 'off') show_overlaps = false;
+		if (state === 'off') show_overlaps = false;
+		if (state === 'on') show_overlaps = true;
 		_.each(stage.children, function(child) {
 			if (child.layer_type === 'ap') {
 				for (var i=0; i<child.children.length; i++) {
@@ -733,9 +735,10 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 		update = true;
 	};
 
-	this.toggleRadius = function(off) {
+	this.toggleRadius = function(state) {
 		show_radius = !show_radius;
-		if (off === 'off') show_radius = false;
+		if (state === 'off') show_radius = false;
+		if (state === 'on') show_radius = true;
 		_.each(stage.children, function(child) {
 			if (child.layer_type === 'ap') {
 				for (var i=0; i<child.children.length; i++) {
@@ -856,9 +859,29 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
         update = true;
     };
 
-	this.getThumb = () => {
-        return stage.toDataURL();
+    this.getPNG = () => {
+      return stage.toDataURL();
     };
+
+  this.getThumb = () => {
+    var imageData = stage.canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height);
+    var newCanvas = $("<canvas>")
+      .attr("width", imageData.width)
+      .attr("height", imageData.height)[0];
+
+    newCanvas.getContext("2d").putImageData(imageData, 0, 0);
+
+    let sw = 150 / canvas.width
+    let sh = canvas.height / sw
+    if (sh > 100) {
+      sh = 100 / canvas.height
+      sw = canvas.width / sh
+    }
+    var context = newCanvas.getContext('2d')
+    context.drawImage(newCanvas,  sw, sh)
+
+    return newCanvas.toDataURL()
+  }
 
 	this.loadPlan = function(plan_id, data, signal_radius, updateControls) {
 		this.updateControls = updateControls;
@@ -932,8 +955,8 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
 
 	}
 
-	this.heatmap = function(off) {
-		if (off) {
+	this.heatmap = function(state) {
+		if (state === 'off') {
 			coverage.removeAllChildren();
 			var layers_length = layers.length;
 			for (var i=0; i<layers_length; i++)

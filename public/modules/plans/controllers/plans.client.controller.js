@@ -190,6 +190,18 @@ angular.module('plans')
       }
 
       $scope.savePlan = function () {
+        var overlaps = $scope.settings.show_overlaps
+        var distances = $scope.settings.show_distances
+        Drawing.toggleOverlaps('off')
+        Drawing.toggleDistances('off')
+        Drawing.centerStage()
+        $scope.plan.print = Drawing.getPNG()
+
+        $scope.settings.show_overlaps = overlaps
+        $scope.settings.show_distances = distances
+        if (overlaps) Drawing.toggleOverlaps('on')
+        if (distances) Drawing.toggleDistances('on')
+
         $scope.plan.title = $scope.flooplan_name
         $scope.plan.thumb = Drawing.getThumb()
         $scope.plan.stage = Drawing.toJSON()
@@ -450,8 +462,15 @@ angular.module('plans')
         if (!plan.details.contacts) plan.details.contacts = []
         Drawing.loadPlan(plan._id, plan.stage, $scope.settings.signal_radius, $scope.updateControls)
         $timeout(() => {
+          $scope.settings.show_heatmap = false
+          Drawing.heatmap('off')
+          $scope.settings.show_overlaps = true
+          Drawing.toggleOverlaps('on')
+          $scope.settings.show_distances = true
+          Drawing.toggleDistances('on')
+          Drawing.toggleRadius('on')
           $scope.planReady = true
-        }, 1100)
+        }, 100)
       }
 
       function initFloor (bplan) {
