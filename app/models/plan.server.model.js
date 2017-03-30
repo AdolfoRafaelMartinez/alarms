@@ -12,6 +12,9 @@ const PlanSchema = new Schema({
     trim: true,
     required: 'Title cannot be blank'
   },
+  floor: {
+    type: String
+  },
   thumb: {
     type: String,
     default: null

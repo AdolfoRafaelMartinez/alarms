@@ -38,7 +38,8 @@
     <div class="floors">
       <a href ng-repeat="p in plans" ng-click="showPlan(p)" ng-class="{'shadowItem': p != plan}">
         <img src="/uploads/{{ p.thumb }}" />
-        <small>Floor {{ p.floor }}</small>
+        <small ng-if="p.floor">Floor {{ p.floor }}</small>
+        <small ng-if="!p.floor">Floor {{ p.title }}</small>
       </a>
     </div>
 </div>

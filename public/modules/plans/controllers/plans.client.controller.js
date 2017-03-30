@@ -456,7 +456,6 @@ angular.module('plans')
 
       function initFloor (bplan) {
         $scope.plans.push(Plans.get({planId: bplan._id}, plan => {
-          plan.floor = bplan.floor
           plan.stage.floorplan = plan.stage.floorplan.replace('http://pj.signalforest.com', '')
           if (!$scope.settings) $scope.showPlan(plan)
         }))

@@ -12,7 +12,7 @@
                 {{ plan.details.address }}<br />
                 {{ plan.details.city }}, {{ plan.details.zipcode }}<br />
             </div>
-            <span>Floor:</span> {{ plan.details.floor || 'N/A' }}<br />
+            <span>Floor:</span> {{ plan.floor || 'N/A' }}<br />
             <span>AP count:</span> {{ getTotalAPs() }}
         </div>
         <div flex="10">
