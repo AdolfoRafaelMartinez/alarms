@@ -864,21 +864,14 @@ function(contextMenu, $q, $http, $timeout, Heatmap) {
     };
 
   this.getThumb = () => {
-    var imageData = stage.canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height);
+    var thumbWidth = 150
+    var thumbHeight = 150 * canvas.height / canvas.width
     var newCanvas = $("<canvas>")
-      .attr("width", imageData.width)
-      .attr("height", imageData.height)[0];
+      .attr('width', thumbWidth)
+      .attr('height', thumbHeight)[0]
 
-    newCanvas.getContext("2d").putImageData(imageData, 0, 0);
-
-    let sw = 150 / canvas.width
-    let sh = canvas.height / sw
-    if (sh > 100) {
-      sh = 100 / canvas.height
-      sw = canvas.width / sh
-    }
     var context = newCanvas.getContext('2d')
-    context.drawImage(newCanvas,  sw, sh)
+    context.drawImage(stage.canvas,  0, 0, canvas.width, canvas.height, 0, 0, thumbWidth, thumbHeight)
 
     return newCanvas.toDataURL()
   }
