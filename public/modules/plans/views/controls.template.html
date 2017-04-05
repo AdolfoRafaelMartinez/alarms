@@ -1,45 +1,46 @@
 <div layout="row">
-    <div flex="10">
-        <div>Units:</div>
-        <md-switch flex ng-model="settings.units" ng-true-value="'m'" ng-false-value="'ft'" ng-change="changeUnits()" aria-label="Units">{{ settings.units }}</md-switch>
-        <hr />
-        <div class="text-center">
-            <button class="btn btn-info" ng-click="startCalibration()" ng-hide="calibration_step">Calibrate</button>
-            <input type="number" placeholder="distance..." ng-show="calibration_done" ng-model="calibration_distance" aria-label="calibrate">
-            <button class="btn btn-xs btn-info" ng-if="calibration_done" ng-click="completeCalibration()">Done</button>
-        </div>
-    </div>
+	<div flex="10">
+		<div>Units:</div>
+		<md-switch flex ng-model="settings.units" ng-true-value="'m'" ng-false-value="'ft'" ng-change="changeUnits()" aria-label="Units">{{ settings.units }}</md-switch>
+		<hr />
+		<div class="text-center">
+			<button class="btn btn-info" ng-click="startCalibration()" ng-hide="calibration_step">Calibrate</button>
+			<input type="number" placeholder="distance..." ng-show="calibration_done" ng-model="calibration_distance" aria-label="calibrate">
+			<button class="btn btn-xs btn-info" ng-if="calibration_done" ng-click="completeCalibration()">Done</button>
+		</div>
+	</div>
 
-    <div>
-        <div>Signal radius:</div>
+	<div>
+		<div>Signal radius:</div>
 
-        <div ng-show="settings.units == 'ft'">
-            <md-slider flex min="{{ UNITS_MIN_FEET }}" max="{{ UNITS_MAX_FEET }}" step="{{ UNITS_STEP_FEET }}" ng-model="settings.signal_radius_feet" aria-label="AP radius" ng-change="updateSignalStrength()" id="signal_radius_feet" class="md-warn"></md-slider>
-            <div flex="5" layout layout-align="center center">
-                <input type="number" ng-model="settings.signal_radius_feet" ng-change="updateSignalStrength()" aria-label="AP radius" aria-controls="signal_radius_feet">
-            </div>
-        </div>
-        <div ng-show="settings.units == 'm'">
-            <md-slider flex min="{{ UNITS_MIN_METERS }}" max="{{ UNITS_MAX_METERS }}" step="{{ UNITS_STEP_METERS }}" ng-model="settings.signal_radius_meters" ng-change="updateSignalStrength()" aria-label="AP radius" id="signal_radius_meters" class="md-warn"></md-slider>
-            <div flex="5" layout layout-align="center center">
-                <input type="number" ng-model="settings.signal_radius_meters" ng-change="updateSignalStrength()" aria-label="AP radius" aria-controls="signal_radius_meters">
-            </div>
-        </div>
-    </div>
+		<div ng-show="settings.units == 'ft'">
+			<md-slider flex min="{{ UNITS_MIN_FEET }}" max="{{ UNITS_MAX_FEET }}" step="{{ UNITS_STEP_FEET }}" ng-model="settings.signal_radius_feet" aria-label="AP radius" ng-change="updateSignalStrength()" id="signal_radius_feet" class="md-warn"></md-slider>
+			<div flex="5" layout layout-align="center center">
+				<input type="number" ng-model="settings.signal_radius_feet" ng-change="updateSignalStrength()" aria-label="AP radius" aria-controls="signal_radius_feet">
+			</div>
+		</div>
+		<div ng-show="settings.units == 'm'">
+			<md-slider flex min="{{ UNITS_MIN_METERS }}" max="{{ UNITS_MAX_METERS }}" step="{{ UNITS_STEP_METERS }}" ng-model="settings.signal_radius_meters" ng-change="updateSignalStrength()" aria-label="AP radius" id="signal_radius_meters" class="md-warn"></md-slider>
+			<div flex="5" layout layout-align="center center">
+				<input type="number" ng-model="settings.signal_radius_meters" ng-change="updateSignalStrength()" aria-label="AP radius" aria-controls="signal_radius_meters">
+			</div>
+		</div>
+	</div>
 
-    <div>
-        <div>Zoom:</div>
-        <md-slider flex min="10%" max="200%" ng-model="settings.scale" ng-change="updateScale()" aria-label="scale" id="scale" class="md-warn"></md-slider>
-        <div flex="5" layout layout-align="center center">
-            <input type="number" ng-model="settings.scale" ng-change="updateScale()" aria-label="scale" aria-controls="scale"> %
-        </div>
-    </div>
+	<div>
+		<div>Zoom:</div>
+		<md-slider flex min="10%" max="200%" ng-model="settings.scale" ng-change="updateScale()" aria-label="scale" id="scale" class="md-warn"></md-slider>
+		<div flex="5" layout layout-align="center center">
+			<input type="number" ng-model="settings.scale" ng-change="updateScale()" aria-label="scale" aria-controls="scale"> %
+		</div>
+	</div>
 
-    <div class="floors">
-      <a href ng-repeat="p in plans" ng-click="showPlan(p)" ng-class="{'shadowItem': p != plan}">
-        <img src="/ss/{{ p.thumb }}" />
-        <small ng-if="p.floor">Floor {{ p.floor }}</small>
-        <small ng-if="!p.floor">Floor {{ p.title }}</small>
-      </a>
-    </div>
+	<div class="floors">
+		<a href ng-click="newPlan()"> <i class="glyphicon glyphicon-plus"></i> <small>Add Floor</small> </a>
+		<a href ng-repeat="p in plans" ng-click="showPlan(p)" ng-class="{'shadowItem': p != plan}">
+			<img src="/ss/{{ p.thumb }}" />
+			<small ng-if="p.floor">Floor {{ p.floor }}</small>
+			<small ng-if="!p.floor">Floor {{ p.title }}</small>
+		</a>
+	</div>
 </div>

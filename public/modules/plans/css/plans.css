@@ -1,309 +1,327 @@
 .position-fixed {
-    position: fixed;
+	position: fixed;
 }
 
 .md-button ng-md-icon {
-    line-height: 30px;
-    vertical-align: text-top;
+	line-height: 30px;
+	vertical-align: text-top;
 }
 
 .plan-property-item {
-    max-width: 640px;
+	max-width: 640px;
 }
 
 .sheet-bg {
-    background: url("//farm8.static.flickr.com/6058/6430440053_0083658254_b.jpg");
+	background: url("//farm8.static.flickr.com/6058/6430440053_0083658254_b.jpg");
 }
 
 .overlay-sheet {
-    position: absolute;
-    z-index: 10;
-    left: 0;
-    right: 0;
-    min-height: 100%;
-    top: 0;
-    transition: all linear 0.2s;
+	position: absolute;
+	z-index: 10;
+	left: 0;
+	right: 0;
+	min-height: 100%;
+	top: 0;
+	transition: all linear 0.2s;
 }
 
 .overlay-sheet.ng-hide {
-    top: 400px;
+	top: 400px;
 }
 
 .overlay-sheet.loading {
-    background-color: white;
-    z-index: 11;
+	background-color: white;
+	z-index: 11;
 }
 
 .plan-properties {
-    max-width: 1240px;
+	max-width: 1240px;
 }
 
 .side-details {
-    padding: 1em 0.5em;
-    font-style: bold;
+	padding: 1em 0.5em;
+	font-style: bold;
 }
 
 .side-details span {
-    font-style: normal;
+	font-style: normal;
 }
 
 .max-800 {
-    max-width: 800px;
+	max-width: 800px;
 }
 
 .add-item {
-    padding-bottom: 10px;
+	padding-bottom: 10px;
 }
 
 .large {
-    font-size: 24px;
-    padding-top: 14px;
+	font-size: 24px;
+	padding-top: 14px;
 }
 
 .small-logo, .small-logo img {
-    max-width: 140px;
+	max-width: 140px;
 }
 
 .tight {
-    padding: 6px;
+	padding: 6px;
 }
 
 md-switch {
-    margin: 0 15px;
+	margin: 0 15px;
 }
 
 plan-list .search {
-  width: 50%;
+	width: 50%;
 }
 
 plan-list h2 {
-  font-family: 'Play', sans-serif;
-  font-size: 30px;
-  border-bottom: 1px solid #444;
-  border-top: 1px solid #444;
-  padding: 10px;
-  margin-bottom: 0;
-  margin-top: 0;
+	font-family: 'Play', sans-serif;
+	font-size: 30px;
+	border-bottom: 1px solid #444;
+	border-top: 1px solid #444;
+	padding: 10px;
+	margin-bottom: 0;
+	margin-top: 0;
 }
 
 plan-list h3 {
-  font-family: 'Play', sans-serif;
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 5px;
-  width: 90%;
+	font-family: 'Play', sans-serif;
+	border-bottom: 1px solid #ddd;
+	padding-bottom: 5px;
+	width: 90%;
 }
 
 plan-list, plan-list section {
-  height: calc(100% - 60px);
-  display: block;
+	height: calc(100% - 60px);
+	display: block;
 }
 
 plan-list img {
-  margin-top: 30px;
-  max-width: 50%;
-  max-height: 80%;
-  float: right;
+	margin-top: 30px;
+	max-width: 50%;
+	max-height: 80%;
+	float: right;
 }
 
 plan-list img.fullsize {
-  max-width: inherit;
-  max-height: inherit;
+	max-width: inherit;
+	max-height: inherit;
 }
 
 plan-list .dashboard {
-  height: 100%;
-  display: block;
+	height: 100%;
+	display: block;
 }
 
 plan-list .create-new {
-  font-family: 'Play', sans-serif;
-  padding: 45px 0 0 5px;
-  text-align: center;
-  vertical-align: top;
+	font-family: 'Play', sans-serif;
+	padding: 45px 0 0 5px;
+	text-align: center;
+	vertical-align: top;
 }
 
 plan-list .create-new span {
-  text-transform: uppercase;
-  color: #888;
-  font-size: 20pt;
+	text-transform: uppercase;
+	color: #888;
+	font-size: 20pt;
 }
 
 plan-list .create-new > div {
-  width: 88%;
-  margin-left: auto;
-  margin-right: auto;
+	width: 88%;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 plan-list .create-new > div input {
-  font-size: larger;
-  border: 0;
-  border-bottom: 1px solid #aaa;
-  border-radius: 0;
-  box-shadow: none;
+	font-size: larger;
+	border: 0;
+	border-bottom: 1px solid #aaa;
+	border-radius: 0;
+	box-shadow: none;
 }
 
 plan-list .create-new > div input:focus {
-  outline: none;
-  box-shadow: none;
-  border: 0;
-  border-bottom: 1px solid #aaa;
+	outline: none;
+	box-shadow: none;
+	border: 0;
+	border-bottom: 1px solid #aaa;
 }
 
 plan-list .page-header {
-  border: 0;
-  margin: 50px 20px 0 0;
-  padding-top: 20px;
+	border: 0;
+	margin: 50px 20px 0 0;
+	padding-top: 20px;
 }
 
 plan-list .page-header input {
-  background: #222;
-  color: white;
-  border: 1px solid #222;
-  border-radius: 15px;
+	background: #222;
+	color: white;
+	border: 1px solid #222;
+	border-radius: 15px;
 }
 
 plan-list div.projects {
-  border-left: 1px solid #444;
+	border-left: 1px solid #444;
 }
 
 plan-list .orphan-plans {
-  height: 200px;
-  overflow-x: auto;
-  margin: 10px 0;
-  padding-left: 10px;
-  border-radius: 20px;
-  border: 4px solid #344;
+	height: 200px;
+	overflow-x: auto;
+	margin: 10px 0;
+	padding-left: 10px;
+	border-radius: 20px;
+	border: 4px solid #344;
 }
 
 plan-list .orphan-plans .list-group-item {
-  width: 220px;
-  height: 135px;
+	width: 220px;
+	height: 135px;
 }
 
 plan-list .list-group {
-  background: rgba(0, 0, 0, 0.5);
-  margin: 0;
-  float: left;
-  text-align: center;
-  color: white;
-  width: 33%;
-  padding: 0;
-  border-right: 1px solid #444;
-  border-bottom: 1px solid #444;
-  height: calc(100% - 20px);
-  display: block;
-  /*
-  background: -moz-linear-gradient(left, #9cd3cd 0%, #ffffff 100%);
-  background: -webkit-linear-gradient(left, #9cd3cd 0%,#ffffff 100%);
-  background: linear-gradient(to right, #9cd3cd 0%,#ffffff 100%);
-  */
+	background: rgba(0, 0, 0, 0.5);
+	margin: 0;
+	float: left;
+	text-align: center;
+	color: white;
+	width: 33%;
+	padding: 0;
+	border-right: 1px solid #444;
+	border-bottom: 1px solid #444;
+	height: calc(100% - 20px);
+	display: block;
+	/*
+	background: -moz-linear-gradient(left, #9cd3cd 0%, #ffffff 100%);
+	background: -webkit-linear-gradient(left, #9cd3cd 0%,#ffffff 100%);
+	background: linear-gradient(to right, #9cd3cd 0%,#ffffff 100%);
+	 */
 }
 
 plan-list div.v1 {
-  height: calc(100% - 200px)
+	height: calc(100% - 200px)
 }
 
 plan-list .list-group > div {
-  padding-top: 20px;
-  height: calc(100% - 55px);
-  display: block;
-  overflow-y: auto;
+	padding-top: 20px;
+	height: calc(100% - 55px);
+	display: block;
+	overflow-y: auto;
 }
 
 plan-list .projects {
-  /* background: url('/modules/core/img/artwork/triangle.jpg') no-repeat;
-  background-size: cover; */
+	/* background: url('/modules/core/img/artwork/triangle.jpg') no-repeat;
+	background-size: cover; */
 }
 
 plan-list .sites {
-  /* background: url('/modules/core/img/artwork/triangle.jpg') no-repeat;
-  background-size: cover; */
+	/* background: url('/modules/core/img/artwork/triangle.jpg') no-repeat;
+	background-size: cover; */
 }
 
 plan-list .buildings {
-  /* background: url('/modules/core/img/artwork/triangle.jpg') no-repeat;
-  background-size: cover; */
+	/* background: url('/modules/core/img/artwork/triangle.jpg') no-repeat;
+	background-size: cover; */
 }
 
 .list-group-item {
-    display: inline-block;
-    color: black;
-    text-align: left;
-    font-size: small;
-    margin: 10px;
-    width: 45%;
-    min-width: 200px;
-    height: 135px;
-    overflow: hidden;
-    opacity: 0.85;
-    border-radius: 20px;
+	display: inline-block;
+	color: black;
+	text-align: left;
+	font-size: small;
+	margin: 10px;
+	width: 45%;
+	min-width: 200px;
+	height: 135px;
+	overflow: hidden;
+	opacity: 0.85;
+	border-radius: 20px;
 }
 
 plan-list .list-group-item:last-child {
-    border-radius: 20px;
-    margin-bottom: 10px;
+	border-radius: 20px;
+	margin-bottom: 10px;
 }
 
 .list-group-item:hover, .list-group-item:focus, .list-group-item.selected {
-  background-color: white;
-  opacity: 1;
-  filter: grayscale(0);
+	background-color: white;
+	opacity: 1;
+	filter: grayscale(0);
 }
 
 .selectedItem {
-  opacity: 1;
-  filter: none;
+	opacity: 1;
+	filter: none;
 }
 
 .shadowItem {
-  opacity: 0.5;
-  filter: blur(1px);
-  filter: grayscale(100%);
+	opacity: 0.5;
+	filter: blur(1px);
+	filter: grayscale(100%);
 }
 
 .floors {
-  margin: 5px 10px;
+	margin: 5px 10px;
+	color: #aaa;
+}
+
+.floors a:first-child {
+	padding: 24px 30px;
+	font-size: 32px;
+	color: #aaa;
+	background: #222;
+}
+
+.floors a:first-child small {
+	font-size: 12px;
+	display: block;
+}
+
+.floors a:hover {
+	color: #fff;
+	background: #444;
 }
 
 .floors > a {
-  float: left;
-  text-align: center;
-  margin-right: 10px;
-  color: white;
+	float: left;
+	text-align: center;
+	margin-right: 10px;
+	color: white;
 }
 
 .floors > a:hover {
-  color: #ddf;
+	color: #ddf;
 }
 
 .floors img {
-  display: block;
-  max-width: 150px;
-  max-height: 100px;
+	display: block;
+	max-width: 120px;
+	max-height: 100px;
 }
 
 md-sidenav {
-  background: black;
+	background: black;
 }
 
 md-sidenav svg path {
-  fill: #ddd;
+	fill: #ddd;
 }
 
 md-sidenav input {
-  background: #444;
-  border: 1px solid #666;
-  padding: 4px 10px;
+	background: #444;
+	border: 1px solid #666;
+	padding: 4px 10px;
 }
 
 .controls {
-  padding: 20px;
-  background: #111;
-  color: white;
+	padding: 20px;
+	background: #111;
+	color: white;
 }
 
 .controls canvas {
-    margin: 0 20px;
+	margin: 0 20px;
 }
 
 .controls input {
@@ -316,18 +334,18 @@ md-sidenav input {
 }
 
 .controls > div > div {
-  margin-right: 10px;
+	margin-right: 10px;
 }
 
 .controls hr {
-  margin-bottom: 5px;
+	margin-bottom: 5px;
 }
 
 .drawing {
-  background: white;
-  color: black;
+	background: white;
+	color: black;
 }
 
 .modal {
-  color: black;
+	color: black;
 }

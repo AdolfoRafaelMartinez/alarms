@@ -8,6 +8,9 @@ module.exports = function (app) {
 	app.route('/buildings/:buildingId')
 		.delete(users.requiresLogin, buildings.hasAuthorization, buildings.delete)
 
+	app.route('/buildings/newPlan')
+		.get(users.requiresLogin, buildings.newPlan)
+
 	// Finish by binding the project middleware
 	app.param('buildingId', buildings.buildingByID)
 }

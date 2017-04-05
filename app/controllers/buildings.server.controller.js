@@ -52,6 +52,10 @@ exports.delete = function (req, res) {
 		})
 }
 
+exports.newPlan = function (req, res, next) {
+	res.send(mongoose.Types.ObjectId())
+}
+
 /**
  * Building authorization middleware
  */
