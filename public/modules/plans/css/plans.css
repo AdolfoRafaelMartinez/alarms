@@ -266,38 +266,49 @@ plan-list .list-group-item:last-child {
 	color: #aaa;
 }
 
-.floors a:first-child {
+.floors div:first-child {
 	padding: 24px 30px;
-	font-size: 32px;
-	color: #aaa;
 	background: #222;
 }
 
-.floors a:first-child small {
+.floors div:first-child a {
+	font-size: 32px;
+	color: #aaa;
+}
+
+.floors div:first-child a small {
 	font-size: 12px;
 	display: block;
 }
 
-.floors a:hover {
+.floors div:hover {
 	color: #fff;
 	background: #444;
 }
 
-.floors > a {
+.floors div {
 	float: left;
 	text-align: center;
 	margin-right: 10px;
 	color: white;
+	width: 110px;
+	height: 110px;
+	padding-top: 10px;
 }
 
-.floors > a:hover {
+.floors a {
+	color: white;
+}
+
+.floors a:hover {
 	color: #ddf;
 }
 
 .floors img {
 	display: block;
-	max-width: 120px;
+	max-width: 100px;
 	max-height: 100px;
+	padding-bottom: 10px;
 }
 
 md-sidenav {

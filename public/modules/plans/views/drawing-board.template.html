@@ -53,15 +53,15 @@
                             </div>
                             <div class="form-group row">
                                 <label class="col-sm-2 ptop5 text-right form-control-label">Project</label>
-                                <div class="col-sm-10"><input type="text" ng-model="plan.details.project" class="form-control" placeholder="project ..." /></div>
+                                <div class="col-sm-10"><input type="text" readonly ng-model="plan.details.project" class="form-control" placeholder="project ..." /></div>
                             </div>
                             <div class="form-group row">
                                 <label class="col-sm-2 ptop5 text-right form-control-label">Site</label>
-                                <div class="col-sm-10"><input type="text" ng-model="plan.details.site" class="form-control" placeholder="site ..." /></div>
+                                <div class="col-sm-10"><input type="text" readonly ng-model="plan.details.site" class="form-control" placeholder="site ..." /></div>
                             </div>
                             <div class="form-group row">
                                 <label class="col-sm-2 ptop5 text-right form-control-label">Building</label>
-                                <div class="col-sm-10"><input type="text" ng-model="plan.details.building" class="form-control" placeholder="building ..." /></div>
+                                <div class="col-sm-10"><input type="text" readonly ng-model="plan.details.building" class="form-control" placeholder="building ..." /></div>
                             </div>
                             <div class="form-group row">
                                 <label class="col-sm-2 ptop5 text-right form-control-label">Floor</label>
@@ -218,12 +218,12 @@
                                         </div>
                                         <div class="col-lg-12"><span>AP/AM Licenses:</span> <span ng-bind="ctrl.lic.ap.qty"></span></div>
                                         <div class="col-lg-12"><span>PEFNG License:</span>
-                                            <span ng-if="ctrl.lic.pefng"><i class="glyphicon glyphicon-ok-circle green"></i></span>
-                                            <span ng-if="!ctrl.lic.pefng"><i class="glyphicon glyphicon-remove-circle red"></i></span>
+                                            <span ng-if="plan.details.lic.pefng"><i class="glyphicon glyphicon-ok-circle green"></i></span>
+                                            <span ng-if="!plan.details.lic.pefng"><i class="glyphicon glyphicon-remove-circle red"></i></span>
                                         </div>
                                         <div class="col-lg-12"><span>RFP License:</span>
-                                            <span ng-if="ctrl.lic.rfp"><i class="glyphicon glyphicon-ok-circle green"></i></span>
-                                            <span ng-if="!ctrl.lic.rfp"><i class="glyphicon glyphicon-remove-circle red"></i></span>
+                                            <span ng-if="plan.details.lic.rfp"><i class="glyphicon glyphicon-ok-circle green"></i></span>
+                                            <span ng-if="!plan.details.lic.rfp"><i class="glyphicon glyphicon-remove-circle red"></i></span>
                                         </div>
                                     </div>
                                 </div>
@@ -258,16 +258,16 @@
                                     <div class="form-group row">
                                         <div class="col-sm-6 text-right"><label class="form-control-label">PEFNG License?</label></div>
                                         <div class="col-sm-6">
-                                            <md-switch aria-label="PEFNG licences" ng-model="edit_prop.lic.pefng">
-                                                {{ edit_prop.lic.pefng ? 'Yes' : 'No' }}
+                                            <md-switch aria-label="PEFNG licences" ng-model="plan.details.lic.pefng">
+                                                {{ plan.details.lic.pefng ? 'Yes' : 'No' }}
                                             </md-switch>
                                         </div>
                                     </div>
                                     <div class="form-group row">
                                         <div class="col-sm-6 text-right"><label class="form-control-label">RFP License?</label></div>
                                         <div class="col-sm-6">
-                                            <md-switch aria-label="RFP licences" ng-model="edit_prop.lic.rfp">
-                                                {{ edit_prop.lic.rfp ? 'Yes' : 'No' }}
+                                            <md-switch aria-label="RFP licences" ng-model="plan.details.lic.rfp">
+                                                {{ plan.details.lic.rfp ? 'Yes' : 'No' }}
                                             </md-switch>
                                         </div>
                                     </div>

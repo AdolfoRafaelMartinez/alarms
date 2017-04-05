@@ -3,8 +3,8 @@
 
 angular.module('plans')
 	.controller('PlansController', [
-		'$scope', '$rootScope', '$state', '$stateParams', '$location', 'pdfReporting', 'Authentication', 'Drawing', '$timeout', '$http', 'Projects', 'Plans', 'Buildings', 'contextMenu', '$q', 'ModalService',
-		function ($scope, $rootScope, $state, $stateParams, $location, pdfReporting, Authentication, Drawing, $timeout, $http, Projects, Plans, Buildings, contextMenu, $q, ModalService) {
+		'$scope', '$rootScope', '$state', '$stateParams', '$location', 'Authentication', 'Drawing', '$timeout', '$http', 'Projects', 'Plans', 'Buildings', 'contextMenu', '$q', 'ModalService',
+		function ($scope, $rootScope, $state, $stateParams, $location, Authentication, Drawing, $timeout, $http, Projects, Plans, Buildings, contextMenu, $q, ModalService) {
 			$scope.authentication = Authentication
 
 			$scope.UNITS_STEP_FEET = 8
@@ -115,13 +115,13 @@ angular.module('plans')
 			}
 
 			$scope.toggleDistances = function () {
-				Drawing.toggleDistances()
+				Drawing.toggleDistances($scope.settings.show_distances ? 'on' : 'off')
 				$scope.settings.show_heatmap = false
 				Drawing.heatmap('off')
 			}
 
 			$scope.toggleOverlaps = function () {
-				Drawing.toggleOverlaps()
+				Drawing.toggleOverlaps($scope.settings.show_overlaps ? 'on' : 'off')
 				$scope.settings.show_heatmap = false
 				Drawing.heatmap('off')
 			}
@@ -192,39 +192,52 @@ angular.module('plans')
 			$scope.savePlan = function () {
 				var overlaps = $scope.settings.show_overlaps
 				var distances = $scope.settings.show_distances
+				var deferred = $q.defer()
 				Drawing.toggleOverlaps('off')
 				Drawing.toggleDistances('off')
+				Drawing.toggleRadius('off')
 				Drawing.centerStage()
-				$scope.plan.print = Drawing.getPNG()
+
+				var plan = new Plans(_.cloneDeep($scope.plan))
+				plan.print = Drawing.getPNG()
 
 				$scope.settings.show_overlaps = overlaps
 				$scope.settings.show_distances = distances
 				if (overlaps) Drawing.toggleOverlaps('on')
 				if (distances) Drawing.toggleDistances('on')
+				Drawing.toggleRadius('on')
 
-				$scope.plan.title = $scope.flooplan_name
-				$scope.plan.thumb = Drawing.getThumb()
-				$scope.plan.stage = Drawing.toJSON()
-				$scope.plan.settings = $scope.settings
+				plan.title = $scope.flooplan_name
+				plan.thumb = Drawing.getThumb()
+				plan.stage = Drawing.toJSON()
+				plan.settings = $scope.settings
 				/* TODO: update plan titles in building */
 
-				if (!$scope.plan._id) {
-					return $scope.plan.$save(function (response) {
+				if (!plan._id) {
+					plan.$save(response => {
+						$scope.plan = response
 						$location.path(`projects/${$scope.bldg._id}/${response._id}`)
-					}, function (errorResponse) {
+						deferred.resolve(response)
+					}, errorResponse => {
 						$scope.error = errorResponse.data.message
+						deferred.reject(errorResponse)
 					})
 				} else {
 					$scope.icons.save = iconset.loading
-					return $scope.plan.$update(function (response) {
+					plan.$update(response => {
 						$scope.icons.save = iconset.done
-						$timeout(function () {
+						$scope.plan = response
+						$timeout(() => {
 							$scope.icons.save = iconset.save
 						}, 3000)
-					}, function (errorResponse) {
+						deferred.resolve(response)
+					}, errorResponse => {
 						$scope.error = errorResponse.data.message
+						deferred.reject(errorResponse)
 					})
 				}
+
+				return deferred.promise
 			}
 
 			$scope.new = {}
@@ -322,7 +335,6 @@ angular.module('plans')
 					stage: {
 						aps: []
 					},
-					controllers: [{}],
 					lic: {
 						ap: {
 							spares: 0
@@ -483,6 +495,9 @@ angular.module('plans')
 			function initFloor (bplan) {
 				$scope.plans.push(Plans.get({planId: bplan._id}, plan => {
 					plan.stage.floorplan = plan.stage.floorplan.replace('http://pj.signalforest.com', '')
+					_.set(plan, 'details.project', $scope.project.title)
+					_.set(plan, 'details.site', $scope.site.name)
+					_.set(plan, 'details.building', $scope.building.name)
 					if (!$scope.settings) $scope.showPlan(plan)
 				}))
 			}
@@ -517,7 +532,10 @@ angular.module('plans')
 						var building
 						_.each($scope.project.sites, s => {
 							building = _.find(s.buildings, b => b._id === $stateParams.bldgID)
-							if (building) $scope.building = building
+							if (building) {
+								$scope.building = building
+								$scope.site = s
+							}
 						})
 						$scope.plans = []
 						_.each($scope.building.plans, initFloor)
@@ -579,13 +597,23 @@ angular.module('plans')
 			}
 
 			$scope.savePlanProperties = function () {
+				var details = _.omit($scope.plan.details, ['controllers', 'ctrlPresent', 'lic', 'stage'])
 				_.each($scope.plans, plan => {
-					_.each(_.omit($scope.plan.details, ['controllers', 'ctrlPresent']), (obj, key) => {
+					_.each(details, (obj, key) => {
 						plan.details[key] = obj
 					})
-					plan.$update()
+					plan.$update() // save plans in the same building
 				})
-				$scope.savePlan()
+
+				/* TODO: add unique designers to project / site / building */
+				$scope.project.details  = _.omit(details, ['project', 'site', 'building', 'address', 'city', 'state', 'zipcode', 'contacts'])
+				$scope.site.details     = _.omit(details, ['site', 'building', 'contacts'])
+				$scope.building.details = details
+
+				$scope.project.$update(project => {
+					$scope.project = project
+				})
+				$scope.savePlan() // save current plan
 				$scope.pp_edit = {}
 			}
 
@@ -659,24 +687,15 @@ angular.module('plans')
 			}
 
 			$scope.report = function () {
-				if (!$scope.settings.show_heatmap) {
-					$scope.settings.show_heatmap = true
-					$scope.toggleHeatmap()
-				}
-				Drawing.centerStage()
-
-				$timeout(() => {
-					$scope.savePlan()
-					$scope.plan.$promise.then(() => {
-						if ($scope.settings.show_heatmap) {
-							$scope.settings.show_heatmap = false
-							$scope.toggleHeatmap()
-						}
-						$timeout(() => {
-							window.open(`/plans/${$scope.plan._id}/pdf`, '_blank')
-						}, 0)
-					})
-				}, 100)
+				$scope.savePlan().then(() => {
+					if ($scope.settings.show_heatmap) {
+						$scope.settings.show_heatmap = false
+						$scope.toggleHeatmap()
+					}
+					$timeout(() => {
+						window.open(`/buildings/${$scope.building._id}/pdf`, '_blank')
+					}, 0)
+				})
 			}
 
 			function updateProject () {

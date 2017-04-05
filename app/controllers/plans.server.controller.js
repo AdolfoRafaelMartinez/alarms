@@ -2,9 +2,6 @@ const mongoose = require('mongoose')
 const fs       = require('fs')
 const _        = require('lodash')
 const Q        = require('q')
-const pug      = require('pug')
-const exec     = require('child_process').exec
-const shortid  = require('shortid')
 
 const errorHandler = require('./errors.server.controller')
 const Plan = mongoose.model('Plan')
@@ -241,49 +238,6 @@ exports.heatmap = function (req, res) {
 	})
 
 	res.json(points)
-}
-
-exports.pdfReport = function (req, res) {
-	if (!req.plan.stage.ams) req.plan.stage.ams = []
-	if (!req.plan.details) req.plan.details = {}
-	if (!req.plan.details.controllers) req.plan.details.controllers = []
-	if (!req.plan.details.client) req.plan.details.client = {}
-	if (!req.plan.details.parts) req.plan.details.parts = []
-	if (!req.plan.details.contacts) req.plan.details.contacts = []
-	if (!req.plan.details.designer) req.plan.details.designer = {}
-	_.each(req.plan.stage.aps, (ap, i) => {
-		if (!_.get(ap, 'inventory.name')) _.set(ap, 'inventory.name', `AP${i}`)
-	})
-	_.each(req.plan.stage.ams, (am, i) => {
-		if (!_.get(am, 'inventory.name')) _.set(am, 'inventory.name', `AM${i}`)
-	})
-
-	const PUGDIR = `${__dirname}/../pug`
-	pug.renderFile(`${PUGDIR}/sf01.pug`,
-		{
-			plan: req.plan,
-			today: new Date().toUTCString(),
-			assetsDir: `${PUGDIR}/assets`
-		}, (err, result) => {
-			console.dir(err)
-			let fileid = shortid.generate()
-			let planPDFName = `${req.plan.details.project}.pdf`
-			let htmlFilename = `${fileid}.html`
-			let pdfFilename = `${fileid}.pdf`
-			let htmlFullPath = `${PUGDIR}/tmp/${htmlFilename}`
-			let cssFilename = `${PUGDIR}/assets/reportv1.css`
-			fs.writeFile(htmlFullPath, result, function (err) {
-				exec(`cd ${PUGDIR}/tmp && wkhtmltopdf --print-media-type ${htmlFilename} ${pdfFilename}`, function (error, stdout, stderr) {
-					let file = fs.readFileSync(`${PUGDIR}/tmp/${pdfFilename}`, 'binary')
-					res.writeHead(200, {
-						'Content-Type': 'application/pdf',
-						'Access-Control-Allow-Origin': '*'
-					})
-					res.write(file, 'binary')
-					res.end()
-				})
-			})
-		})
 }
 
 /**

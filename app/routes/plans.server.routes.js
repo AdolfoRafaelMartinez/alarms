@@ -11,8 +11,6 @@ module.exports = function (app) {
 
 	app.route('/plans/:planId/coverage').post(users.requiresLogin, plans.hasAuthorization, plans.heatmap)
 
-	app.route('/plans/:planId/pdf').get(users.requiresLogin, plans.hasAuthorization, plans.pdfReport)
-
 	app.route('/plans/:planId')
         .get(users.requiresLogin, plans.hasAuthorization, plans.read)
         .put(users.requiresLogin, plans.hasAuthorization, plans.update)

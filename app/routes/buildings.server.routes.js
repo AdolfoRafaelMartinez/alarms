@@ -11,6 +11,9 @@ module.exports = function (app) {
 	app.route('/buildings/newPlan')
 		.get(users.requiresLogin, buildings.newPlan)
 
+	app.route('/buildings/:buildingId/pdf')
+		.get(users.requiresLogin, buildings.hasAuthorization, buildings.pdfReport)
+
 	// Finish by binding the project middleware
 	app.param('buildingId', buildings.buildingByID)
 }

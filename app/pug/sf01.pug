@@ -16,29 +16,29 @@ html(lang="en")
 						h1 WLAN
 							br
 							='SURVEY DESIGN'
-					img.clientlogo(src=plan.details.client.logo)
+					img.clientlogo(src=building.details.client.logo)
 				div.content
 					div.halfleft
 						div.cardtitlefull.blue
 							span Project Details
-						p.details=plan.details.client.name
+						p.details=building.details.client.name
 							br
-							=plan.details.project
+							=building.details.project
 							br
-							=plan.details.site
+							=building.details.site
 					div.halfright
 						div.cardtitlefull.green
 							span Site Details
-						p.details=plan.details.address
+						p.details=building.details.address
 							br
-							=`${plan.details.city} ${plan.details.state}, ${plan.details.zipcode}`
+							=`${building.details.city} ${building.details.state}, ${building.details.zipcode}`
 							br
-							=plan.details.floors
+							=building.details.floors
 					div.full
 						div.cardtitlefull.grey
 							span Contacts
 						p.contacts
-							each contact in plan.details.contacts
+							each contact in building.details.contacts
 								=contact.position
 								br
 								=contact.name
@@ -48,13 +48,13 @@ html(lang="en")
 						div.cardtitlefull.black
 							span Presented by
 						p.details
-							=plan.details.msp.name
+							=building.details.msp.name
 							br
-							Designer: =plan.details.designer.name
-								br
+							Designer: =`${building.details.designer.name} - ${building.details.designer.position}`
+							br
 							=today
 				div.footer
-					img.msplogo(src=plan.details.msp.logo)
+					img.msplogo(src=building.details.msp.logo)
 					img.pjlogo(src=`${assetsDir}/pbpj.png`)
 
 			// BOM
@@ -62,51 +62,49 @@ html(lang="en")
 				div.header
 					div.headertitle
 						h2
-							=plan.details.project
+							=building.details.project
 							br
-							=plan.details.site
+							=building.details.site
 						h3='Bill of Materials'
 
-					img.clientlogo(src=plan.details.client.logo)
+					img.clientlogo(src=building.details.client.logo)
 				div.content
 					div.third
 						div.cardtitlefull.green
 							span APs
-						p.aps=`${plan.stage.aps.length}`
+						p.aps=`${aps}`
 					div.third
 						div.cardtitlefull.blue
 							span AMs
-						p.ams=`${plan.stage.ams.length}`
+						p.ams=`${ams}`
 					div.smallstack
 						div.small
 							div.cardtitlefull.grey
 								span Mounts
-							p.mounts=`${plan.stage.aps.length}`
+							p.mounts=`${apms}`
 						div.small
 							div.cardtitlefull.black
 								span SFPs
-							p.sfps=`${plan.stage.aps.length}`
+							p.sfps=`${apms}`
 					div.full
 						div.cardtitlefull.darkblue
 							span Controllers
 
-						each ctrl in plan.details.controllers
-							p.controllers=`${ctrl.country} - ${ctrl.model}`
-								if ctrl.ha
-									- HA
-							p=ctrl.description
+						p.controllers=`${ctrl.country} - ${ctrl.model}`
+							if ctrl.ha
+								= '- HA (TWO Controllers)'
+						p=ctrl.description
 
 					div.full
 						div.cardtitlefull.darkgreen
 							span Licenses
 						div.licenses
 
-							each ctrl in plan.details.controllers
-								div=`${ctrl.lic.ap.qty} LIC-AP`
-								if ctrl.lic.pefng
-									div PEFNG
-								if ctrl.lic.rfc
-									div RFC
+							div=`${apms} LIC-AP`
+							if lic.pefng
+								div=`${apms} PEFNG`
+							if lic.rfp
+								div=`${apms} RFP`
 
 					div.full
 						div.bom
@@ -116,44 +114,45 @@ html(lang="en")
 									th(width='70%' align='left') Description
 									th(width='8%' align='center') Qty
 
-								each part in plan.details.parts
+								each part in building.details.parts
 									tr(valign='top')
 										td(align='left')=part.name
 										td=part.desc
 										td(align='center')=part.nr
 
 				div.footer
-					img.msplogo(src=plan.details.msp.logo)
+					img.msplogo(src=building.details.msp.logo)
 					img.pjlogo(src=`${assetsDir}/pbpj.png`)
 
 			// Floor plan
-			div.page
-				div.header
-					div.headertitle
-						h2
-							=`${plan.details.project}`
-							br
-							=`${plan.details.site}`
-							br
-							=`${plan.details.building}`
-					img.clientlogo(src=plan.details.client.logo)
-				div.content
-					div.full
-						img.floor(src=`../../../public/uploads/${plan.print}`)
-					div.full
-						div.placements
-							dl
-								each am, ami in plan.stage.ams
-									div.am
-										dt=`${ami + 1}:`
-										dd=`${am.inventory.name}`
-								each ap, api in plan.stage.aps
-									div.ap
-										dt=`${api + 1}:`
-										dd=`${ap.inventory.name}`
-				div.footer
-					img.msplogo(src=plan.details.msp.logo)
-					img.pjlogo(src=`${assetsDir}/pbpj.png`)
+			each plan in plans
+				div.page
+					div.header
+						div.headertitle
+							h2
+								=`${building.details.project}`
+								br
+								=`${building.details.site}`
+								br
+								=`${building.details.building}`
+						img.clientlogo(src=building.details.client.logo)
+					div.content
+						div.full
+							img.floor(src=`../../../public/ss/${plan.print}`)
+						div.full
+							div.placements
+								dl
+									each am, ami in plan.stage.ams
+										div.am
+											dt=`${ami + 1}:`
+											dd=`${am.inventory.name}`
+									each ap, api in plan.stage.aps
+										div.ap
+											dt=`${api + 1}:`
+											dd=`${ap.inventory.name}`
+					div.footer
+						img.msplogo(src=building.details.msp.logo)
+						img.pjlogo(src=`${assetsDir}/pbpj.png`)
 
 
 			// THANK YOU page
@@ -162,6 +161,6 @@ html(lang="en")
 					div.tycard
 						p Thank you!
 					div
-						img(src=plan.details.msp.logo)
+						img(src=building.details.msp.logo)
 					div
 						img(src=`${assetsDir}/pJlogo.png`)
