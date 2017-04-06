@@ -264,6 +264,10 @@ plan-list .list-group-item:last-child {
 	filter: grayscale(100%);
 }
 
+.panel-heading a {
+	padding-right: 20px;
+}
+
 .floors {
 	margin: 5px 10px;
 	color: #aaa;
