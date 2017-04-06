@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 const fs       = require('fs')
 const _        = require('lodash')
 const Q        = require('q')
+const shortid  = require('shortid')
 
 const errorHandler = require('./errors.server.controller')
 const Plan = mongoose.model('Plan')
@@ -107,7 +108,7 @@ exports.update = function (req, res) {
 	saveImages(req.body.print, req.body.thumb, req.body._id)
 		.then(pics => {
 			if (pics) {
-				plan_data.thumb = pics.thumb
+				plan_data.thumb = pics.thumb + '?v=' + shortid.generate()
 				plan_data.print = pics.print
 			}
 			plan = _.extend(plan, plan_data)

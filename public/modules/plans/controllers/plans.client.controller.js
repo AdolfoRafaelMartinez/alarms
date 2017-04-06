@@ -193,12 +193,14 @@ angular.module('plans')
 				var overlaps = $scope.settings.show_overlaps
 				var distances = $scope.settings.show_distances
 				var deferred = $q.defer()
+				var plan = new Plans(_.cloneDeep($scope.plan))
+				plan.thumb = Drawing.getThumb()
+
 				Drawing.toggleOverlaps('off')
 				Drawing.toggleDistances('off')
 				Drawing.toggleRadius('off')
 				Drawing.centerStage()
 
-				var plan = new Plans(_.cloneDeep($scope.plan))
 				plan.print = Drawing.getPNG()
 
 				$scope.settings.show_overlaps = overlaps
@@ -208,7 +210,6 @@ angular.module('plans')
 				Drawing.toggleRadius('on')
 
 				plan.title = $scope.flooplan_name
-				plan.thumb = Drawing.getThumb()
 				plan.stage = Drawing.toJSON()
 				plan.settings = $scope.settings
 				/* TODO: update plan titles in building */
@@ -227,6 +228,8 @@ angular.module('plans')
 					plan.$update(response => {
 						$scope.icons.save = iconset.done
 						$scope.plan = response
+						let index = _.findIndex($scope.plans, p => p._id === response._id)
+						$scope.plans[index] = response
 						$timeout(() => {
 							$scope.icons.save = iconset.save
 						}, 3000)
@@ -615,6 +618,31 @@ angular.module('plans')
 				})
 				$scope.savePlan() // save current plan
 				$scope.pp_edit = {}
+			}
+
+			$scope.askDeleteFloorplan = function (plan) {
+				ModalService.showModal({
+					templateUrl: 'deleteModal.html',
+					controller: 'deleteModalController',
+					inputs: { item: `plan: ${plan.title || 'Floor ' + plan.floor}` }
+				})
+					.then(function (modal) {
+						modal.element.modal()
+						modal.close.then(function (answer) {
+							if (answer) {
+								_.each($scope.project.sites, site => {
+									_.each(site.buildings, bldg => {
+										_.remove(bldg.plans, p => p._id === plan._id)
+									})
+								})
+								_.remove($scope.plans, p => p._id === plan._id)
+								plan.$delete()
+								$scope.project.$update(project => {
+									$scope.project = project
+								})
+							}
+						})
+					})
 			}
 
 			$scope.askDeleteProject = function (project) {
