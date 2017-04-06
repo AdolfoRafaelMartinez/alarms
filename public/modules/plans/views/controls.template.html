@@ -39,8 +39,8 @@
 
 	<div class="floors">
 		<div> <a href ng-click="newPlan()"> <i class="glyphicon glyphicon-plus"></i> <small>Add Floor</small> </a> </div>
-		<div ng-repeat="p in plans" ng-class="{'shadowItem': p != plan}">
-			<a href ng-click="showPlan(p)">
+		<div ng-repeat="p in plans" ng-class="{'shadowItem': p != plan}" ng-click="showPlan(p)">
+			<a href>
 				<img ng-src="/ss/{{ p.thumb }}" />
 				<small ng-if="p.floor">Floor {{ p.floor }}</small>
 				<small ng-if="!p.floor">Floor {{ p.title }}</small>

@@ -70,13 +70,13 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 		var DISTANCE_BUBBLE_RGB = '#fff'
 		var DISTANCE_CUT_OFF = 60
 		var HASH_COLOR = [
-		{ overlap: 21, color: 'rgba(255, 0, 0, 0.2)' },
-		{ overlap: 14, color: 'rgba(0, 255, 0, 0.2)' },
-		{ overlap: 0,  color: 'rgba(240, 255, 40, 0.2)' }
+			{ overlap: 21, color: 'rgba(255, 0, 0, 0.2)' },
+			{ overlap: 14, color: 'rgba(0, 255, 0, 0.2)' },
+			{ overlap: 0,  color: 'rgba(240, 255, 40, 0.2)' }
 		]
 
 		var tick = function (event) {
-		// this set makes it so the stage only re-renders when an event handler indicates a change has happened.
+			// this set makes it so the stage only re-renders when an event handler indicates a change has happened.
 			if (update) {
 				update = false // only update once
 				stage.update(event)
@@ -142,17 +142,17 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 
 		function getDistance (ap_start, ap_end) {
 			return Math.sqrt(
-			Math.pow(ap_start.realx - ap_end.realx, 2) +
-			Math.pow(ap_start.realy - ap_end.realy, 2)
-		)
+				Math.pow(ap_start.realx - ap_end.realx, 2) +
+				Math.pow(ap_start.realy - ap_end.realy, 2)
+			)
 		}
 
 		function drawDistanceObject (obj) {
 			obj.pdistance = getDistance(obj.ap_start, obj.ap_end)
 			if (obj.pdistance < DISTANCE_CUT_OFF) {
 				obj.pline.graphics.clear().setStrokeStyle(1).beginStroke(DISTANCE_STROKE_RGB)
-			.moveTo(obj.p_start.x, obj.p_start.y)
-			.lineTo(obj.p_end.x, obj.p_end.y)
+					.moveTo(obj.p_start.x, obj.p_start.y)
+					.lineTo(obj.p_end.x, obj.p_end.y)
 				obj.ptext.text = obj.pdistance.toFixed(2) + ' ft'
 				obj.pbubble.scaleX = obj.pbubble.scaleY = 100 / plan.stage_scale
 				obj.ptext.scaleX = obj.ptext.scaleY = 100 / plan.stage_scale
@@ -192,7 +192,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			for (i = 0; i < layers_length; i++) {
 				if (layers[i].layer_type !== 'ap') continue
 				ap.distances = []
-			/* jshint -W083 */
+				/* jshint -W083 */
 				_.each(layers[i].children, function (ap2) {
 					if (ap !== ap2) {
 						c = new createjs.Container()
@@ -289,7 +289,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 								text.x = plan.radius * Math.cos(apb)
 								text.y = plan.radius * Math.sin(apb)
 								text.textBaseline = 'alphabetic'
-							// ap.addChild(text);
+								// ap.addChild(text);
 
 								leftside = 0
 								if (ap.x >= c.x) leftside = 1
@@ -307,7 +307,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 								hash.graphics.beginFill(hash_color).arc(c.x - ap.x, c.y - ap.y, plan.radius - 1, rightside * Math.PI + alpha - beta, rightside * Math.PI + alpha + beta - 1 / plan.radius)
 								intersections.push(hash)
 
-							// update the intersections on the adjacent AP as well
+								// update the intersections on the adjacent AP as well
 								if (!processing) drawIntersections(c, true)
 							}
 						}
@@ -339,13 +339,13 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 				ap_clicked = true
 				evt.stopPropagation()
 				evt.preventDefault()
-			/* jshint validthis: true */
+				/* jshint validthis: true */
 				this.offset = {
 					x: this.x - evt.stageX * 100 / plan.stage_scale,
 					y: this.y - evt.stageY * 100 / plan.stage_scale
 				}
 				this.parent.addChild(this)
-			/* jshint validthis: false */
+				/* jshint validthis: false */
 				names = []
 				for (var i = 0; i < ap.distances.length; i++) names.push(distances.getChildByName(ap.distances[i].name))
 			}
@@ -466,23 +466,28 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			canvas.width = canvas.parentElement.clientWidth - canvasMarginW
 			canvas.height = canvas.parentElement.clientHeight - canvasMarginH
 			canvas.style.width = (canvas.parentElement.clientWidth - canvasMarginW) + 'px'
-			if (!stage) {
+			if (stage) {
+				stage.enableDOMEvents(false)
+				/* TODO: remove ticker on leave page */
+				createjs.Ticker.removeEventListener('tick', tick)
+				stage.removeAllChildren()
+				stage.removeAllEventListeners()
+				stage.canvas = canvas
+				stage.enableDOMEvents(true)
+			} else {
 				stage = new createjs.Stage(canvas)
 				createjs.Touch.enable(stage)
-				stage.enableMouseOver(10)
-				addListeners(canvas, this)
-				stage.mouseMoveOutside = true // keep tracking the mouse even when it leaves the canvas
-			} else {
-				stage.removeAllChildren()
-				stage.update()
+				stage.enableMouseOver(5)
 			}
+			addListeners(canvas, this)
+			stage.mouseMoveOutside = true // keep tracking the mouse even when it leaves the canvas
 			if (!plan || !plan.floor_width) {
 				plan.floor_width = 200 // m or ft
 				plan.floor_width_px = canvas.width
 			}
 			plan.stage_ppm = plan.floor_width_px / plan.floor_width
 
-		// add default layers
+			// add default layers
 			layers = [new createjs.Container()]
 			layers[0].layer_type = 'ap'
 			layers[1] = new createjs.Container()
@@ -724,10 +729,10 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			update = true
 		}
 
-	/**
-	* Overlaps are added as child for the AP container itself;
-	* the overlaps container is shown behind the main AP circle container
-	*/
+		/**
+		 * Overlaps are added as child for the AP container itself;
+		 * the overlaps container is shown behind the main AP circle container
+		 */
 		this.toggleOverlaps = function (state) {
 			show_overlaps = !show_overlaps
 			if (state === 'off') show_overlaps = false
@@ -760,7 +765,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			if (!percent) return
 			plan.stage_scale = percent
 			if (this.updateControls) this.updateControls('scale', Math.round(plan.stage_scale))
-		// plan.stage_ppm = plan.floor_width_px / plan.floor_width;
+			// plan.stage_ppm = plan.floor_width_px / plan.floor_width;
 			plan.floor_width = plan.floor_width_px / plan.stage_ppm
 			stage.setTransform(stage.x, stage.y, percent / 100, percent / 100).update()
 			for (var i = 0; i < distances.children.length; i++) {
@@ -783,7 +788,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			var img = new Image()
 			var defer = $q.defer()
 			img.setAttribute('crossOrigin', 'anonymous')
-			img.src = url.replace('public/', '').replace('http://bitlion.com:3000', '')
+			img.src = url.replace('public/', '')
 			img.onload = function (event) {
 				var t = event.target
 				var f = new createjs.Bitmap(t)
@@ -833,7 +838,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			var children, i, d, m, layers_length = layers.length
 			for (i = 0; i < layers_length; i++) {
 				if (layers[i].layer_type === 'ap') {
-				/* jshint -W083 */
+					/* jshint -W083 */
 					_.each(layers[i].children, function (ap) {
 						json.aps.push({
 							name: ap.name,
@@ -842,7 +847,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 						})
 					})
 				} else if (layers[i].layer_type === 'walls') {
-				/* jshint -W083 */
+					/* jshint -W083 */
 					_.each(layers[i].children, function (wall) {
 						json.walls.push({
 							wall_type: wall.wall_type,
@@ -874,8 +879,8 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			var thumbWidth = 150
 			var thumbHeight = 150 * canvas.height / canvas.width
 			var newCanvas = $('<canvas>')
-      .attr('width', thumbWidth)
-      .attr('height', thumbHeight)[0]
+				.attr('width', thumbWidth)
+				.attr('height', thumbHeight)[0]
 
 			var context = newCanvas.getContext('2d')
 			context.drawImage(stage.canvas,  0, 0, canvas.width, canvas.height, 0, 0, thumbWidth, thumbHeight)
@@ -892,10 +897,10 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 				this.initBoard(signal_radius)
 				if (data.floorplan) {
 					this.addFloorPlan(data.floorplan)
-				.then(function () {
-					if (data.plan && data.plan.stage_scale) this.scale(stage_scale)
-					else this.scale(100)
-				}.bind(this))
+						.then(function () {
+							if (data.plan && data.plan.stage_scale) this.scale(stage_scale)
+							else this.scale(100)
+						}.bind(this))
 				}
 
 				stage.x = _.get(data.plan, 'stage.x')
@@ -927,8 +932,8 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 
 			for (var i = 0; i < layers_length; i++) {
 				if (layers[i].layer_type !== 'ap') continue
-			// layers[i].visible = false;
-			/* jshint -W083 */
+				// layers[i].visible = false;
+				/* jshint -W083 */
 				_.each(layers[i].children, function (ap2) {
 					points.push({
 						x: ap2.x,
@@ -938,19 +943,19 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 					})
 				})
 
-			/* TODO: add a mouse over event with a tooltip showing signal strength at any point on the map
-			* use getValueAt({ x: 12, y: 12 });
-			*/
+				/* TODO: add a mouse over event with a tooltip showing signal strength at any point on the map
+				 * use getValueAt({ x: 12, y: 12 });
+				 */
 			}
 
 			$http.post('/plans/' + plan._id + '/coverage', {points: points, ppm: plan.stage_ppm})
-		.success(function (response) {
-			var bitheat = new createjs.Bitmap(response)
-			bitheat.x = 0
-			bitheat.y = 0
-			coverage.addChild(bitheat)
-			update = true
-		})
+				.success(function (response) {
+					var bitheat = new createjs.Bitmap(response)
+					bitheat.x = 0
+					bitheat.y = 0
+					coverage.addChild(bitheat)
+					update = true
+				})
 		}
 
 		this.heatmap = function (state) {

@@ -90,7 +90,6 @@ angular.module('plans')
 
 			$scope.getCurrentAP = function () {
 				$scope.ap = Drawing.getCurrentAP()
-				console.log('current AP', $scope.ap)
 				if ($scope.ap) $scope.menu.mode = 'ap'
 			}
 
