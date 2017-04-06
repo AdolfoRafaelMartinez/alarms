@@ -122,19 +122,20 @@
                                 <div class="add-item">
                                     <button class="btn btn-info btn-xs" ng-click="addContact()"><i class="glyphicon glyphicon-plus-sign"></i> Add Contact</button>
                                 </div>
-                                <div class="col-lg-4" ng-repeat="(contactIndex, contact) in plan.details.contacts">
-                                    <div class="form-group row">
-                                        <div class="col-lg-1"><a href ng-click="toggleEdit('contacts', contact)"><i class="glyphicon glyphicon-pencil"></i></a></div>
-                                        <div class="col-lg-11">
+                                <div class="col-lg-3 clickable list-group-item" ng-repeat="(contactIndex, contact) in plan.details.contacts" ng-click="toggleEdit('contacts', contact)">
+									<div class="topright text-right">
+										<a href ng-click="removeContact(contactIndex)">
+											<i class="glyphicon glyphicon-remove" ng-click="removeContact(contactIndex)"></i>
+										</a>
+									</div>
+                                    <div class="form-group">
+                                        <div>
                                             <span>Type:</span> <em ng-bind="contact.type"></em>
-                                            <a href ng-click="removeContact(contactIndex)" style="padding-left: 1em;">
-                                                <i class="glyphicon glyphicon-remove" ng-click="removeContact(contactIndex)"></i>
-                                            </a>
                                         </div>
-                                        <div class="col-lg-12"><span>Name:</span> <em ng-bind="contact.name"></em></div>
-                                        <div class="col-lg-12"><span>Position:</span> <em ng-bind="contact.position"></em></div>
-                                        <div class="col-lg-12"><span>Phone:</span> <em ng-bind="contact.phone"></em></div>
-                                        <div class="col-lg-12"><span>Email:</span> <em ng-bind="contact.email"></em></div>
+                                        <div><span>Name:</span> <em ng-bind="contact.name"></em></div>
+                                        <div><span>Position:</span> <em ng-bind="contact.position"></em></div>
+                                        <div><span>Phone:</span> <em ng-bind="contact.phone"></em></div>
+                                        <div><span>Email:</span> <em ng-bind="contact.email"></em></div>
                                     </div>
                                 </div>
                                 <div class="form-group col-log-12" ng-if="!plan.details.contacts.length">
@@ -168,7 +169,7 @@
                                     </div>
                                     <div class="form-group row">
                                         <div class="col-sm-offset-2 col-sm-10">
-                                            <button type="submit" class="btn btn-primary" ng-click="savePlanProperties();">Save</button>
+                                            <button type="submit" class="btn btn-primary" ng-click="saveContact();">Save</button>
                                             <button class="btn btn-default pull-right" ng-click="toggleEdit('contacts')">Cancel</button>
                                         </div>
                                     </div>
@@ -192,36 +193,37 @@
                     <div class="panel-body">
                         <div class="form-group row" ng-hide="pp_edit['controllers']">
                             <div class="col-lg-12">
-                                <div class="form-group row">
-                                    <div class="col-lg-12">
+                                <div class="form-group">
+                                    <div>
                                         <label class="form-control-label">Controller Present?</label>
                                         <md-switch aria-label="controller present" ng-change="checkController()" ng-model="plan.details.ctrlPresent">
                                             {{ plan.details.ctrlPresent ? 'YES' : 'No (Instant Cluster)' }}
                                         </md-switch>
                                     </div>
                                 </div>
-                                <div class="col-lg-4" ng-repeat="(ctrlIndex, ctrl) in plan.details.controllers" ng-if="plan.details.ctrlPresent">
-                                    <div class="form-group row">
-                                        <div class="col-lg-1"><a href ng-click="toggleEdit('controllers', ctrl)"><i class="glyphicon glyphicon-pencil"></i></a></div>
-                                        <div class="col-lg-11">
+                                <div class="col-lg-3 clickable list-group-item" ng-repeat="(ctrlIndex, ctrl) in plan.details.controllers" ng-if="plan.details.ctrlPresent" ng-click="toggleEdit('controllers', ctrl)">
+									<div class="topright text-right">
+										<a href ng-click="removeController(ctrlIndex)" style="padding-left: 1em;">
+											<i class="glyphicon glyphicon-remove"></i>
+										</a>
+									</div>
+                                    <div class="form-group">
+                                        <div>
                                             <span>Country Code:</span> <em ng-bind="ctrl.country"></em>
-                                            <a href ng-click="removeController(ctrlIndex)" style="padding-left: 1em;">
-                                                <i class="glyphicon glyphicon-remove"></i>
-                                            </a>
                                         </div>
 
-                                        <div class="col-lg-12"><span>Model:</span> <em ng-bind="ctrl.model"></em></div>
-                                        <div class="col-lg-12"><span>Description:</span> <em ng-bind="ctrl.description"></em></div>
-                                        <div class="col-lg-12"><span>HA:</span>
+                                        <div><span>Model:</span> <em ng-bind="ctrl.model"></em></div>
+                                        <div><span>Description:</span> <em ng-bind="ctrl.description"></em></div>
+                                        <div><span>HA:</span>
                                             <span ng-if="ctrl.ha"><i class="glyphicon glyphicon-ok-circle green"></i></span>
                                             <span ng-if="!ctrl.ha"><i class="glyphicon glyphicon-remove-circle red"></i></span>
                                         </div>
-                                        <div class="col-lg-12"><span>AP/AM Licenses:</span> <span ng-bind="ctrl.lic.ap.qty"></span></div>
-                                        <div class="col-lg-12"><span>PEFNG License:</span>
+                                        <div><span>AP/AM Licenses:</span> <span ng-bind="ctrl.lic.ap.qty"></span></div>
+                                        <div><span>PEFNG License:</span>
                                             <span ng-if="plan.details.lic.pefng"><i class="glyphicon glyphicon-ok-circle green"></i></span>
                                             <span ng-if="!plan.details.lic.pefng"><i class="glyphicon glyphicon-remove-circle red"></i></span>
                                         </div>
-                                        <div class="col-lg-12"><span>RFP License:</span>
+                                        <div><span>RFP License:</span>
                                             <span ng-if="plan.details.lic.rfp"><i class="glyphicon glyphicon-ok-circle green"></i></span>
                                             <span ng-if="!plan.details.lic.rfp"><i class="glyphicon glyphicon-remove-circle red"></i></span>
                                         </div>

@@ -467,6 +467,22 @@ angular.module('plans')
 				})
 			}
 
+			$scope.showSettings = function (item) {
+				ModalService.showModal({
+					templateUrl: 'settingsModal.html',
+					controller: 'settingsModalController',
+					inputs: { item: item }
+				})
+					.then(function (modal) {
+						modal.element.modal()
+						modal.close.then(function (save) {
+							if (save) {
+								console.log('SAVE')
+							}
+						})
+					})
+			}
+
 			$scope.showBuilding = (building) => {
 				if (!building.plans) $scope.createPlanAndLoad($scope.selected.building)
 				else $location.path(`building/${building._id}`)
@@ -551,12 +567,20 @@ angular.module('plans')
 				Drawing.selectTool(mode)
 			}
 
+			var newContact = {}
 			$scope.addContact = function () {
 				$scope.pp_edit.contacts = true
-				var newContact = {}
+				newContact = {}
 				$scope.edit_prop = newContact
+			}
+
+			$scope.saveContact = function () {
 				if (!$scope.plan.details.contacts) $scope.plan.details.contacts = []
-				$scope.plan.details.contacts.push(newContact)
+				if (newContact.name) {
+					$scope.plan.details.contacts.push(_.clone(newContact))
+					newContact = {}
+				}
+				$scope.savePlanProperties()
 			}
 
 			$scope.removeContact = function (index) {

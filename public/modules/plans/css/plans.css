@@ -200,7 +200,7 @@ plan-list .list-group {
 }
 
 plan-list div.v1 {
-	height: calc(100% - 200px)
+	height: calc(100% - 240px)
 }
 
 plan-list .list-group > div {
@@ -225,15 +225,18 @@ plan-list .buildings {
 	background-size: cover; */
 }
 
+plan-list .list-group-item {
+	width: 45%;
+	min-width: 200px;
+	height: 135px;
+}
+
 .list-group-item {
 	display: inline-block;
 	color: black;
 	text-align: left;
 	font-size: small;
 	margin: 10px;
-	width: 45%;
-	min-width: 200px;
-	height: 135px;
 	overflow: hidden;
 	opacity: 0.85;
 	border-radius: 20px;
@@ -375,4 +378,14 @@ md-sidenav input {
 
 .modal {
 	color: black;
+}
+
+.clickable {
+	border-radius: 10px;
+	cursor: pointer;
+    box-shadow: inset 1px 1px 6px rgba(0,0,80,0.4);
+}
+
+.clickable:hover {
+	background: #eff;
 }

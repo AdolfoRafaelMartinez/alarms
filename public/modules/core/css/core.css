@@ -83,7 +83,7 @@ section > div > div {
     right: 0;
 }
 
-.topright .glyphicon-trash {
+.topright .glyphicon-trash, .topright .glyphicon-remove {
     font-size: 19px;
     border-radius: 50%;
     background: #eee;
@@ -96,9 +96,31 @@ section > div > div {
     box-shadow: inset 1px 1px 6px rgba(0,0,80,0.4);
 }
 
-.topright .glyphicon-trash:hover {
+.topright .glyphicon-trash:hover, .topright .glyphicon-remove:hover {
   color: #a88;
   background: #fef;
+}
+
+.bottomright {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+}
+
+.bottomright .glyphicon {
+	font-size: 22px;
+    padding: 10px;
+    text-shadow: -1px -1px 1px #fff, 1px 1px 1px #000;
+    color: #444;
+}
+
+.bottomright .glyphicon:hover {
+  color: #a88;
+  background: #fef;
+}
+
+.padtop {
+	padding-top: 10px;
 }
 
 .md-whiteframe-z2 {
