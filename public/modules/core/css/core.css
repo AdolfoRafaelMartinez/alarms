@@ -145,6 +145,11 @@ canvas {
 	background: white;
 }
 
+.inline {
+	display: inline-block;
+	vertical-align: middle;
+}
+
 #context_menu {
     display: none;
 	border-radius: 8px;

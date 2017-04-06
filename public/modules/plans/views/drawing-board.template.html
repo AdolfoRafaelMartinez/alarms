@@ -3,7 +3,7 @@
 
 <!-- plan properties -->
 <div class="panel-body overlay-sheet sheet-bg" ng-show="plan_properties">
-	<button class="btn btn-secondary" ng-click="plan_properties = !plan_properties"><i class="glyphicon glyphicon-backward"></i> Back</button>
+	<button class="btn btn-secondary" ng-click="togglePlanProperties()"><i class="glyphicon glyphicon-backward"></i> Back</button>
     <div class="row">
         <div class="panel-group col-lg-12" id="pp_accordion" role="tablist" aria-multiselectable="true">
             <div class="panel panel-default">
@@ -315,7 +315,7 @@
             </ul>
         </div>
 
-        <div class="panel-body" ng-if="menu.mode == 'ap'">
+        <div class="panel-body" ng-show="menu.mode == 'ap'">
             <form>
                 <div class="form-group row">
                     <label class="col-sm-2 form-control-label">Name</label>
@@ -337,6 +337,13 @@
                 </div>
             </form>
         </div>
+
+        <div class="panel-body" ng-show="menu.mode == 'plan'">
+			<div ng-click="togglePlanProperties()">
+				<div class="inline"><ng-md-icon icon="settings"></ng-md-icon></div>
+				<div class="inline">Floorplan properties</div>
+			</div>
+		</div>
 
     </div>
 </div>

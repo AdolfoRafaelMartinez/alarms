@@ -62,12 +62,15 @@ angular.module('plans')
 			$scope.state = {}
 
 			$scope.menu = {
-				mode: 'ap'
+				mode: 'plan'
 			}
 			Drawing.setupMenu($scope.menu)
 
 			$scope.closeMenu = function () {
 				contextMenu.close()
+				delete $scope.ap
+				Drawing.unselectAP()
+				$scope.menu.mode = 'plan'
 			}
 
 			$scope.planProperties = function () {
@@ -82,10 +85,13 @@ angular.module('plans')
 
 			$scope.deleteAP = function () {
 				Drawing.deleteSelectedAP()
+				$scope.closeMenu()
 			}
 
 			$scope.getCurrentAP = function () {
 				$scope.ap = Drawing.getCurrentAP()
+				console.log('current AP', $scope.ap)
+				if ($scope.ap) $scope.menu.mode = 'ap'
 			}
 
 			$scope.deleteWall = function () {
@@ -98,15 +104,22 @@ angular.module('plans')
 					$scope.$digest()
 				})
 				$scope.calibration_step = true
+				Drawing.toggleOverlaps('off')
+				Drawing.toggleRadius('off')
+				Drawing.toggleDistances('off')
 			}
 
-			$scope.completeCalibration = function () {
-				Drawing.completeCalibration($scope.calibration_distance)
+			$scope.completeCalibration = function (cancel) {
+				Drawing.completeCalibration($scope.calibration_distance, cancel)
 				$scope.calibration_done = false
 				$scope.calibration_step = false
+				Drawing.toggleOverlaps($scope.settings.show_overlaps ? 'on' : 'off')
+				Drawing.toggleRadius($scope.settings.show_heatmap ? 'off' : 'on')
+				Drawing.toggleDistances($scope.settings.show_distances ? 'on' : 'off')
 			}
 
 			$scope.changeUnits = function () {
+				alert('feature not available in Beta')
 				console.log('changeUnits', $scope.settings)
 			}
 
@@ -124,6 +137,7 @@ angular.module('plans')
 				Drawing.toggleOverlaps($scope.settings.show_overlaps ? 'on' : 'off')
 				$scope.settings.show_heatmap = false
 				Drawing.heatmap('off')
+				Drawing.toggleRadius('on')
 			}
 
 			$scope.toggleHeatmap = function () {
@@ -187,6 +201,11 @@ angular.module('plans')
 
 			$scope.getTotalAPs = function () {
 				return Drawing.getTotalAPs()
+			}
+
+			$scope.togglePlanProperties = function () {
+				contextMenu.close()
+				$scope.plan_properties = !$scope.plan_properties
 			}
 
 			$scope.savePlan = function () {
@@ -364,7 +383,9 @@ angular.module('plans')
 
 			$scope.newPlan = function () {
 				$scope.flooplan_name = ''
+				var details = _.clone($scope.plan.details)
 				$scope.plan = new Plans(planSkeleton)
+				$scope.plan.details = details
 				$scope.plan.$save(response => {
 					$scope.plan = response
 					$scope.plan.title = 'Untitled'

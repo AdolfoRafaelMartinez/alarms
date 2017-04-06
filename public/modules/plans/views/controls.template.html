@@ -1,12 +1,14 @@
 <div layout="row">
 	<div flex="10">
 		<div>Units:</div>
-		<md-switch flex ng-model="settings.units" ng-true-value="'m'" ng-false-value="'ft'" ng-change="changeUnits()" aria-label="Units">{{ settings.units }}</md-switch>
+		<md-switch flex ng-model="settings.units" ng-true-value="'m'" ng-hide="calibration_step" ng-false-value="'ft'" ng-change="changeUnits()" aria-label="Units">{{ settings.units }}</md-switch>
 		<hr />
 		<div class="text-center">
 			<button class="btn btn-info" ng-click="startCalibration()" ng-hide="calibration_step">Calibrate</button>
+			<span ng-show="calibration_step && !calibration_done">Draw a line that you know the distance for.</span>
 			<input type="number" placeholder="distance..." ng-show="calibration_done" ng-model="calibration_distance" aria-label="calibrate">
 			<button class="btn btn-xs btn-info" ng-if="calibration_done" ng-click="completeCalibration()">Done</button>
+			<button class="btn btn-xs btn-info" ng-if="calibration_step" ng-click="completeCalibration(true)">Cancel</button>
 		</div>
 	</div>
 
