@@ -17,7 +17,7 @@ cache:
 
 test_async:
     script:
-        #- node ./specs/start.js ./specs/async.spec.js
+        - npm test
 
 stages:
     - build

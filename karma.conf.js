@@ -1,22 +1,18 @@
-'use strict';
+const _ = require('lodash')
 
-/**
- * Module dependencies.
- */
-var applicationConfiguration = require('./config/config');
+var applicationConfiguration = require('./config/config')
 
-// Karma configuration
-module.exports = function(config) {
+module.exports = function (config) {
+	console.log(_.filter(applicationConfiguration.assets.lib.js.concat(applicationConfiguration.assets.js, applicationConfiguration.assets.tests)))
 	config.set({
 		// Frameworks to use
 		frameworks: ['jasmine'],
 
 		// List of files / patterns to load in the browser
-		files: applicationConfiguration.assets.lib.js.concat(applicationConfiguration.assets.js, applicationConfiguration.assets.tests),
+		files: applicationConfiguration.assets.lib.js.concat(_.filter(applicationConfiguration.assets.js, applicationConfiguration.assets.tests)),
 
 		// Test results reporter to use
 		// Possible values: 'dots', 'progress', 'junit', 'growl', 'coverage'
-		//reporters: ['progress'],
 		reporters: ['progress'],
 
 		// Web server port
@@ -42,11 +38,30 @@ module.exports = function(config) {
 		// - IE (only Windows)
 		browsers: ['PhantomJS'],
 
+		customLaunchers: {
+			'PhantomJS_custom': {
+				base: 'PhantomJS',
+				options: {
+					windowName: 'puddlejump-karma',
+					settings: {
+						webSecurityEnabled: false
+					}
+				},
+				flags: ['--load-images=true'],
+				debug: true
+			}
+		},
+
+		phantomjsLauncher: {
+			// Have phantomjs exit if a ResourceError is encountered (useful if karma exits without killing phantom)
+			exitOnResourceError: true
+		},
+
 		// If browser does not capture in given timeout [ms], kill it
 		captureTimeout: 60000,
 
 		// Continuous Integration mode
 		// If true, it capture browsers, run tests and exit
 		singleRun: true
-	});
-};
+	})
+}

@@ -389,5 +389,7 @@ module.exports = function (grunt) {
 
 	grunt.registerTask('ja', ['clean', 'lint', 'loadConfig', 'uglify', 'cssmin', 'copy:ja'])
 
-	grunt.registerTask('test', ['env:test', 'mochaTest', 'karma:unit'])
+	grunt.registerTask('test', ['env:test', 'mochaTest'])
+
+	grunt.registerTask('testAngular', ['karma:unit'])
 }

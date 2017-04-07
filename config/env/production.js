@@ -10,8 +10,7 @@ module.exports = {
 				'public/lib/angular-material/angular-material.css',
 				'public/lib/jQueryFileUpload/css/style.css',
 				'public/lib/blueimp-file-upload/css/jquery.fileupload.css',
-				'public/lib/blueimp-file-upload/css/jquery.fileupload-ui.css',
-				'public/lib/lobipanel/dist/css/lobipanel.min.css'
+				'public/lib/blueimp-file-upload/css/jquery.fileupload-ui.css'
 			],
 			js: [
 				'public/lib/bootstrap/dist/js/bootstrap.min.js',
@@ -27,10 +26,9 @@ module.exports = {
 				'public/lib/angular-ui-utils/ui-utils.js',
 				'public/lib/angular-bootstrap/ui-bootstrap-tpls.js',
 				'public/lib/easeljs/lib/easeljs-NEXT.combined.js',
-				'public/lib/caman/dist/caman.full.min.js',
 
-				'public/lib/angular-dragdrop/src/angular-dragdrop.min.js',
-				'public/lib/angular-modal-service/dst/angular-modal-service.min.js',
+				'public/lib/angular-dragdrop/src/angular-dragdrop.js',
+				'public/lib/angular-modal-service/dst/angular-modal-service.js',
 
 				'public/lib/blueimp-file-upload/js/vendor/jquery.ui.widget.js',
 				'public/lib/blueimp-load-image/js/load-image.all.min.js',
@@ -39,9 +37,7 @@ module.exports = {
 				'public/lib/blueimp-file-upload/js/jquery.fileupload-process.js',
 				'public/lib/blueimp-file-upload/js/jquery.fileupload-image.js',
 				'public/lib/blueimp-file-upload/js/jquery.fileupload-validate.js',
-				'public/lib/blueimp-file-upload/js/jquery.fileupload-angular.js',
-
-				'public/lib/lobipanel/dist/js/lobipanel.min.js'
+				'public/lib/blueimp-file-upload/js/jquery.fileupload-angular.js'
 			]
 		},
 		css: 'public/dist/application.min.css',

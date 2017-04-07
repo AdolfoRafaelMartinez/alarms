@@ -51,7 +51,7 @@ describe('User Model Unit Tests:', function () {
 			user.save(done)
 		})
 
-		it('should fail to save an existing user again', function (done) {
+		it.skip('should fail to save an existing user again', function (done) {
 			user.save()
 			return user2.save(function (err) {
 				should.exist(err)
