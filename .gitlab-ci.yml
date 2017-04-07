@@ -26,15 +26,18 @@ stages:
 
 build:
     stage: build
-    script: grunt build
+    script: 
+        - yarn install --ignore-engines
+        - grunt build
     environment:
         name: production
 
 deploy_staging:
     stage: deploy
     script:
+        - yarn install --ignore-engines
         - grunt build
-        - echo 'scp ' + `ls dist/`
+        - ls dist/
     environment:
         name: test
         url: https://pjtest.signalforest.com

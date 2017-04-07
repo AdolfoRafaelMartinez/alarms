@@ -3,7 +3,6 @@ const _ = require('lodash')
 var applicationConfiguration = require('./config/config')
 
 module.exports = function (config) {
-	console.log(_.filter(applicationConfiguration.assets.lib.js.concat(applicationConfiguration.assets.js, applicationConfiguration.assets.tests)))
 	config.set({
 		// Frameworks to use
 		frameworks: ['jasmine'],
