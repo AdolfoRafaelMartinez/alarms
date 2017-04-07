@@ -1,7 +1,7 @@
-'use strict';
+'use strict'
 
 module.exports = {
-	db: process.env.MONGOHQ_URL || process.env.MONGOLAB_URI || 'mongodb://' + (process.env.DB_1_PORT_27017_TCP_ADDR || 'localhost') + '/puddlejump',
+	db: 'mongodb://localhost/puddlejump',
 	assets: {
 		lib: {
 			css: [
@@ -25,21 +25,21 @@ module.exports = {
 				'public/lib/angular-sanitize/angular-sanitize.js',
 				'public/lib/angular-ui-router/release/angular-ui-router.js',
 				'public/lib/angular-ui-utils/ui-utils.js',
-        'public/lib/angular-bootstrap/ui-bootstrap-tpls.js',
-        'public/lib/easeljs/lib/easeljs-NEXT.combined.js',
-        'public/lib/caman/dist/caman.full.min.js',
+				'public/lib/angular-bootstrap/ui-bootstrap-tpls.js',
+				'public/lib/easeljs/lib/easeljs-NEXT.combined.js',
+				'public/lib/caman/dist/caman.full.min.js',
 
-        'public/lib/angular-dragdrop/src/angular-dragdrop.min.js',
-        'public/lib/angular-modal-service/dst/angular-modal-service.min.js',
+				'public/lib/angular-dragdrop/src/angular-dragdrop.min.js',
+				'public/lib/angular-modal-service/dst/angular-modal-service.min.js',
 
-        'public/lib/blueimp-file-upload/js/vendor/jquery.ui.widget.js',
-        'public/lib/blueimp-load-image/js/load-image.all.min.js',
-        'public/lib/blueimp-canvas-to-blob/js/canvas-to-blob.min.js',
-        'public/lib/blueimp-file-upload/js/jquery.fileupload.js',
-        'public/lib/blueimp-file-upload/js/jquery.fileupload-process.js',
-        'public/lib/blueimp-file-upload/js/jquery.fileupload-image.js',
-        'public/lib/blueimp-file-upload/js/jquery.fileupload-validate.js',
-        'public/lib/blueimp-file-upload/js/jquery.fileupload-angular.js',
+				'public/lib/blueimp-file-upload/js/vendor/jquery.ui.widget.js',
+				'public/lib/blueimp-load-image/js/load-image.all.min.js',
+				'public/lib/blueimp-canvas-to-blob/js/canvas-to-blob.min.js',
+				'public/lib/blueimp-file-upload/js/jquery.fileupload.js',
+				'public/lib/blueimp-file-upload/js/jquery.fileupload-process.js',
+				'public/lib/blueimp-file-upload/js/jquery.fileupload-image.js',
+				'public/lib/blueimp-file-upload/js/jquery.fileupload-validate.js',
+				'public/lib/blueimp-file-upload/js/jquery.fileupload-angular.js',
 
 				'public/lib/lobipanel/dist/js/lobipanel.min.js'
 			]
@@ -82,4 +82,4 @@ module.exports = {
 			}
 		}
 	}
-};
+}

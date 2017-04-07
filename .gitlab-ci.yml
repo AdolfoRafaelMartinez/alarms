@@ -7,21 +7,46 @@ image: node:latest
 # Only needed when using a docker container to run your tests in.
 # Check out: http://docs.gitlab.com/ce/ci/docker/using_docker_images.html#what-is-service
 services:
-  - mongo:latest
+    - mongo:latest
 
-# This folder is cached between builds
-# http://docs.gitlab.com/ce/ci/yaml/README.html#cache
+      # This folder is cached between builds
+      # http://docs.gitlab.com/ce/ci/yaml/README.html#cache
 cache:
-  paths:
-  - node_modules/
+    paths:
+        - node_modules/
 
 test_async:
-  script:
-   - yarn --ignore-engines
-   - grunt build
-   #- node ./specs/start.js ./specs/async.spec.js
+    script:
+        #- node ./specs/start.js ./specs/async.spec.js
 
-#test_db:
-#  script:
-#   - npm install
-   #- node ./specs/start.js ./specs/db-postgres.spec.js
+stages:
+    - build
+    - deploy
+
+build:
+    stage: build
+    script: grunt build
+    environment:
+        name: production
+
+deploy_staging:
+    stage: deploy
+    script:
+        - grunt build
+        - echo 'scp ' + `ls dist/`
+    environment:
+        name: test
+        url: https://pjtest.signalforest.com
+    only:
+        - qa
+
+deploy_prod:
+    stage: deploy
+    script:
+        - echo "Deploying to production"
+    environment:
+        name: production
+        url: https://pj.signalforest.com
+    when: manual
+    only:
+        - master
