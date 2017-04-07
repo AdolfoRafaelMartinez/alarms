@@ -138,7 +138,7 @@ exports.delete = function (req, res) {
  * List of Projects
  */
 exports.list = function (req, res) {
-	let query
+	var query
 	if (req.query.buildingId) {
 		let search = {
 			'sites.buildings._id': req.query.buildingId

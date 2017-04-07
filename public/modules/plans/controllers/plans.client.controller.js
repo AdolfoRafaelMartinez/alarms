@@ -487,7 +487,8 @@ angular.module('plans')
 				})
 			}
 
-			$scope.showSettings = function (item) {
+			$scope.showSettings = function (item, $event) {
+				$event.stopPropagation()
 				ModalService.showModal({
 					templateUrl: 'settingsModal.html',
 					controller: 'settingsModalController',
