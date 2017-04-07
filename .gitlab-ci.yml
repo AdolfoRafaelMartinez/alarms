@@ -16,6 +16,7 @@ cache:
         - node_modules/
 
 test_async:
+    stage: build
     script:
         - npm test
 
