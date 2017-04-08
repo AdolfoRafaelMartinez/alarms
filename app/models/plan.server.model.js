@@ -8,9 +8,8 @@ const PlanSchema = new Schema({
 	},
 	title: {
 		type: String,
-		default: 'new plan',
-		trim: true,
-		required: 'Title cannot be blank'
+		default: 'untitled',
+		trim: true
 	},
 	floor: {
 		type: String
