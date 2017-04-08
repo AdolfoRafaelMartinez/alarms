@@ -1,75 +1,131 @@
-<md-list>
-    <md-item>
-        <div flex="10" class="side-details">
-            <div class="pull-right">
-                <a href ng-click="plan_properties = !plan_properties"><ng-md-icon icon="settings"></ng-md-icon></a><br />
-                <a href ng-click="report()"><i class="glyphicon glyphicon-save-file large"></i></a>
-            </div>
-            {{ plan.details.client.name || '(project details not set)' }}<br />
-            <span>Project:</span> {{ plan.details.project }}<br />
-            <span>Site:</span> {{ plan.details.site }}<br />
-            <div ng-if="plan.details.address">
-                {{ plan.details.address }}<br />
-                {{ plan.details.city }}, {{ plan.details.zipcode }}<br />
-            </div>
-            <span>Floor:</span> {{ plan.floor || 'N/A' }}<br />
-            <span>AP count:</span> {{ getTotalAPs() }}
-        </div>
-        <div flex="10">
-            <input type="text" required ng-model="flooplan_name" />
-            <md-button ng-click="savePlan()" aria-label="Save plan"><ng-md-icon icon="{{ icons.save }}"></ng-md-icon> <span>Save</span></md-button>
-        </div>
-    </md-item>
-    <md-item>
-        <div flex="10">
-            <form id="fileupload" action="/upload" method="POST" enctype="multipart/form-data" data-ng-controller="pjFileUploadController" data-file-upload="options" data-ng-class="{'fileupload-processing': processing() || loadingFiles}">
-                <span class="btn btn-success fileinput-button" ng-class="{disabled: disabled}">
-                    <i class="glyphicon glyphicon-plus"></i>
-                    <span>Upload Floorplan...</span>
-                    <input type="file" name="files[]" multiple ng-disabled="disabled">
-                </span>
-                <div class="col-lg-12 fade" data-ng-class="{in: active()}">
-                    <br />
-                    <!-- The global progress bar -->
-                    <div class="progress progress-striped active" data-file-upload-progress="progress()"><div class="progress-bar progress-bar-success" data-ng-style="{width: num + '%'}"></div></div>
-                    <!-- The extended global progress state -->
-                    <div class="progress-extended">&nbsp;</div>
-                </div>
-                <strong data-ng-show="file.error" class="error text-danger">{{file.error}}</strong>
-            </form>
-        </div>
-    </md-item>
-    <md-item>
-        <div flex="10">
-            <div>
-                <h4>Tools:</h4>
-                <hr />
-                <md-button ng-click="show_walls=false; selectTool('pan')" aria-label="pan-tool"><ng-md-icon icon="{{ icons.pan }}"></ng-md-icon></md-button>
-                <md-button ng-click="show_walls=false; selectTool('ap')" aria-label="ap-placement-tool"><ng-md-icon icon="{{ icons.ap }}"></ng-md-icon></md-button>
-                <md-button ng-click="show_walls= true; selectTool('wall')" aria-label="wall-placement-tool"><ng-md-icon icon="{{ icons.wall }}"></ng-md-icon></md-button>
-                <div ng-show="show_walls">
-                    Wall type: <md-select role="application" ng-model="wall_type" ng-change="selectWallType()">
-                        <md-option ng-value="wall_id" ng-repeat="(wall_id, wall_type) in wall_types">{{ wall_type.desc }}</md-option>
-                    </md-select>
-                </div>
-                <h4>Show:</h4>
-                <hr />
-                <div flex="10">
-                    <md-switch flex ng-model="settings.show_distances" ng-change="toggleDistances()" aria-label="Show Distances">Distances</md-switch>
-                </div>
-                <div flex="10">
-                    <md-switch flex ng-model="settings.show_overlaps" ng-change="toggleOverlaps()" aria-label="Show Overlaps">Overlaps</md-switch>
-                </div>
-                <div flex="10">
-                    <md-switch flex ng-model="settings.show_heatmap" ng-change="toggleHeatmap()" aria-label="Print View">Print View</md-switch>
-                </div>
-            </div>
-        </div>
-    </md-item>
-    <md-item ng-repeat="it in ul.layers">
-        <md-button ng-click="ul.selectLayer(it)" ng-class="{'selected' : it === ul.selected }">
-            <md-icon md-svg-icon="{{it.icon}}" class="avatar"></md-icon>
-            {{it.name}}
-        </md-button>
-    </md-item>
-</md-list>
+<uib-accordion close-others="false">
+
+	<!-- Details -->
+	<uib-accordion-group class="panel-default" is-open="sma.details">
+		<uib-accordion-heading>
+			Details <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': sma.details, 'glyphicon-chevron-right': !sma.details}"></i>
+		</uib-accordion-heading>
+
+		<div class="pull-right">
+			<a href ng-click="plan_properties = !plan_properties"><ng-md-icon icon="settings"></ng-md-icon></a><br />
+		</div>
+		{{ plan.details.client.name || '(project details not set)' }}<br />
+		<span>Project:</span> {{ plan.details.project }}<br />
+		<span>Site:</span> {{ plan.details.site }}<br />
+
+		<div ng-if="plan.details.address">
+			{{ plan.details.address }}<br />
+			{{ plan.details.city }}, {{ plan.details.zipcode }}<br />
+		</div>
+
+		<span>Floor:</span> {{ plan.floor || 'N/A' }}<br />
+		<span> Vendor (Aruba / Cisco / Aeorhive / Ruckus)</span><br />
+		<span>AP count:</span> {{ getTotalAPs() }}<br />
+		<span>AM count:</span> {{ getTotalAMs() }}
+
+		<uib-accordion-group class="panel-inner" is-open="apgroups.open">
+			<uib-accordion-heading>
+				AP/AM Groups <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': apgroups.open, 'glyphicon-chevron-right': !apgroups.open}"></i>
+			</uib-accordion-heading>
+			<div>
+				AP Group 1: (APcount1)
+				<p />
+				<p /> AP Group 2: (APcount2)
+				<p /> AM Group 1: (AMcount1)
+			</div>
+		</uib-accordion-group>
+
+	</uib-accordion-group>
+
+	<!-- Floorplan -->
+	<uib-accordion-group class="panel-default" is-open="sma.plan">
+		<uib-accordion-heading>
+			Floorplan <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': sma.plan, 'glyphicon-chevron-right': !sma.plan}"></i>
+		</uib-accordion-heading>
+		<div class="tools" data-ng-controller="pjFileUploadController">
+
+			<form class="actionf" id="fileupload" action="/upload" method="POST" enctype="multipart/form-data" data-file-upload="options" data-ng-class="{'fileupload-processing': processing() || loadingFiles}">
+
+				<button class="fileinput-button" ng-class="{disabled: disabled}">
+					<i class="glyphicon large glyphicon-cloud-upload"></i>
+					<span>Upload</span>
+					<input type="file" name="files[]" multiple ng-disabled="disabled">
+				</button>
+
+			</form>
+
+			<div class="actionf">
+				<input type="text" ng-model="plan.floor" class="elem elem-green input" value="1"><br>
+				Floor #
+			</div>
+			<button class="actionf">
+				<i class="glyphicon large glyphicon-floppy-save"></i>
+				Save
+			</button>
+
+			<div class="full fade clear" data-ng-class="{in: active()}">
+				<br />
+				<!-- The global progress bar -->
+				<div class="progress progress-striped active" data-file-upload-progress="progress()">
+					<div class="progress-bar progress-bar-success" data-ng-style="{width: num + '%'}"></div>
+				</div>
+				<!-- The extended global progress state -->
+				<div class="progress-extended">&nbsp;</div>
+			</div>
+			<strong data-ng-show="file.error" class="error text-danger">{{file.error}}</strong>
+		</div>
+	</uib-accordion-group>
+
+	<!-- Tools -->
+	<uib-accordion-group class="panel-default" is-open="sma.tools">
+		<uib-accordion-heading>
+			Tools <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': sma.tools, 'glyphicon-chevron-right': !sma.tools}"></i>
+		</uib-accordion-heading>
+		<div class="tools">
+			<div class="action">
+				<md-button ng-click="show_walls=false; selectTool('pan')" aria-label="pan-tool">
+					<ng-md-icon icon="{{ icons.pan }}"></ng-md-icon>
+					Move
+				</md-button>
+			</div>
+			<div class="action">
+				<md-button ng-click="show_walls=false; selectTool('ap')" aria-label="ap-placement-tool">
+					<img src="modules/plans/images/icons/AP-W.png" />
+					AP
+				</md-button>
+			</div>
+			<div class="action">
+				<md-button ng-click="show_walls=false; selectTool('am')" aria-label="am-placement-tool">
+					<img src="modules/plans/images/icons/AM-W.png">
+					AM
+				</md-button>
+			</div>
+			<div class="action">
+				<md-button ng-click="show_walls=false; selectTool('mdf')" aria-label="mdf-placement-tool">
+					<img src="modules/plans/images/icons/MDFIDF-W.png">
+					IDF
+				</md-button>
+			</div>
+			<div class="action" ng-if="walls">
+				<md-button ng-click="show_walls= true; selectTool('wall')" aria-label="wall-placement-tool">
+					<img src="modules/plans/images/icons/MDFIDF-W.png">
+				</md-button>
+			</div>
+			<div ng-show="show_walls">
+				Wall type: 
+				<md-select role="application" ng-model="wall_type" ng-change="selectWallType()">
+					<md-option ng-value="wall_id" ng-repeat="(wall_id, wall_type) in wall_types">{{ wall_type.desc }}</md-option>
+				</md-select>
+			</div>
+		</div>
+	</uib-accordion-group>
+
+	<!-- Reporting -->
+	<uib-accordion-group class="panel-default" is-open="sma.reporting">
+		<uib-accordion-heading>
+			Reporting <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': sma.reporting, 'glyphicon-chevron-right': !sma.reporting"></i>
+		</uib-accordion-heading>
+		<button class="btn btn-success full text-justify" ng-click="report()"><i class="glyphicon glyphicon-save-file"></i> Generate Report</button>
+	</uib-accordion-group>
+</uib-accordion>
+
