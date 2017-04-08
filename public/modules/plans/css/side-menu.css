@@ -82,13 +82,13 @@ md-sidenav .actionf input {
 	margin-top: 7px;
 }
 
-md-sidenav .action i, img {
+md-sidenav .action img {
 	padding-bottom: 10px;
 	width: 40px;
 	display: block;
 }
 
-md-sidenav .actionf i, img {
+md-sidenav .actionf img {
 	padding-bottom: 10px;
 }
 
