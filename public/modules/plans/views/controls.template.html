@@ -37,6 +37,19 @@
 		</div>
 	</div>
 
+	<div>
+		<div>Show:</div>
+		<div flex="10">
+			<md-switch flex ng-model="settings.show_distances" ng-change="toggleDistances()" aria-label="Show Distances">Distances</md-switch>
+		</div>
+		<div flex="10">
+			<md-switch flex ng-model="settings.show_overlaps" ng-change="toggleOverlaps()" aria-label="Show Overlaps">Overlaps</md-switch>
+		</div>
+		<div flex="10">
+			<md-switch flex ng-model="settings.show_heatmap" ng-change="toggleHeatmap()" aria-label="Print View">Print View</md-switch>
+		</div>
+	</div>
+
 	<div class="floors">
 		<div> <a href ng-click="newPlan()"> <i class="glyphicon glyphicon-plus"></i> <small>Add Floor</small> </a> </div>
 		<div ng-repeat="p in plans" ng-class="{'shadowItem': p != plan}" ng-click="showPlan(p)">

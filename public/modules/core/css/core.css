@@ -31,6 +31,9 @@ header {
 	border: 1px solid #222;
 }
 
+.clear {
+	clear: both;
+}
 
 .navbar-inverse {
   background-image: linear-gradient(to bottom, #1c2331 0%, #000 100%);

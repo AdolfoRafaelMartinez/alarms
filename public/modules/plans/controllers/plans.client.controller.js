@@ -66,6 +66,13 @@ angular.module('plans')
 			}
 			Drawing.setupMenu($scope.menu)
 
+			$scope.sma = {
+				details: true,
+				plan: true,
+				tools: true,
+				reporting: true
+			}
+
 			$scope.closeMenu = function () {
 				contextMenu.close()
 				delete $scope.ap
