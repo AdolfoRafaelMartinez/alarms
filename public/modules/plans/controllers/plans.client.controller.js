@@ -494,19 +494,28 @@ angular.module('plans')
 				})
 			}
 
-			$scope.showSettings = function (item, $event) {
+			$scope.showSettings = function (type, item, $event) {
 				$event.stopPropagation()
+				if (type === 'site') $scope.selectSite(item)
+				if (type === 'project') $scope.selectProject(item)
 				ModalService.showModal({
-					templateUrl: 'settingsModal.html',
+					templateUrl: 'modules/plans/views/settings.modal.html',
 					controller: 'settingsModalController',
-					inputs: { item: item }
+					inputs: { item: item, type: type, project: $scope.selected.project }
 				})
 					.then(function (modal) {
 						modal.element.modal()
-						modal.close.then(function (save) {
-							if (save) {
-								console.log('SAVE')
+						/*
+						modal.element.on('hidden.bs.modal', () => {
+							if (!modal.controller.closed) {
+								$scope.selected.project.$update(project => {
+									$scope.selected.project = project
+								})
 							}
+						})
+						*/
+						modal.close.then(function (project) {
+							$scope.selected.project = project
 						})
 					})
 			}

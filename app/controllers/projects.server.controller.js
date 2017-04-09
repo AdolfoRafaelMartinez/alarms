@@ -6,6 +6,7 @@ const Q        = require('q')
 
 const errorHandler = require('./errors.server.controller')
 const Project = mongoose.model('Project')
+const Plan = mongoose.model('Plan')
 
 function saveThumb (thumb, pid) {
 	if (!thumb) return Q.resolve({})
@@ -94,12 +95,31 @@ exports.update = function (req, res) {
 			project_data.screenshot = pic.file
 			project = _.extend(project, project_data)
 			_.each(project.sites, site => {
+				_.set(site, 'details.project', project.title)
+				site.details.client = project.details.client
+				if (!_.get(site, 'details.msp.name')) _.set(site, 'details.msp', project.details.msp)
+				if (!_.get(site, 'details.designer.name')) _.set(site, 'details.designer', project.details.designer)
 				if (!site._id) site._id = mongoose.Types.ObjectId().toString()
 				_.each(site.buildings, b => {
 					if (!b._id) b._id = mongoose.Types.ObjectId().toString()
 				})
+				_.each(site.buildings, bldg => {
+					_.set(bldg, 'details.project', project.title)
+					bldg.details.site = site.name
+					bldg.details.client = project.details.client
+					if (!_.get(bldg, 'details.msp.name')) _.set(bldg, 'details.msp', project.details.msp)
+					if (!_.get(bldg, 'details.designer.name')) _.set(bldg, 'details.designer', project.details.designer)
+					_.each(bldg.plans, plan => {
+						Plan.findOneAndUpdate({_id: plan._id}, {$set: {
+							'details.project': project.title,
+							'details.site': site.name,
+							'details.building': bldg.name,
+							'details.client': project.details.client
+						}}).exec()
+					})
+				})
 			})
-			return project.save(function (err) {
+			Project.findOneAndUpdate({_id: project._id}, project).exec(err => {
 				if (err) {
 					return res.status(400).send({
 						message: errorHandler.getErrorMessage(err)
@@ -110,6 +130,7 @@ exports.update = function (req, res) {
 			})
 		})
 		.catch(err => {
+			console.dir(err)
 			res.status(500).send({
 				message: errorHandler.getErrorMessage(err),
 				err: err

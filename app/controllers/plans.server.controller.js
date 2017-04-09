@@ -112,7 +112,7 @@ exports.update = function (req, res) {
 				plan_data.print = pics.print
 			}
 			plan = _.extend(plan, plan_data)
-			return plan.save(function (err) {
+			Plan.findOneAndUpdate({_id: plan._id}, plan).exec(err => {
 				if (err) {
 					return res.status(400).send({
 						message: errorHandler.getErrorMessage(err)

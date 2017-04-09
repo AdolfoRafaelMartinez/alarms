@@ -1,0 +1,269 @@
+<div class="modal fade">
+	<div class="modal-dialog settings">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" ng-click="close('Cancel')" data-dismiss="modal" aria-hidden="true"><i class="glyphicon glyphicon-remove"></i></button>
+				<h2 class="modal-title">{{ item.name || item.title }} - Settings</h2>
+			</div>
+			<div class="modal-body">
+				<uib-accordion close-others="false">
+
+					<!-- Item Details -->
+					<uib-accordion-group class="panel-default" is-open="sma.details">
+						<uib-accordion-heading>
+							Details <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': sma.details, 'glyphicon-chevron-right': !sma.details}"></i>
+						</uib-accordion-heading>
+
+						<div class="form-group" ng-if="!pp_edit['details']">
+							<div class="clickable list-group-item" ng-click="toggleEdit('details')">
+								<div><span>Client:</span> <em ng-bind="item.details.client.name"></em></div>
+								<div ng-if="item.details.client.logo" class="small-logo">
+									<img ng-src="{{ item.details.client.logo }}" />
+								</div>
+								<div ng-if="type === 'project'"><span>Project:</span> <em ng-bind="item.title"></em></div>
+								<div ng-if="type != 'project'"><span>Project:</span> <em ng-bind="item.details.project"></em></div>
+
+								<div ng-if="type === 'site'"><span>Site:</span> <em ng-bind="item.name"></em></div>
+								<div ng-if="type === 'bldg'"><span>Site:</span> <em ng-bind="item.details.site"></em></div>
+
+								<div ng-if="type === 'bldg'"><span>Building:</span> <em ng-bind="item.name"></em></div>
+
+								<div ng-if="type != 'project'">
+									<span>Address:</span> <em ng-bind="item.details.address"></em>
+									<em ng-bind="item.details.city"></em> <em ng-bind="item.details.state"></em> <em ng-bind="item.details.zipcode"></em>
+								</div>
+								<div>
+									<span>MSP:</span> <em ng-bind="item.details.msp.name"></em>
+									<div ng-if="item.details.msp.logo">
+										<img ng-src="{{ item.details.msp.logo }}" class="small-logo" />
+									</div>
+								</div>
+								<div>
+									<span>Designer:</span> <em ng-bind="item.details.designer.name"></em>
+									<span ng-if="item.details.designer.position">, <em ng-bind="item.details.designer.position"></em> </span>
+								</div>
+							</div>
+						</div>
+						<div ng-show="pp_edit['details']" class="item-property-item">
+							<div class="form-group row">
+								<label class="col-sm-2 ptop5 text-right form-control-label">Client</label>
+								<div class="col-sm-10"><input type="text" ng-readonly="type !== 'project'" ng-model="item.details.client.name" class="form-control" placeholder="client name ..." /></div>
+							</div>
+							<div class="form-group row">
+								<label class="col-sm-2 ptop5 text-right form-control-label">Client Logo</label>
+								<div class="col-sm-10"><input type="text" ng-readonly="type !== 'project'" ng-model="item.details.client.logo" class="form-control" placeholder="Client logo URL ..." /></div>
+							</div>
+							<div class="form-group row" ng-if="type === 'project'">
+								<label class="col-sm-2 ptop5 text-right form-control-label">Project</label>
+								<div class="col-sm-10"><input type="text" ng-model="item.title" class="form-control" placeholder="project ..." /></div>
+							</div>
+							<div class="form-group row" ng-if="type === 'site'">
+								<label class="col-sm-2 ptop5 text-right form-control-label">Site</label>
+								<div class="col-sm-10"><input type="text" ng-model="item.name" class="form-control" placeholder="site ..." /></div>
+							</div>
+							<div class="form-group row" ng-if="type === 'bldg'">
+								<label class="col-sm-2 ptop5 text-right form-control-label">Building</label>
+								<div class="col-sm-10"><input type="text" ng-model="item.name" class="form-control" placeholder="building ..." /></div>
+							</div>
+							<div class="form-group row" ng-if="type === 'bldg'">
+								<label class="col-sm-2 ptop5 text-right form-control-label">Address</label>
+								<div class="col-sm-10"><input type="text" ng-model="item.details.address" class="form-control" placeholder="address"/></div>
+							</div>
+							<div class="form-group row" ng-if="type === 'bldg'">
+								<div class="col-sm-offset-2 col-sm-4"><input type="text" ng-model="item.details.city" class="form-control" placeholder="city" /></div>
+								<div class="col-sm-3"><input type="text" ng-model="item.details.state" class="form-control" placeholder="state" /></div>
+								<div class="col-sm-3"><input type="text" ng-model="item.details.zipcode" class="form-control" placeholder="zipcode" /></div>
+							</div>
+
+							<div class="form-group row">
+								<label class="col-sm-2 ptop5 text-right form-control-label">MSP</label>
+								<div class="col-sm-10"><input type="text" ng-model="item.details.msp.name" class="form-control" placeholder="MSP name"/></div>
+							</div>
+							<div class="form-group row">
+								<label class="col-sm-2 ptop5 text-right form-control-label">MSP logo</label>
+								<div class="col-sm-10"><input type="text" ng-model="item.details.msp.logo" class="form-control" placeholder="MSP logo URL (gif, jpg, png)"/></div>
+							</div>
+							<div class="form-group row">
+								<label class="col-sm-2 ptop5 text-right form-control-label">Designer</label>
+								<div class="col-sm-10"><input type="text" ng-model="item.details.designer.name" class="form-control" placeholder="Designer name"/></div>
+							</div>
+							<div class="form-group row">
+								<label class="col-sm-2 ptop5 text-right form-control-label">Designer position</label>
+								<div class="col-sm-10"><input type="text" ng-model="item.details.designer.position" class="form-control" placeholder="Designer position"/></div>
+							</div>
+							<div class="col-lg-12">
+								<div class="form-group row">
+									<div class="col-sm-offset-2 col-sm-10">
+										<button type="submit" class="btn btn-primary" ng-click="save();">Save</button>
+										<button type="submit" class="btn btn-default pull-right" ng-click="toggleEdit('details')">Cancel</button>
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</uib-accordion-group>
+
+					<!-- Item Contacts -->
+					<uib-accordion-group class="panel-default" is-open="sma.contacts">
+						<uib-accordion-heading>
+							Contacts 
+							<a href ng-click="addContact($event)"> <i class="glyphicon glyphicon-plus-sign"></i> </a>
+							<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': sma.contacts, 'glyphicon-chevron-right': !sma.contacts}"></i>
+						</uib-accordion-heading>
+
+						<div class="form-group row contacts" ng-hide="pp_edit['contacts']">
+							<div class="col-lg-12">
+								<div class="col-lg-3 clickable list-group-item" ng-repeat="(contactIndex, contact) in item.details.contacts" ng-click="toggleEdit('contacts', contact)">
+									<div class="topright text-right">
+										<a href ng-click="askDeleteContact(contactIndex, $event)">
+											<i class="glyphicon glyphicon-remove"></i>
+										</a>
+									</div>
+									<div class="form-group">
+										<div>
+											<span>Type:</span> <em ng-bind="contact.type"></em>
+										</div>
+										<div><span>Name:</span> <em ng-bind="contact.name"></em></div>
+										<div><span>Position:</span> <em ng-bind="contact.position"></em></div>
+										<div><span>Phone:</span> <em ng-bind="contact.phone"></em></div>
+										<div><span>Email:</span> <em ng-bind="contact.email"></em></div>
+									</div>
+								</div>
+								<div class="form-group col-log-12" ng-if="!item.details.contacts.length">
+									<i>Please add some contacts.</i>
+								</div>
+							</div>
+						</div>
+
+						<div class="form-group edit-contact" ng-show="pp_edit['contacts']">
+							<form>
+								<div class="col-lg-12 plan-property-item">
+									<div class="form-group row">
+										<label class="col-sm-2 ptop5 text-right form-control-label">Type</label>
+										<div class="col-sm-10"><input type="text" ng-model="edit_prop.type" class="form-control" placeholder="site contact, installer, etc..."/></div>
+									</div>
+									<div class="form-group row">
+										<label class="col-sm-2 ptop5 text-right form-control-label">Contact</label>
+										<div class="col-sm-10"><input type="text" ng-model="edit_prop.name" class="form-control" placeholder="Name"/></div>
+									</div>
+									<div class="form-group row">
+										<label class="col-sm-2 ptop5 text-right form-control-label">Position</label>
+										<div class="col-sm-10"><input type="text" ng-model="edit_prop.position" class="form-control" placeholder="Position"/></div>
+									</div>
+									<div class="form-group row">
+										<label class="col-sm-2 ptop5 text-right form-control-label">Phone</label>
+										<div class="col-sm-10"><input type="text" ng-model="edit_prop.phone" class="form-control" placeholder="Phone"/></div>
+									</div>
+									<div class="form-group row">
+										<label class="col-sm-2 ptop5 text-right form-control-label">Email</label>
+										<div class="col-sm-10"><input type="text" ng-model="edit_prop.email" class="form-control" placeholder="Email"/></div>
+									</div>
+									<div class="form-group row">
+										<div class="col-sm-offset-2 col-sm-10">
+											<button type="submit" class="btn btn-primary" ng-click="saveContact();">Save</button>
+											<button class="btn btn-default pull-right" ng-click="toggleEdit('contacts')">Cancel</button>
+										</div>
+									</div>
+								</div>
+							</form>
+						</div>
+					</uib-accordion-group>
+
+					<!-- Item WiFi -->
+					<uib-accordion-group class="panel-default" is-open="sma.wifi" ng-if="type === 'bldg'">
+						<uib-accordion-heading>
+							WiFi Details 
+							<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': sma.wifi, 'glyphicon-chevron-right': !sma.wifi}"></i>
+						</uib-accordion-heading>
+
+						<div class="form-group row" ng-hide="pp_edit['controllers']" ng-click="toggleEdit('controllers')">
+							<div class="col-lg-12">
+								<div class="col-lg-3 clickable list-group-item" ng-repeat="(ctrlIndex, ctrl) in item.details.controllers">
+									<div class="topright text-right">
+										<a href ng-click="removeController(ctrlIndex)" style="padding-left: 1em;">
+											<i class="glyphicon glyphicon-remove"></i>
+										</a>
+									</div>
+									<div class="form-group">
+										<div>
+											<span>Country Code:</span> <em ng-bind="ctrl.country"></em>
+										</div>
+
+										<div><span>Model:</span> <em ng-bind="ctrl.model"></em></div>
+										<div><span>Description:</span> <em ng-bind="ctrl.description"></em></div>
+										<div><span>HA:</span>
+											<span ng-if="ctrl.ha"><i class="glyphicon glyphicon-ok-circle green"></i></span>
+											<span ng-if="!ctrl.ha"><i class="glyphicon glyphicon-remove-circle red"></i></span>
+										</div>
+										<div><span>AP/AM Licenses:</span> <span ng-bind="ctrl.lic.ap.qty"></span></div>
+										<div><span>PEFNG License:</span>
+											<span ng-if="item.details.lic.pefng"><i class="glyphicon glyphicon-ok-circle green"></i></span>
+											<span ng-if="!item.details.lic.pefng"><i class="glyphicon glyphicon-remove-circle red"></i></span>
+										</div>
+										<div><span>RFP License:</span>
+											<span ng-if="item.details.lic.rfp"><i class="glyphicon glyphicon-ok-circle green"></i></span>
+											<span ng-if="!item.details.lic.rfp"><i class="glyphicon glyphicon-remove-circle red"></i></span>
+										</div>
+									</div>
+									<div ng-if="!item.details.controllers.length">No controllers.</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="form-group edit-contact" ng-show="pp_edit['controllers']">
+							<form>
+								<div class="col-lg-12 plan-property-item">
+									<div class="form-group row">
+										<label class="col-sm-6 ptop5 text-right form-control-label">Country Code</label>
+										<div class="col-sm-6"><input type="text" ng-model="edit_prop.country" class="form-control" placeholder="US / CA / JP etc..."/></div>
+									</div>
+									<div class="form-group row">
+										<label class="col-sm-6 ptop5 text-right form-control-label">Model</label>
+										<div class="col-sm-6"><input type="text" ng-model="edit_prop.model" class="form-control" placeholder="Model"/></div>
+									</div>
+									<div class="form-group row">
+										<label class="col-sm-6 ptop5 text-right form-control-label">Description</label>
+										<div class="col-sm-6"><input type="text" ng-model="edit_prop.description" class="form-control" placeholder="Description..."/></div>
+									</div>
+									<div class="form-group row">
+										<div class="col-sm-6 text-right"><label class="form-control-label">HA</label></div>
+										<div class="col-sm-6">
+											<md-switch aria-label="HA" ng-model="edit_prop.ha">HA</md-switch>
+										</div>
+									</div>
+									<div class="form-group row">
+										<label class="col-sm-6 text-right form-control-label">AP/AM spares</label>
+										<div class="col-sm-6"><input type="number" ng-model="edit_prop.lic.ap.spares" class="form-control tight" placeholder="qty" /></div>
+									</div>
+									<div class="form-group row">
+										<div class="col-sm-6 text-right"><label class="form-control-label">PEFNG License?</label></div>
+										<div class="col-sm-6">
+											<md-switch aria-label="PEFNG licences" ng-model="item.details.lic.pefng">
+												{{ item.details.lic.pefng ? 'Yes' : 'No' }}
+											</md-switch>
+										</div>
+									</div>
+									<div class="form-group row">
+										<div class="col-sm-6 text-right"><label class="form-control-label">RFP License?</label></div>
+										<div class="col-sm-6">
+											<md-switch aria-label="RFP licences" ng-model="item.details.lic.rfp">
+												{{ item.details.lic.rfp ? 'Yes' : 'No' }}
+											</md-switch>
+										</div>
+									</div>
+									<div class="form-group row">
+										<div class="col-sm-offset-2 col-sm-10">
+											<button type="submit" class="btn btn-primary" ng-click="save();">Save</button>
+											<button class="btn btn-default pull-right" ng-click="toggleEdit('controllers')">Cancel</button>
+										</div>
+									</div>
+								</div>
+							</form>
+						</div>
+					</uib-accordion-group>
+				</uib-accordion>
+
+			</div>
+		</div>
+	</div>
+</div>
