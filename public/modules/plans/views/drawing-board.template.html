@@ -16,8 +16,9 @@
                 </div>
                 <div id="collapseClient" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="pp_client">
                     <div class="panel-body">
-                        <div class="form-group" ng-if="!pp_edit['client']">
+                        <div class="form-group client" ng-if="!pp_edit['client']">
                             <div class="clickable list-group-item" ng-click="toggleEdit('client')">
+								<div class="topright text-right"><i class="glyphicon glyphicon-edit"></i></div>
                                 <div><span>Client:</span> <em ng-bind="plan.details.client.name"></em></div>
                                 <div ng-if="plan.details.client.logo" class="small-logo">
                                     <img ng-src="{{ plan.details.client.logo }}" />

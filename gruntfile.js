@@ -271,6 +271,13 @@ module.exports = function (grunt) {
 						'server.js',
 						'node_modules'
 					]
+				}, {
+					expand: true,
+					flatten: true,
+					dest: 'dist/public/ss/',
+					src: [
+						'public/modules/core/img/none.jpg'
+					]
 				}]
 			},
 			ja: {

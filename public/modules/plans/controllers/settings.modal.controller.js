@@ -33,6 +33,7 @@ angular.module('plans')
 			}
 
 			$scope.saveContact = function () {
+				if (typeof $scope.item.details !== 'object') $scope.item.details = {}
 				if (!$scope.item.details.contacts) $scope.item.details.contacts = []
 				if (newContact.name) {
 					$scope.item.details.contacts.push(_.clone(newContact))

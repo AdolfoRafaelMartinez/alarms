@@ -7,7 +7,7 @@
 		</uib-accordion-heading>
 
 		<div class="pull-right">
-			<a href ng-click="plan_properties = !plan_properties"><ng-md-icon icon="settings"></ng-md-icon></a><br />
+			<a href ng-click="togglePlanProperties()"><ng-md-icon icon="settings"></ng-md-icon></a><br />
 		</div>
 		{{ plan.details.client.name || '(project details not set)' }}<br />
 		<span>Project:</span> {{ plan.details.project }}<br />
@@ -42,9 +42,9 @@
 		<uib-accordion-heading>
 			Floorplan <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': sma.plan, 'glyphicon-chevron-right': !sma.plan}"></i>
 		</uib-accordion-heading>
-		<div class="tools" data-ng-controller="pjFileUploadController">
+		<div class="tools">
 
-			<form class="actionf" id="fileupload" action="/upload" method="POST" enctype="multipart/form-data" data-file-upload="options" data-ng-class="{'fileupload-processing': processing() || loadingFiles}">
+			<form class="actionf" data-ng-controller="pjFileUploadController" id="fileupload" action="/upload" method="POST" enctype="multipart/form-data" data-file-upload="options" data-ng-class="{'fileupload-processing': processing() || loadingFiles}">
 
 				<button class="fileinput-button" ng-class="{disabled: disabled}">
 					<i class="glyphicon large glyphicon-cloud-upload"></i>

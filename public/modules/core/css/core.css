@@ -91,7 +91,7 @@ section > div > div {
     right: 0;
 }
 
-.topright .glyphicon-trash, .topright .glyphicon-remove {
+.topright .glyphicon {
     font-size: 19px;
     border-radius: 50%;
     background: #eee;
@@ -104,7 +104,7 @@ section > div > div {
     box-shadow: inset 1px 1px 6px rgba(0,0,80,0.4);
 }
 
-.topright .glyphicon-trash:hover, .topright .glyphicon-remove:hover {
+.topright .glyphicon:hover {
   color: #a88;
   background: #fef;
 }
