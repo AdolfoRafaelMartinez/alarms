@@ -83,31 +83,31 @@
 		</uib-accordion-heading>
 		<div class="tools">
 			<div class="action">
-				<md-button ng-click="show_walls=false; selectTool('pan')" aria-label="pan-tool">
+				<md-button ng-click="show_walls=false; selectTool('pan')" aria-label="pan-tool" ng-class="{'selected': mouse_mode === 'pan'}">
 					<ng-md-icon icon="{{ icons.pan }}"></ng-md-icon>
 					Move
 				</md-button>
 			</div>
 			<div class="action">
-				<md-button ng-click="show_walls=false; selectTool('ap')" aria-label="ap-placement-tool">
+				<md-button ng-click="show_walls=false; selectTool('ap')" aria-label="ap-placement-tool" ng-class="{'selected': mouse_mode === 'ap'}">
 					<img src="modules/plans/images/icons/AP-W.png" />
 					AP
 				</md-button>
 			</div>
 			<div class="action">
-				<md-button ng-click="show_walls=false; selectTool('am')" aria-label="am-placement-tool">
+				<md-button ng-click="show_walls=false; selectTool('am')" aria-label="am-placement-tool" ng-class="{'selected': mouse_mode === 'am'}">
 					<img src="modules/plans/images/icons/AM-W.png">
 					AM
 				</md-button>
 			</div>
 			<div class="action">
-				<md-button ng-click="show_walls=false; selectTool('mdf')" aria-label="mdf-placement-tool">
+				<md-button ng-click="show_walls=false; selectTool('idf')" aria-label="mdf-placement-tool" ng-class="{'selected': mouse_mode === 'idf'}">
 					<img src="modules/plans/images/icons/MDFIDF-W.png">
 					IDF
 				</md-button>
 			</div>
 			<div class="action" ng-if="walls">
-				<md-button ng-click="show_walls= true; selectTool('wall')" aria-label="wall-placement-tool">
+				<md-button ng-click="show_walls= true; selectTool('wall')" aria-label="wall-placement-tool" ng-class="{'selected': mouse_mode === 'wall'}">
 					<img src="modules/plans/images/icons/MDFIDF-W.png">
 				</md-button>
 			</div>

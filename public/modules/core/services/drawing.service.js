@@ -28,6 +28,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 		var mouseTarget // the display object currently under the mouse, or being dragged
 		var dragStarted // indicates whether we are currently in a drag operation
 		var mouse_mode = 'ap'
+		var mouse_prev_mode = 'ap'
 		var ap_clicked
 		var wall_clicked
 		var mouse_last_position
@@ -46,13 +47,20 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 				regX: 0,
 				regY: 0
 			},
-			ap_index: 1,
+			item_index: {
+				ap: 1,
+				am: 1,
+				idf: 1,
+				mdf: 1
+			},
 			stage_ppm: 300,
 			radius: 0,
 			real_radius: 0,
 			floor_width: 0,
 			floor_width_px: 0
 		}
+
+		var itemTypes = ['ap', 'am', 'idf', 'mdf']
 
 		var show_overlaps = true
 		var show_distances = true
@@ -62,18 +70,35 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 
 		var AP_CIRCLE_STROKE_RGB = '#888'
 		var AP_CIRCLE_RGBA = 'rgba(180, 220, 255, 0.6)'
-		var AP_CIRCLE_RGBA_OPAQUE = 'rgba(200, 200, 255, 0.2)'
-		var AP_TEXT_RGB = '#fff'
-		var AP_BUBBLE_RGB = 'rgba(0, 0, 100, 0.8)'
-		var DISTANCE_STROKE_RGB = '#444'
-		var DISTANCE_TEXT_RGB = '#aaa'
-		var DISTANCE_BUBBLE_RGB = '#fff'
-		var DISTANCE_CUT_OFF = 60
+		var TEXT_RGB = {
+			ap: '#fff',
+			am: '#fff',
+			idf: '#fff',
+			mdf: '#fff',
+			distance: '#aaa'
+		}
+		var BUBBLE_RGB = {
+			ap: 'rgba(0, 0, 100, 0.8)',
+			am: 'rgba(0, 100, 0, 0.5)',
+			idf: 'rgba(0, 100, 100, 0.8)',
+			mdf: 'rgba(100, 0, 0, 0.8)',
+			distance: '#fff'
+		}
+		var BUBBLE_RGBA_TRANSLUCENT = {
+			ap: 'rgba(200, 200, 255, 0.2)',
+			am: 'rgba(100, 200, 100, 0.5)',
+			idf: 'rgba(100, 200, 200, 0.2)',
+			mdf: 'rgba(200, 100, 100, 0.2)',
+		}
 		var HASH_COLOR = [
 			{ overlap: 21, color: 'rgba(255, 0, 0, 0.2)' },
 			{ overlap: 14, color: 'rgba(0, 255, 0, 0.2)' },
 			{ overlap: 0,  color: 'rgba(240, 255, 40, 0.2)' }
 		]
+		var DISTANCE_STROKE_RGB = '#444'
+		var DISTANCE_CUT_OFF = 60
+		var AM_VISUAL_RADIUS = 60
+		var AM_VISUAL_RADIUS_PRINT = 10
 
 		var tick = function (event) {
 			// this set makes it so the stage only re-renders when an event handler indicates a change has happened.
@@ -170,18 +195,41 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			}
 		}
 
-		function addBubble (text, color) {
+		function addBubble (text, itemType) {
+			var color = BUBBLE_RGB[itemType]
 			var bubble = new createjs.Shape()
 			var textBounds = text.getBounds()
-			bubble.graphics.beginFill(color).drawRoundRect(0, 0, textBounds.width + 10, textBounds.height + 10, 5, 5)
+			switch (itemType) {
+				case 'ap':
+				case 'distance':
+					bubble.graphics.beginFill(color).drawRoundRect(0, 0, textBounds.width + 10, textBounds.height + 10, 5, 5)
+					text.regX = textBounds.width / 2
+					text.regY = -15
+					bubble.regX = text.regX + 5
+					bubble.regY = -13 + textBounds.height
+					break
+
+				case 'am':
+					bubble.graphics.beginFill(color).drawCircle(0, 0, Math.max(textBounds.width, textBounds.height))
+					text.regX = textBounds.width / 2
+					text.regY = 0 - textBounds.height / 2 + 2
+					bubble.regX = 0
+					bubble.regY = 0
+					break
+
+				case 'idf':
+					bubble.graphics.beginFill(color).drawRoundRect(0, 0, AM_VISUAL_RADIUS_PRINT, AM_VISUAL_RADIUS_PRINT, 5, 5)
+					break
+
+				case 'mdf':
+					bubble.graphics.beginFill(color).drawRoundRect(0, 0, AM_VISUAL_RADIUS_PRINT, AM_VISUAL_RADIUS_PRINT, 5, 5)
+					break
+			}
+
 			bubble.x = text.x
 			bubble.y = text.y
 			bubble.scaleX = bubble.scaleY = text.scaleX
 			bubble.name = 'bubble'
-			text.regX = textBounds.width / 2
-			text.regY = -15
-			bubble.regX = text.regX + 5
-			bubble.regY = -13 + textBounds.height
 
 			return bubble
 		}
@@ -213,7 +261,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 						ap2.distances.push(c)
 						distances.addChild(c)
 
-						var text = new createjs.Text(d.toFixed(2) + ' ft', fontsize + 'px Arial', DISTANCE_TEXT_RGB)
+						var text = new createjs.Text(d.toFixed(2) + ' ft', fontsize + 'px Arial', TEXT_RGB['distance'])
 						text.x = c.p_start.x + (c.p_end.x - c.p_start.x) / 2 - 10
 						text.y = c.p_start.y + (c.p_end.y - c.p_start.y) / 2 - 10
 						text.textBaseline = 'alphabetic'
@@ -221,7 +269,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 						text.scaleX = text.scaleY = 100 / plan.stage_scale
 						c.ptext = text
 
-						var bubble = addBubble(text, DISTANCE_BUBBLE_RGB)
+						var bubble = addBubble(text, 'distance')
 						c.pbubble = bubble
 						c.addChild(bubble)
 						c.addChild(text)
@@ -256,10 +304,10 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 
 		this.touchMove = function (e) {
 			if (!mouse_last_click) return
-			if (mouse_mode === 'ap' || !ap_clicked) {
+			if (itemTypes.includes(mouse_mode) || !ap_clicked) {
 				is_dragging = true
 			}
-			if (mouse_mode !== 'ap' || !ap_clicked) {
+			if (!itemTypes.includes(mouse_mode) || !ap_clicked) {
 				stage.x += e.x - mouse_last_position.x
 				stage.y += e.y - mouse_last_position.y
 				update = true
@@ -274,7 +322,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			_.each(stage.children, function (child) {
 				if (child.layer_type === 'ap') {
 					for (i = 0; i < child.children.length; i++) {
-						if (child.children[i] !== ap) {
+						if (child.children[i] !== ap && child.children[i].itemType === 'ap') {
 							c = child.children[i]
 							d = Math.sqrt(Math.pow(c.x - ap.x, 2) + Math.pow(c.y - ap.y, 2))
 							if (d < plan.radius * 2) {
@@ -282,7 +330,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 								rsq = Math.pow(plan.radius, 2)
 								overlap = ((2 * rsq * Math.acos(d / r2) - d / 2 * Math.sqrt(4 * rsq - d * d)) / (2 * rsq * Math.acos(0)) * 100).toFixed(0)
 
-								var text = new createjs.Text('' + overlap + '%', '12px Arial', DISTANCE_TEXT_RGB)
+								var text = new createjs.Text('' + overlap + '%', '12px Arial', TEXT_RGB['distance'])
 								alpha = Math.atan((ap.y - c.y) / (ap.x - c.x))
 								beta  = Math.acos(Math.sqrt(Math.pow(ap.x - c.x, 2) + Math.pow(ap.y - c.y, 2)) / 2 / plan.radius)
 								apb = alpha + beta
@@ -315,12 +363,14 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 				}
 			})
 
-			for (j = 0; j < ap.children.length; j++) {
-				ap.overlaps.removeAllChildren()
-			}
-			if (show_overlaps) {
-				for (j = 0; j < intersections.length; j++) {
-					ap.overlaps.addChild(intersections[j])
+			if (ap.itemType === 'ap') {
+				for (j = 0; j < ap.children.length; j++) {
+					ap.overlaps.removeAllChildren()
+				}
+				if (show_overlaps) {
+					for (j = 0; j < intersections.length; j++) {
+						ap.overlaps.addChild(intersections[j])
+					}
 				}
 			}
 		}
@@ -330,29 +380,26 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 
 			function mousedown (evt) {
 				if (evt.nativeEvent.button === 2) {
-					console.log('mousedown', ap)
 					selectedAP = ap
-					contextMenu.switchMenu('ap')
+					contextMenu.switchMenu(ap.itemType)
 					return
 				}
-				if (mouse_mode !== 'ap') return
+				if (!itemTypes.includes(mouse_mode)) return
 				ap_clicked = true
 				evt.stopPropagation()
 				evt.preventDefault()
-				/* jshint validthis: true */
 				this.offset = {
 					x: this.x - evt.stageX * 100 / plan.stage_scale,
 					y: this.y - evt.stageY * 100 / plan.stage_scale
 				}
 				this.parent.addChild(this)
-				/* jshint validthis: false */
 				names = []
 				for (var i = 0; i < ap.distances.length; i++) names.push(distances.getChildByName(ap.distances[i].name))
 			}
 
 			function mousemove (evt) {
 				if (evt.nativeEvent.button === 2) return
-				if (mouse_mode !== 'ap') return
+				if (!itemTypes.includes(mouse_mode)) return
 				if (!ap.offset) return
 				ap.x = evt.stageX * 100 / plan.stage_scale + ap.offset.x
 				ap.y = evt.stageY * 100 / plan.stage_scale + ap.offset.y
@@ -374,7 +421,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 					drawDistanceObject(names[i], names[i].p_start, names[i].p_end)
 				}
 
-				drawIntersections(ap)
+				if (ap.itemType === 'ap') drawIntersections(ap)
 				is_dragging = true
 				update = true
 			}
@@ -393,19 +440,61 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			ap.on('touchend', mouseup)
 
 			ap.on('rollover', function (evt) {
-				if (mouse_mode !== 'ap') return
-				if (this.children[0].graphics) {
-					this.children[0].graphics.clear().setStrokeStyle(1).beginFill(AP_CIRCLE_RGBA_OPAQUE).beginStroke(AP_CIRCLE_STROKE_RGB).drawCircle(0, 0, plan.radius)
-					update = true
+				if (!itemTypes.includes(mouse_mode)) return
+				var color = BUBBLE_RGBA_TRANSLUCENT[ap.itemType]
+				var graphics = this.children[0].graphics
+				switch (ap.itemType) {
+					case 'ap':
+						if (graphics) {
+							graphics.clear().setStrokeStyle(1).beginFill(BUBBLE_RGBA_TRANSLUCENT.ap).beginStroke(AP_CIRCLE_STROKE_RGB).drawCircle(0, 0, plan.radius)
+						}
+						break
+
+					case 'am':
+						graphics.clear().beginFill(color).drawCircle(0, 0, AM_VISUAL_RADIUS - 5).endFill()
+						graphics.beginFill('White').drawCircle(0, 0, 2).endFill()
+						graphics.beginStroke(color).drawCircle(0, 0, AM_VISUAL_RADIUS).endStroke()
+						graphics.beginStroke(color).drawCircle(0, 0, AM_VISUAL_RADIUS + 10).endStroke()
+						break
+
+					case 'idf':
+						graphics.clear().beginFill(color).drawRoundRect(0, 0, AM_VISUAL_RADIUS, AM_VISUAL_RADIUS, 5, 5)
+						break
+
+					case 'mdf':
+						graphics.clear().beginFill(color).drawRoundRect(0, 0, AM_VISUAL_RADIUS, AM_VISUAL_RADIUS, 5, 5)
+						break
 				}
+				update = true
 			})
 
 			ap.on('rollout', function (evt) {
-				if (mouse_mode !== 'ap') return
-				if (this.children[0].graphics) {
-					this.children[0].graphics.clear().setStrokeStyle(1).beginFill(AP_CIRCLE_RGBA).beginStroke(AP_CIRCLE_STROKE_RGB).drawCircle(0, 0, plan.radius)
-					update = true
+				if (!itemTypes.includes(mouse_mode)) return
+				var color = BUBBLE_RGB[ap.itemType]
+				var graphics = this.children[0].graphics
+				switch (ap.itemType) {
+					case 'ap':
+						if (graphics) {
+							graphics.clear().setStrokeStyle(1).beginFill(AP_CIRCLE_RGBA).beginStroke(AP_CIRCLE_STROKE_RGB).drawCircle(0, 0, plan.radius)
+						}
+						break
+
+					case 'am':
+						graphics.clear().beginFill(color).drawCircle(0, 0, AM_VISUAL_RADIUS - 5).endFill()
+						graphics.beginFill('White').drawCircle(0, 0, 2).endFill()
+						graphics.beginStroke(color).drawCircle(0, 0, AM_VISUAL_RADIUS).endStroke()
+						graphics.beginStroke(color).drawCircle(0, 0, AM_VISUAL_RADIUS + 10).endStroke()
+						break
+
+					case 'idf':
+						graphics.clear().beginFill(color).drawRoundRect(0, 0, AM_VISUAL_RADIUS, AM_VISUAL_RADIUS, 5, 5)
+						break
+
+					case 'mdf':
+						graphics.clear().beginFill(color).drawRoundRect(0, 0, AM_VISUAL_RADIUS, AM_VISUAL_RADIUS, 5, 5)
+						break
 				}
+				update = true
 			})
 		}
 
@@ -415,23 +504,38 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 				if (mouse_last_click.x === e.x && mouse_last_click.y === e.y) {
 					var x = (e.x - stage.x - canvas.offsetParent.offsetLeft - canvasMarginW / 2) * 100 / plan.stage_scale
 					var y = (e.y - stage.y - canvas.offsetParent.offsetTop - canvasMarginH / 2) * 100 / plan.stage_scale
-					if (mouse_mode === 'wall') {
-						contextMenu.disabled = true
-						this.addWall(x, y)
-					} else {
-						if (calibration_step === 1) {
-							calibration_step++
-							this.calibrationLine(x, y, 0)
-						} else if (calibration_step === 2) {
-							this.calibrationLine(x, y, 1)
-							this.calibrationDone()
-						} else {
-							this.addAP(x, y, plan.real_radius)
-						}
+					switch (mouse_mode) {
+						case 'wall':
+							contextMenu.disabled = true
+							this.addWall(x, y)
+							break
+
+						case 'calibration':
+							if (calibration_step === 1) {
+								calibration_step++
+								this.calibrationLine(x, y, 0)
+							} else if (calibration_step === 2) {
+								this.calibrationLine(x, y, 1)
+								this.calibrationDone()
+							}
+							break
+
+						case 'ap':
+							this.addAP(x, y, plan.real_radius, 'ap')
+							break
+
+						case 'am':
+							this.addAP(x, y, plan.real_radius, 'am')
+							break
+
+						case 'idf':
+							this.addAP(x, y, plan.real_radius, 'idf')
+							break
 					}
 					update = true
 				}
 			} else if (e.button === 2) {
+				selectedAP = null
 				current_wall = false
 			}
 			is_dragging = false
@@ -456,11 +560,27 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			return false
 		}
 
+		this.getItemCount = function (itemType) {
+			var itemCount = 0
+			if (typeof layers === 'undefined') return 0
+			for (var i = 0; i < layers.length; i++) {
+				if (layers[i].layer_type !== 'ap') continue
+				itemCount += layers[i].children ? _.filter(layers[i].children, child => child.itemType === itemType).length : 0
+			}
+
+			return itemCount
+		}
+
 		this.initBoard = function (r, canvasIndex) {
 			mouse_mode = 'ap'
 			plan.radius = r
 			plan.real_radius = r
-			plan.ap_index = 1
+			plan.item_index = {
+				ap: 1,
+				am: 1,
+				idf: 1,
+				mdf: 1
+			}
 			DISTANCE_CUT_OFF = r * 2
 			canvas = document.getElementsByTagName('canvas')[canvasIndex || 0]
 			canvas.width = canvas.parentElement.clientWidth - canvasMarginW
@@ -514,6 +634,8 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 		}
 
 		this.startCalibration = function (cb) {
+			mouse_prev_mode = mouse_mode
+			mouse_mode = 'calibration'
 			calibration_step = 1
 			this.calibrationDone = cb
 		}
@@ -544,6 +666,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 				}
 				delete this.calibration_line
 			}
+			mouse_mode = mouse_prev_mode
 		}
 
 		this.addWallSegment = function (x, y) {
@@ -563,28 +686,15 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			current_wall = false
 		}
 
-		this.getTotalAPs = function () {
-			var totalAPs = 0
-			if (typeof layers === 'undefined') return 0
-			for (var i = 0; i < layers.length; i++) {
-				if (layers[i].layer_type !== 'ap') continue
-				totalAPs += layers[i].children ? layers[i].children.length : 0
-			}
-
-			return totalAPs
-		}
-
-		this.addAP = function (x, y, signal_radius) {
+		this.addAP = function (x, y, signal_radius, itemType) {
 			if (is_dragging) {
 				is_dragging = false
 				return
 			}
 
-			var circle = new createjs.Shape()
 			var ap = new createjs.Shape()
 			var container = new createjs.Container()
 			var mperpx = 1 / plan.stage_ppm
-			addHandlers.call(this, container)
 			layers[current_layer].addChild(container)
 
 			container.scaleX = container.scaleY = container.scale = 1
@@ -592,62 +702,115 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			container.y = y
 			container.realx = mperpx * container.x
 			container.realy = mperpx * container.y
+			container.itemType = itemType
 
-			var overlaps = new createjs.Container()
-			container.overlaps = overlaps
-			overlaps.mouseEnabled = false
+			addHandlers.call(this, container)
 
-			circle.id = _.uniqueId()
-			circle.graphics.setStrokeStyle(1).beginFill(AP_CIRCLE_RGBA).beginStroke(AP_CIRCLE_STROKE_RGB).drawCircle(0, 0, plan.radius)
-			circle.puddleShape = 'signal'
-			circle.regX = circle.regY = 0
-			circle.scaleX = circle.scaleY = circle.scale = 1
-			circle.cursor = 'pointer'
-			container.addChild(circle)
+			var itemIndex = 0
 
-			ap.graphics.beginFill('Blue').drawRect(-5, -5, 10, 10)
-			ap.puddleShape = 'ap'
+			switch (itemType) {
+				case 'ap':
+					itemIndex = plan.item_index[itemType]
+					var overlaps = new createjs.Container()
+					container.overlaps = overlaps
+					overlaps.mouseEnabled = false
+
+					var circle = new createjs.Shape()
+					circle.id = _.uniqueId()
+					circle.graphics.setStrokeStyle(1).beginFill(AP_CIRCLE_RGBA).beginStroke(AP_CIRCLE_STROKE_RGB).drawCircle(0, 0, plan.radius)
+					circle.puddleShape = 'signal'
+					circle.regX = circle.regY = 0
+					circle.scaleX = circle.scaleY = circle.scale = 1
+					circle.cursor = 'pointer'
+					container.addChild(circle)
+					ap.overlaps = overlaps
+					container.addChild(ap)
+					container.addChild(overlaps)
+					ap.graphics.beginFill('Blue').drawRect(-5, -5, 10, 10)
+					ap.puddleShape = 'ap'
+					break
+
+				case 'am':
+					itemIndex = plan.item_index[itemType]
+					var circle = new createjs.Shape()
+					circle.id = _.uniqueId()
+					circle.graphics.beginFill(BUBBLE_RGB.am).drawCircle(0, 0, AM_VISUAL_RADIUS - 5).endFill()
+					circle.graphics.beginFill('White').drawCircle(0, 0, 2).endFill()
+					circle.graphics.beginStroke(BUBBLE_RGB.am).drawCircle(0, 0, AM_VISUAL_RADIUS).endStroke()
+					circle.graphics.beginStroke(BUBBLE_RGB.am).drawCircle(0, 0, AM_VISUAL_RADIUS + 10).endStroke()
+					circle.puddleShape = 'print'
+					circle.regX = circle.regY = 0
+					circle.scaleX = circle.scaleY = circle.scale = 1
+					circle.cursor = 'pointer'
+					container.addChild(circle)
+					container.addChild(ap)
+					ap.puddleShape = 'am'
+					break
+
+				case 'idf':
+					itemIndex = plan.item_index[itemType]
+					ap.puddleShape = 'idf'
+					break
+
+				case 'mdf':
+					itemIndex = 1
+					ap.puddleShape = 'mdf'
+					break
+			}
+
+			container.inventory = {
+				number: plan.item_index[itemType]
+			}
+			plan.item_index[itemType]++
+
 			ap.regX = ap.regY = 0
 			ap.scaleX = ap.scaleY = ap.scale = 1
 			ap.cursor = 'pointer'
-			ap.overlaps = overlaps
-			container.addChild(ap)
-			container.addChild(overlaps)
 
-			var apNumber = plan.ap_index++
-			var text = new createjs.Text(apNumber, '12px Arial', AP_TEXT_RGB)
+			var text = new createjs.Text(itemIndex, '12px Arial', TEXT_RGB[itemType])
+
 			text.scaleX = text.scaleY = 100 / plan.stage_scale
 			text.textBaseline = 'alphabetic'
 
-			var bubble = addBubble(text, AP_BUBBLE_RGB)
+			var bubble = addBubble(text, itemType)
 			ap.pbubble = bubble
-			ap.inventory = {
-				number: apNumber
-			}
 			container.addChild(bubble)
 			container.addChild(text)
 
 			addDistances.call(this, container)
-			drawIntersections(container)
+
+			if (itemType === 'ap') drawIntersections(container)
 
 			update = true
-			$timeout(this.getTotalAPs, 0)
 		}
 
-		this.reIndexAPs = function () {
-			var ap_index = 1
+		this.reindexItems = function () {
+			var index = {
+				ap: 1,
+				am: 1,
+				idf: 1,
+				mdf: 1
+			}
 			_.each(layers, layer => {
 				if (layer.layer_type === 'ap') {
-					_.map(layer.children, ap => {
-						ap.children[4].text = ap_index
-						_.set(ap, 'inventory.number', ap_index++)
+					_.map(layer.children, item => {
+						switch (item.itemType) {
+							case 'ap':
+								item.children[4].text = index[item.itemType]
+								break
+
+							case 'am':
+							case 'idf':
+								item.children[1].text = index[item.itemType]
+						}
+						_.set(item, 'inventory.number', index[item.itemType]++)
 					})
 				}
 			})
-			plan.ap_index = ap_index
+			plan.item_index = index
 		}
 
-		this.getCurrentAP = function () {
+		this.getCurrentItem = function () {
 			return selectedAP
 		}
 
@@ -689,7 +852,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			this.toggleOverlaps()
 			update = true
 			this.toggleOverlaps()
-			this.reIndexAPs()
+			this.reIndexItems()
 		}
 
 		this.deleteSelectedWall = function () {
@@ -740,7 +903,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			_.each(stage.children, function (child) {
 				if (child.layer_type === 'ap') {
 					for (var i = 0; i < child.children.length; i++) {
-						drawIntersections(child.children[i])
+						if (child.children[i].itemType === 'ap') drawIntersections(child.children[i])
 					}
 				}
 			})
@@ -776,8 +939,10 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			_.each(stage.children, function (child) {
 				if (child.layer_type === 'ap') {
 					for (var i = 0; i < child.children.length; i++) {
-						child.children[i].children[3].scaleX = child.children[i].children[3].scaleY = 100 / plan.stage_scale
-						child.children[i].children[4].scaleX = child.children[i].children[4].scaleY = 100 / plan.stage_scale
+						if (child.children[i].itemType === 'ap') {
+							child.children[i].children[3].scaleX = child.children[i].children[3].scaleY = 100 / plan.stage_scale
+							child.children[i].children[4].scaleX = child.children[i].children[4].scaleY = 100 / plan.stage_scale
+						}
 					}
 				}
 			})
@@ -831,23 +996,22 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			var json = {
 				plan: plan,
 				floorplan: floorplan.children[0] ? floorplan.children[0].image.src : '',
-				aps: [],
+				items: [],
 				walls: []
 			}
 
 			var children, i, d, m, layers_length = layers.length
 			for (i = 0; i < layers_length; i++) {
 				if (layers[i].layer_type === 'ap') {
-					/* jshint -W083 */
 					_.each(layers[i].children, function (ap) {
-						json.aps.push({
+						json.items.push({
 							name: ap.name,
+							itemType: ap.itemType,
 							x: ap.x,
 							y: ap.y
 						})
 					})
 				} else if (layers[i].layer_type === 'walls') {
-					/* jshint -W083 */
 					_.each(layers[i].children, function (wall) {
 						json.walls.push({
 							wall_type: wall.wall_type,
@@ -908,10 +1072,10 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 				stage.regX = _.get(data.plan, 'stage.regX')
 				stage.regY = _.get(data.plan, 'stage.regY')
 
-				_.each(data.aps, function (ap) {
-					this.addAP(ap.x, ap.y, signal_radius)
+				_.each(data.items, function (item) {
+					this.addAP(item.x, item.y, signal_radius, item.itemType || 'ap')
 				}.bind(this))
-				this.reIndexAPs()
+				this.reindexItems()
 				_.each(data.walls, function (wall) {
 					current_wall = false
 					this.wall_type = wall.wall_type

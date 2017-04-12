@@ -75,7 +75,7 @@ angular.module('plans')
 
 			$scope.closeMenu = function () {
 				contextMenu.close()
-				delete $scope.ap
+				delete $scope.selectedItem
 				Drawing.unselectAP()
 				$scope.menu.mode = 'plan'
 			}
@@ -96,8 +96,9 @@ angular.module('plans')
 			}
 
 			$scope.getCurrentAP = function () {
-				$scope.ap = Drawing.getCurrentAP()
-				if ($scope.ap) $scope.menu.mode = 'ap'
+				$scope.selectedItem = Drawing.getCurrentItem()
+				console.log('getCurrentItem', $scope.selectedItem)
+				$scope.menu.mode = $scope.selectedItem ? $scope.selectedItem.itemType : 'plan'
 			}
 
 			$scope.deleteWall = function () {
@@ -206,7 +207,15 @@ angular.module('plans')
 			}
 
 			$scope.getTotalAPs = function () {
-				return Drawing.getTotalAPs()
+				return Drawing.getItemCount('ap')
+			}
+
+			$scope.getTotalAMs = function () {
+				return Drawing.getItemCount('am')
+			}
+
+			$scope.getTotalIDFs = function () {
+				return Drawing.getItemCount('idf')
 			}
 
 			$scope.togglePlanProperties = function () {
@@ -589,6 +598,7 @@ angular.module('plans')
 				}
 			}
 
+			$scope.mouse_mode = 'ap'
 			$scope.selectTool = function (mode) {
 				$scope.mouse_mode = mode
 				Drawing.selectTool(mode)
