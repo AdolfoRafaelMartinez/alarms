@@ -90,8 +90,8 @@ angular.module('plans')
 			$scope.wall_type = 'DW'
 			$scope.selectWallType()
 
-			$scope.deleteAP = function () {
-				Drawing.deleteSelectedAP()
+			$scope.deleteSelectedItem = function () {
+				Drawing.deleteSelectedItem()
 				$scope.closeMenu()
 			}
 
@@ -658,6 +658,14 @@ angular.module('plans')
 
 			$scope.updateLicenses = function () {
 				$scope.plan.details.controllers[0].lic.ap.qty = $scope.plan.stage.aps.length
+			}
+
+			$scope.toggleMDF = function () {
+				Drawing.setupIDF($scope.selectedItem)
+			}
+
+			$scope.saveSelectedItem = function () {
+				$scope.closeMenu()
 			}
 
 			$scope.savePlanProperties = function () {

@@ -42,9 +42,11 @@
 		<uib-accordion-heading>
 			Floorplan <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': sma.plan, 'glyphicon-chevron-right': !sma.plan}"></i>
 		</uib-accordion-heading>
-		<div class="tools" data-ng-controller="pjFileUploadController">
+		<div class="tools">
 
-			<form class="actionf" id="fileupload" action="/upload" method="POST" enctype="multipart/form-data" data-file-upload="options" data-ng-class="{'fileupload-processing': processing() || loadingFiles}">
+			<form class="actionf" id="fileupload" data-ng-controller="pjFileUploadController"
+				action="/upload" method="POST" enctype="multipart/form-data" data-file-upload="options" 
+				ng-class="{'fileupload-processing': processing() || loadingFiles}">
 
 				<button class="fileinput-button" ng-class="{disabled: disabled}">
 					<i class="glyphicon large glyphicon-cloud-upload"></i>

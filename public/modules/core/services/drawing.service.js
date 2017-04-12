@@ -98,7 +98,11 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 		var DISTANCE_STROKE_RGB = '#444'
 		var DISTANCE_CUT_OFF = 60
 		var AM_VISUAL_RADIUS = 60
-		var AM_VISUAL_RADIUS_PRINT = 10
+		var AM_VISUAL_RADIUS_PRINT = 40
+		var IDF_VISUAL_RADIUS = 30
+		var IDF_VISUAL_RADIUS_PRINT = 20
+		var MDF_VISUAL_RADIUS = 30
+		var MDF_VISUAL_RADIUS_PRINT = 20
 
 		var tick = function (event) {
 			// this set makes it so the stage only re-renders when an event handler indicates a change has happened.
@@ -199,6 +203,12 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			var color = BUBBLE_RGB[itemType]
 			var bubble = new createjs.Shape()
 			var textBounds = text.getBounds()
+			text.regX = textBounds.width / 2
+			text.regY = 0 - textBounds.height / 2 + 2
+			bubble.regX = 0
+			bubble.regY = 0
+			bubble.cursor = 'pointer'
+			text.cursor = 'pointer'
 			switch (itemType) {
 				case 'ap':
 				case 'distance':
@@ -210,19 +220,18 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 					break
 
 				case 'am':
-					bubble.graphics.beginFill(color).drawCircle(0, 0, Math.max(textBounds.width, textBounds.height))
-					text.regX = textBounds.width / 2
-					text.regY = 0 - textBounds.height / 2 + 2
-					bubble.regX = 0
-					bubble.regY = 0
+					bubble.graphics.beginFill(color).drawCircle(0, 0, Math.max(textBounds.width, textBounds.height)).endFill()
+					bubble.graphics.beginStroke(color).drawCircle(0, 0, AM_VISUAL_RADIUS_PRINT).endStroke()
+					bubble.graphics.beginStroke(color).drawCircle(0, 0, AM_VISUAL_RADIUS_PRINT + 10).endStroke()
 					break
 
 				case 'idf':
-					bubble.graphics.beginFill(color).drawRoundRect(0, 0, AM_VISUAL_RADIUS_PRINT, AM_VISUAL_RADIUS_PRINT, 5, 5)
+					bubble.graphics.beginFill(color).drawRoundRect(0 - IDF_VISUAL_RADIUS_PRINT, 0 - IDF_VISUAL_RADIUS_PRINT / 2, IDF_VISUAL_RADIUS_PRINT * 2, IDF_VISUAL_RADIUS_PRINT, 2, 2).endFill()
 					break
 
 				case 'mdf':
-					bubble.graphics.beginFill(color).drawRoundRect(0, 0, AM_VISUAL_RADIUS_PRINT, AM_VISUAL_RADIUS_PRINT, 5, 5)
+					bubble.graphics.beginFill(color).drawRoundRect(0 - MDF_VISUAL_RADIUS_PRINT, 0 - MDF_VISUAL_RADIUS_PRINT / 2, MDF_VISUAL_RADIUS_PRINT * 2, MDF_VISUAL_RADIUS_PRINT, 10, 10).endFill()
+					bubble.graphics.beginStroke(color).drawRoundRect(-4 - MDF_VISUAL_RADIUS_PRINT, -4 - MDF_VISUAL_RADIUS_PRINT / 2, MDF_VISUAL_RADIUS_PRINT * 2 + 8, MDF_VISUAL_RADIUS_PRINT + 8, 5, 5)
 					break
 			}
 
@@ -316,6 +325,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 		}
 
 		var drawIntersections = function (ap, processing) {
+			if (ap.itemType !== 'ap') return
 			var c, d, r2, i, j, rsq, overlap, apb, alpha, beta, color
 			var hash_color, leftside, rightside
 			var intersections = []
@@ -363,14 +373,12 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 				}
 			})
 
-			if (ap.itemType === 'ap') {
-				for (j = 0; j < ap.children.length; j++) {
-					ap.overlaps.removeAllChildren()
-				}
-				if (show_overlaps) {
-					for (j = 0; j < intersections.length; j++) {
-						ap.overlaps.addChild(intersections[j])
-					}
+			for (j = 0; j < ap.children.length; j++) {
+				ap.overlaps.removeAllChildren()
+			}
+			if (show_overlaps) {
+				for (j = 0; j < intersections.length; j++) {
+					ap.overlaps.addChild(intersections[j])
 				}
 			}
 		}
@@ -379,6 +387,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			var names
 
 			function mousedown (evt) {
+				console.log('mousedown', selectedAP)
 				if (evt.nativeEvent.button === 2) {
 					selectedAP = ap
 					contextMenu.switchMenu(ap.itemType)
@@ -452,17 +461,16 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 
 					case 'am':
 						graphics.clear().beginFill(color).drawCircle(0, 0, AM_VISUAL_RADIUS - 5).endFill()
-						graphics.beginFill('White').drawCircle(0, 0, 2).endFill()
 						graphics.beginStroke(color).drawCircle(0, 0, AM_VISUAL_RADIUS).endStroke()
 						graphics.beginStroke(color).drawCircle(0, 0, AM_VISUAL_RADIUS + 10).endStroke()
 						break
 
 					case 'idf':
-						graphics.clear().beginFill(color).drawRoundRect(0, 0, AM_VISUAL_RADIUS, AM_VISUAL_RADIUS, 5, 5)
+						graphics.clear().beginFill(color).drawRoundRect(0 - IDF_VISUAL_RADIUS/2, 0 - IDF_VISUAL_RADIUS/2, IDF_VISUAL_RADIUS, IDF_VISUAL_RADIUS, 5, 5)
 						break
 
 					case 'mdf':
-						graphics.clear().beginFill(color).drawRoundRect(0, 0, AM_VISUAL_RADIUS, AM_VISUAL_RADIUS, 5, 5)
+						graphics.clear().beginFill(color).drawRoundRect(0 - MDF_VISUAL_RADIUS/2, 0 - MDF_VISUAL_RADIUS/2, MDF_VISUAL_RADIUS, MDF_VISUAL_RADIUS, 15, 15)
 						break
 				}
 				update = true
@@ -481,17 +489,16 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 
 					case 'am':
 						graphics.clear().beginFill(color).drawCircle(0, 0, AM_VISUAL_RADIUS - 5).endFill()
-						graphics.beginFill('White').drawCircle(0, 0, 2).endFill()
 						graphics.beginStroke(color).drawCircle(0, 0, AM_VISUAL_RADIUS).endStroke()
 						graphics.beginStroke(color).drawCircle(0, 0, AM_VISUAL_RADIUS + 10).endStroke()
 						break
 
 					case 'idf':
-						graphics.clear().beginFill(color).drawRoundRect(0, 0, AM_VISUAL_RADIUS, AM_VISUAL_RADIUS, 5, 5)
+						graphics.clear().beginFill(color).drawRoundRect(0 - IDF_VISUAL_RADIUS/2, 0 - IDF_VISUAL_RADIUS/2, IDF_VISUAL_RADIUS/2, IDF_VISUAL_RADIUS/2, 5, 5)
 						break
 
 					case 'mdf':
-						graphics.clear().beginFill(color).drawRoundRect(0, 0, AM_VISUAL_RADIUS, AM_VISUAL_RADIUS, 5, 5)
+						graphics.clear().beginFill(color).drawRoundRect(0 - MDF_VISUAL_RADIUS/2, 0 - MDF_VISUAL_RADIUS/2, MDF_VISUAL_RADIUS/2, MDF_VISUAL_RADIUS/2, 15, 15)
 						break
 				}
 				update = true
@@ -534,9 +541,6 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 					}
 					update = true
 				}
-			} else if (e.button === 2) {
-				selectedAP = null
-				current_wall = false
 			}
 			is_dragging = false
 			mouse_last_click = false
@@ -707,10 +711,12 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			addHandlers.call(this, container)
 
 			var itemIndex = 0
+			var text
 
 			switch (itemType) {
 				case 'ap':
 					itemIndex = plan.item_index[itemType]
+					text = new createjs.Text(itemIndex, '12px Arial', TEXT_RGB[itemType])
 					var overlaps = new createjs.Container()
 					container.overlaps = overlaps
 					overlaps.mouseEnabled = false
@@ -732,10 +738,10 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 
 				case 'am':
 					itemIndex = plan.item_index[itemType]
+					text = new createjs.Text(itemIndex, '12px Arial', TEXT_RGB[itemType])
 					var circle = new createjs.Shape()
 					circle.id = _.uniqueId()
 					circle.graphics.beginFill(BUBBLE_RGB.am).drawCircle(0, 0, AM_VISUAL_RADIUS - 5).endFill()
-					circle.graphics.beginFill('White').drawCircle(0, 0, 2).endFill()
 					circle.graphics.beginStroke(BUBBLE_RGB.am).drawCircle(0, 0, AM_VISUAL_RADIUS).endStroke()
 					circle.graphics.beginStroke(BUBBLE_RGB.am).drawCircle(0, 0, AM_VISUAL_RADIUS + 10).endStroke()
 					circle.puddleShape = 'print'
@@ -749,11 +755,31 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 
 				case 'idf':
 					itemIndex = plan.item_index[itemType]
+					text = new createjs.Text(`IDF ${itemIndex}`, '10px Arial', TEXT_RGB[itemType])
+					var square = new createjs.Shape()
+					square.id = _.uniqueId()
+					// square.graphics.beginFill(BUBBLE_RGB.idf).drawRoundRect(0 - IDF_VISUAL_RADIUS, 0 - IDF_VISUAL_RADIUS / 2, IDF_VISUAL_RADIUS * 2, IDF_VISUAL_RADIUS).endFill()
+					square.puddleShape = 'display'
+					square.regX = square.regY = 0
+					square.scaleX = square.scaleY = square.scale = 1
+					square.cursor = 'pointer'
+					container.addChild(square)
+					container.addChild(ap)
 					ap.puddleShape = 'idf'
 					break
 
 				case 'mdf':
 					itemIndex = 1
+					text = new createjs.Text(`MDF ${itemIndex}`, '10px Arial', TEXT_RGB[itemType])
+					var square = new createjs.Shape()
+					square.id = _.uniqueId()
+					// square.graphics.beginFill(BUBBLE_RGB.mdf).drawRoundRect(0 - MDF_VISUAL_RADIUS / 2, 0 - MDF_VISUAL_RADIUS / 2, MDF_VISUAL_RADIUS, MDF_VISUAL_RADIUS).endFill()
+					square.puddleShape = 'display'
+					square.regX = square.regY = 0
+					square.scaleX = square.scaleY = square.scale = 1
+					square.cursor = 'pointer'
+					container.addChild(square)
+					container.addChild(ap)
 					ap.puddleShape = 'mdf'
 					break
 			}
@@ -761,13 +787,12 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			container.inventory = {
 				number: plan.item_index[itemType]
 			}
+			if (itemType === 'mdf') container.inventory.mdf = true
 			plan.item_index[itemType]++
 
 			ap.regX = ap.regY = 0
 			ap.scaleX = ap.scaleY = ap.scale = 1
 			ap.cursor = 'pointer'
-
-			var text = new createjs.Text(itemIndex, '12px Arial', TEXT_RGB[itemType])
 
 			text.scaleX = text.scaleY = 100 / plan.stage_scale
 			text.textBaseline = 'alphabetic'
@@ -800,8 +825,16 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 								break
 
 							case 'am':
+								item.children[3].text = index[item.itemType]
+								break
+
 							case 'idf':
-								item.children[1].text = index[item.itemType]
+								item.children[3].text = `IDF ${index[item.itemType]}`
+								break
+
+							case 'mdf':
+								item.children[3].text = 'MDF'
+								break
 						}
 						_.set(item, 'inventory.number', index[item.itemType]++)
 					})
@@ -818,7 +851,8 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			selectedAP = false
 		}
 
-		this.deleteSelectedAP = function () {
+		this.deleteSelectedItem = function () {
+			console.log('deleteSelectedAP', selectedAP)
 			if (!selectedAP) return
 			contextMenu.close()
 			var i, j, k
@@ -852,7 +886,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			this.toggleOverlaps()
 			update = true
 			this.toggleOverlaps()
-			this.reIndexItems()
+			this.reindexItems()
 		}
 
 		this.deleteSelectedWall = function () {
@@ -942,6 +976,10 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 						if (child.children[i].itemType === 'ap') {
 							child.children[i].children[3].scaleX = child.children[i].children[3].scaleY = 100 / plan.stage_scale
 							child.children[i].children[4].scaleX = child.children[i].children[4].scaleY = 100 / plan.stage_scale
+						} else {
+							console.log(child.children[i])
+							child.children[i].children[2].scaleX = child.children[i].children[2].scaleY = 100 / plan.stage_scale
+							child.children[i].children[3].scaleX = child.children[i].children[3].scaleY = 100 / plan.stage_scale
 						}
 					}
 				}
@@ -1144,6 +1182,49 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 		this.selectWallType = function (wall) {
 			this.cancelWall()
 			this.wall_type = wall
+		}
+
+		function redrawIDF (idf) {
+			console.log('redrawIDF', idf)
+			var text = _.find(idf.children, c => c.text !== undefined)
+			if (idf.itemType === 'idf') {
+				idf.children[2].graphics.clear().beginFill(BUBBLE_RGB.idf).drawRoundRect(0 - IDF_VISUAL_RADIUS_PRINT, 0 - IDF_VISUAL_RADIUS_PRINT / 2, IDF_VISUAL_RADIUS_PRINT * 2, IDF_VISUAL_RADIUS_PRINT, 2, 2).endFill()
+				idf.children[3].text = 'IDF ' + plan.item_index['idf']++
+			} else {
+				idf.children[2].graphics.clear().beginFill(BUBBLE_RGB.mdf).drawRoundRect(0 - MDF_VISUAL_RADIUS_PRINT, 0 - MDF_VISUAL_RADIUS_PRINT / 2, MDF_VISUAL_RADIUS_PRINT * 2, MDF_VISUAL_RADIUS_PRINT, 10, 10).endFill()
+				idf.children[2].graphics.beginStroke(BUBBLE_RGB.mdf).drawRoundRect(-4 - MDF_VISUAL_RADIUS_PRINT, -4 - MDF_VISUAL_RADIUS_PRINT / 2, MDF_VISUAL_RADIUS_PRINT * 2 + 8, MDF_VISUAL_RADIUS_PRINT + 8, 5, 5)
+				idf.children[3].text = 'MDF'
+			}
+		}
+
+		var lastMDF
+		this.setupIDF = function (item) {
+			if (item.inventory.mdf) {
+				item.itemType = 'mdf'
+			} else {
+				item.itemType = 'idf'
+			}
+			redrawIDF(item)
+			var children, i, d, m, layers_length = layers.length
+			for (i = 0; i < layers_length; i++) {
+				if (layers[i].layer_type === 'ap') {
+					_.each(layers[i].children, function (ap) {
+						if (ap.id !== item.id) {
+							if (item.itemType === 'mdf' && ap.itemType === 'mdf') {
+								ap.itemType = 'idf'
+								lastMDF = ap.id
+								redrawIDF(ap)
+							} else if (item.itemType === 'idf' && lastMDF && ap.id === lastMDF) {
+								// TODO: maybe switch back option? -- only works for previous MDF assigned in current session (not loaded)
+								// ap.itemType = 'mdf'
+								// redrawIDF(ap)
+							}
+						}
+					})
+				}
+			}
+			this.reindexItems()
+			update = true
 		}
 
 		Heatmap.setup({
