@@ -1110,6 +1110,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 				stage.regX = _.get(data.plan, 'stage.regX')
 				stage.regY = _.get(data.plan, 'stage.regY')
 
+				if (!data.items && data.aps) data.items = data.aps
 				_.each(data.items, function (item) {
 					this.addAP(item.x, item.y, signal_radius, item.itemType || 'ap')
 				}.bind(this))
