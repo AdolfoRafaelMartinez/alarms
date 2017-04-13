@@ -185,6 +185,10 @@ canvas {
 	float: right;
 }
 
+#context_menu .panel-title span {
+	text-transform: uppercase;
+}
+
 #context_menu .dropdown-menu {
 	display: block;
 }

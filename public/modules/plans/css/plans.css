@@ -258,6 +258,10 @@ plan-list .list-group-item:last-child {
 	filter: none;
 }
 
+button.selected {
+	background: #666;
+}
+
 .shadowItem {
 	opacity: 0.5;
 	filter: blur(1px);

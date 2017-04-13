@@ -296,7 +296,7 @@
     <div class="panel panel-info">
         <div class="panel-heading ui-widget-header">
             <div class="panel-title">
-                AP <span class="label label-info" ng-bind="ap.inventory.number"></span>
+				<span>{{ menu.mode }}</span> <span class="label label-info" ng-bind="selectedItem.inventory.number"></span>
                 <div><a href ng-click="closeMenu()"><i class="panel-control-icon glyphicon glyphicon-remove"></i></a></div>
             </div>
         </div>
@@ -320,20 +320,61 @@
             <form>
                 <div class="form-group row">
                     <label class="col-sm-2 form-control-label">Name</label>
-                    <div class="col-sm-10"><input type="text" ng-model="ap.inventory.name" class="form-control" placeholder="e.g. AP-hall-01..." /></div>
+                    <div class="col-sm-10"><input type="text" ng-model="selectedItem.inventory.name" class="form-control" placeholder="e.g. AP-hall-01..." /></div>
                 </div>
                 <div class="form-group row">
                     <label class="col-sm-2 form-control-label">Brand</label>
-                    <div class="col-sm-10"><input type="text" ng-model="ap.inventory.brand" class="form-control" placeholder="name..." /></div>
+                    <div class="col-sm-10"><input type="text" ng-model="selectedItem.inventory.brand" class="form-control" placeholder="name..." /></div>
                 </div>
                 <div class="form-group row">
                     <label class="col-sm-2 form-control-label">Model</label>
-                    <div class="col-sm-10"><input type="text" ng-model="ap.inventory.model" class="form-control" placeholder="number..." /></div>
+                    <div class="col-sm-10"><input type="text" ng-model="selectedItem.inventory.model" class="form-control" placeholder="number..." /></div>
                 </div>
                 <div class="form-group row">
                     <div class="col-sm-12">
-                        <button type="submit" class="btn btn-primary" ng-click="saveAP()">Save</button>
-                        <button class="btn btn-danger pull-right" role="menuitem" tabindex="1" ng-click="deleteAP()"> Delete AP </button>
+                        <button type="submit" class="btn btn-primary" ng-click="saveSelectedItem()">Save</button>
+                        <button class="btn btn-danger pull-right" role="menuitem" tabindex="1" ng-click="deleteSelectedItem()"> Delete AP </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="panel-body" ng-show="menu.mode == 'am'">
+            <form>
+                <div class="form-group row">
+                    <label class="col-sm-2 form-control-label">Name</label>
+                    <div class="col-sm-10"><input type="text" ng-model="selectedItem.inventory.name" class="form-control" placeholder="e.g. AM-hall-01..." /></div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-2 form-control-label">Brand</label>
+                    <div class="col-sm-10"><input type="text" ng-model="selectedItem.inventory.brand" class="form-control" placeholder="name..." /></div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-2 form-control-label">Model</label>
+                    <div class="col-sm-10"><input type="text" ng-model="selectedItem.inventory.model" class="form-control" placeholder="number..." /></div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <button type="submit" class="btn btn-primary" ng-click="saveSelectedItem()">Save</button>
+                        <button class="btn btn-danger pull-right" role="menuitem" tabindex="1" ng-click="deleteSelectedItem()"> Delete AM </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="panel-body" ng-show="menu.mode === 'idf' || menu.mode === 'mdf'">
+            <form>
+                <div class="form-group row">
+                    <label class="col-sm-2 form-control-label">Name</label>
+                    <div class="col-sm-10"><input type="text" ng-model="selectedItem.inventory.name" class="form-control" placeholder="e.g. IDF-hall-01..." /></div>
+                </div>
+                <div class="form-group row">
+					<md-switch flex ng-model="selectedItem.inventory.mdf" ng-change="toggleMDF()" aria-label="This is the MDF">MDF</md-switch>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <button type="submit" class="btn btn-primary" ng-click="saveSelectedItem()">Save</button>
+                        <button class="btn btn-danger pull-right" role="menuitem" tabindex="1" ng-click="deleteSelectedItem()"> Delete </button>
                     </div>
                 </div>
             </form>
