@@ -8,6 +8,7 @@ module.exports = {
 				'public/lib/bootstrap/dist/css/bootstrap.css',
 				'public/lib/bootstrap/dist/css/bootstrap-theme.css',
 				'public/lib/angular-material/angular-material.css',
+				'public/lib/angular-ui-select/select.min.css',
 				'public/lib/jQueryFileUpload/css/style.css',
 				'public/lib/blueimp-file-upload/css/jquery.fileupload.css',
 				'public/lib/blueimp-file-upload/css/jquery.fileupload-ui.css'
@@ -22,6 +23,7 @@ module.exports = {
 				'public/lib/angular-aria/angular-aria.js',
 				'public/lib/angular-material/angular-material.js',
 				'public/lib/angular-sanitize/angular-sanitize.js',
+				'public/lib/angular-ui-select/dist/select.min.js',
 				'public/lib/angular-ui-router/release/angular-ui-router.js',
 				'public/lib/angular-ui-utils/ui-utils.js',
 				'public/lib/angular-bootstrap/ui-bootstrap-tpls.js',

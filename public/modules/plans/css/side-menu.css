@@ -5,12 +5,9 @@ md-sidenav uib-accordion {
 md-sidenav uib-accordion .large {
     font-size: 35px;
     padding-top: 0px;
-    display: -webkit-flex;
-    display:         flex;
-    -webkit-align-items: center;
-            align-items: center;
-    -webkit-justify-content: center;
-            justify-content: center;
+	margin-top: 2px;
+	margin-bottom: 8px;
+    line-height: 0.7;
 }
 
 md-sidenav .panel-heading a {
@@ -68,18 +65,16 @@ md-sidenav .action {
 }
 
 md-sidenav .actionf {
-	width: 33%;
+	width: 32%;
 	text-align: center;
 	padding: 5px;
-	float: left;
+	display: inline-block;
+	overflow: hidden;
     color: white;
     background: transparent;
 	border: none;
 	height: 75px;
-}
-
-md-sidenav .actionf input {
-	margin-top: 7px;
+	cursor: pointer;
 }
 
 md-sidenav .action img {
@@ -92,8 +87,13 @@ md-sidenav .actionf img {
 	padding-bottom: 10px;
 }
 
-md-sidenav form.actionf {
-	padding-top: 0;
+md-sidenav .actionf div {
+	padding-top: 5px;
+}
+
+md-sidenav .actionf button {
+	background: transparent;
+	border: none;
 }
 
 md-sidenav .md-button ng-md-icon {
@@ -102,7 +102,12 @@ md-sidenav .md-button ng-md-icon {
     line-height: 17px;
 }
 
-md-sidenav form .fileinput-button {
+md-sidenav #fileupload .large {
+	margin-top: -2px;
+	padding-bottom: 6px;
+}
+
+md-sidenav form button {
     text-align: center;
     padding: 5px;
     color: white;
@@ -110,30 +115,24 @@ md-sidenav form .fileinput-button {
     border: none;
 }
 
-md-sidenav button.action:hover, md-sidenav button.actionf:hover, md-sidenav form.actionf:hover {
+md-sidenav button.action:hover, md-sidenav .actionf:hover {
 	background-color: #333;
 	border-radius: 4px;
 }
 
 md-sidenav .actionf input {
-	margin-top: 3px;
-	margin-left: 5px;
-	display: -webkit-flex;
-	display:         flex;
+	margin-top: 10px;
 	-webkit-align-items: center;
-	align-items: center;
-	-webkit-justify-content: center;
-	justify-content: center;
-	width: 80%;
+	width: 100%;
 	background: white;
 	color: black;
 	font-size: 12px;
 	border-radius:4px;
 	border:none;
-		-webkit-box-shadow: inset 0 2px 2px rgba(0,0,0,.25);
+	-webkit-box-shadow: inset 0 2px 2px rgba(0,0,0,.25);
     box-shadow: inset 0 2px 2px rgba(0,0,0,.25);
 	text-align: center;
-	line-height: 1;
+	margin-bottom: 6px;
 }
 
 md-sidenav .full {

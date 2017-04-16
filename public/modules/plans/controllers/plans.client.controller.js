@@ -97,7 +97,6 @@ angular.module('plans')
 
 			$scope.getCurrentAP = function () {
 				$scope.selectedItem = Drawing.getCurrentItem()
-				console.log('getCurrentItem', $scope.selectedItem)
 				$scope.menu.mode = $scope.selectedItem ? $scope.selectedItem.itemType : 'plan'
 			}
 
@@ -430,22 +429,37 @@ angular.module('plans')
 			}
 
 			$scope.createPlanAndLoad = function (building) {
+				if (!building) {
+					console.log("No building provided")
+					return
+				}
 				var plan = new Plans(planSkeleton)
-				var promises = []
-				plan.$save(response => {
-					plan.stage._id = response._id
-					promises.push(plan.$update())
-					if (building) {
-						if (!building.plans) building.plans = []
-						building.plans.push({
-							_id: response._id
-						})
-						delete building.new
-						promises.push($scope.selected.project.$update())
+				var project = $scope.selected.project
+				var site = _.find(project.sites, s => s._id === $scope.selected.site._id)
+				var bldg = _.find(site.buildings, b => b._id === building._id)
+				_.set(plan, 'details.project', project.title)
+				_.set(plan, 'details.site', site.name)
+				_.set(plan, 'details.building', bldg.name)
+				_.set(plan, 'details.client', project.details.client)
+				_.set(plan, 'details.vendor', _.get(bldg, 'details.inventory.vendor'))
+				_.each(plan.stage.items, ap => {
+					if (['ap', 'am', undefined].includes(ap.itemType)) {
+						_.set(ap, 'inventory.vendor', _.get(bldg, 'details.inventory.vendor'))
+						_.set(ap, 'inventory.sku', _.get(bldg, 'details.inventory.aps'))
 					}
-					$q.all(promises).then(() => {
-						$location.path(`building/${building._id}`)
+				})
+
+				plan.$save(response => {
+					if (!bldg.plans) bldg.plans = []
+					bldg.plans.push({
+						_id: response._id
 					})
+					delete bldg.new
+					$scope.selected.project.$update()
+						.then(() => {
+							console.log(bldg, $scope.selected.project)
+							$location.path(`building/${building._id}`)
+						})
 				}, errorResponse => {
 					$scope.error = errorResponse.data.message
 				})
@@ -478,6 +492,7 @@ angular.module('plans')
 			}
 
 			$scope.updateControls = function (key, val) {
+				$scope.settings[key] = val
 				if ($scope.$$phase) {
 					$scope.settings[key] = val
 				} else {
@@ -505,8 +520,19 @@ angular.module('plans')
 
 			$scope.showSettings = function (type, item, $event) {
 				$event.stopPropagation()
-				if (type === 'site') $scope.selectSite(item)
-				if (type === 'project') $scope.selectProject(item)
+				switch (type) {
+					case 'project':
+						$scope.selectProject(item)
+						break
+
+					case 'site':
+						$scope.selectSite(_.find($scope.selected.project.sites, s => s._id === item._id))
+						break
+
+					case 'bldg':
+						item = _.find($scope.selected.site.buildings, b => b._id === item._id)
+						break
+				}
 				ModalService.showModal({
 					templateUrl: 'modules/plans/views/settings.modal.html',
 					controller: 'settingsModalController',
@@ -516,21 +542,17 @@ angular.module('plans')
 						modal.element.modal()
 						/*
 						modal.element.on('hidden.bs.modal', () => {
-							if (!modal.controller.closed) {
-								$scope.selected.project.$update(project => {
-									$scope.selected.project = project
-								})
-							}
+							modal.scope.close()
 						})
-						*/
 						modal.close.then(function (project) {
 							$scope.selected.project = project
 						})
+						*/
 					})
 			}
 
 			$scope.showBuilding = (building) => {
-				if (!building.plans) $scope.createPlanAndLoad($scope.selected.building)
+				if (!building.plans) $scope.createPlanAndLoad(building)
 				else $location.path(`building/${building._id}`)
 			}
 
@@ -544,7 +566,7 @@ angular.module('plans')
 				$scope.flooplan_name = plan.title
 				if (typeof plan.details !== 'object') plan.details = {}
 				if (!plan.details.contacts) plan.details.contacts = []
-				Drawing.loadPlan(plan._id, plan.stage, $scope.settings.signal_radius, $scope.updateControls)
+				Drawing.loadPlan(plan, $scope.settings.signal_radius, $scope.updateControls)
 				$timeout(() => {
 					$scope.settings.show_heatmap = false
 					Drawing.heatmap('off')
@@ -688,9 +710,9 @@ angular.module('plans')
 				})
 
 				/* TODO: add unique designers to project / site / building */
-				$scope.project.details  = _.omit(details, ['project', 'site', 'building', 'address', 'city', 'state', 'zipcode', 'contacts'])
-				$scope.site.details     = _.omit(details, ['site', 'building', 'contacts'])
-				$scope.building.details = details
+				$scope.project.details  = _.defaultsDeep($scope.project.details, _.omit(details, ['project', 'site', 'building', 'address', 'city', 'state', 'zipcode', 'contacts']))
+				$scope.site.details     = _.defaultsDeep($scope.site.details, _.omit(details, ['site', 'building', 'contacts']))
+				$scope.building.details = _.defaultsDeep($scope.building.details, details)
 
 				$scope.project.$update(project => {
 					$scope.project = project
@@ -786,10 +808,12 @@ angular.module('plans')
 
 			$scope.selectProject = project => {
 				$scope.selected = {project: project}
+				$scope.sort.sites = 'name'
 			}
 
 			$scope.selectSite = site => {
 				$scope.selected.site = site
+				$scope.sort.buildings = 'name'
 				delete $scope.selected.building
 			}
 

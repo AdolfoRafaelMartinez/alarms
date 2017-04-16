@@ -1,8 +1,8 @@
 'use strict'
 
 angular.module('plans')
-	.controller('settingsModalController', ['$scope', 'close', 'item', 'type', 'project', 'ModalService',
-		function ($scope, close, item, type, project, ModalService) {
+	.controller('settingsModalController', ['$scope', 'close', 'item', 'type', 'project', 'ModalService', 'Vendors', 'APs', 'Mounts', 'Controllers',
+		function ($scope, close, item, type, project, ModalService, Vendors, APs, Mounts, Controllers) {
 			$scope.item = item
 			$scope.type = type
 			$scope.project = project
@@ -11,10 +11,6 @@ angular.module('plans')
 				details: true,
 				contacts: false,
 				wifi: false
-			}
-
-			$scope.close = function () {
-				close($scope.project, 500)
 			}
 
 			$scope.pp_edit = {}
@@ -68,9 +64,12 @@ angular.module('plans')
 			}
 
 			$scope.save = function () {
-				$scope.project.$update(project => {
-					$scope.project = project
-				})
-				$scope.pp_edit.details = false
+				$scope.project.$update()
+				$scope.pp_edit = {}
 			}
+
+			$scope.getAPs         = search => APs.query({search: search}).$promise
+			$scope.getControllers = search => Controllers.query({search: search}).$promise
+			$scope.getMounts      = search => Mounts.query({search: search}).$promise
+			$scope.vendors        = Vendors.query()
 		}])

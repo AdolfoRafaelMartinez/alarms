@@ -43,7 +43,7 @@ exports.delete = function (req, res) {
 	})
 	_.each(req.project.sites, site => {
 		_.each(site.buildings, (b, i) => {
-			if (b._id === building._id) {
+			if (!b || b._id === building._id) {
 				site.buildings.splice(i, 1)
 			}
 		})
@@ -82,17 +82,16 @@ exports.pdfReport = function (req, res, next) {
 			if (!plan.details.parts) plan.details.parts = []
 			if (!plan.details.contacts) plan.details.contacts = []
 			if (!plan.details.designer) plan.details.designer = {}
-			aps += plan.stage.aps.length
+			if (!plan.stage.items) plan.stage.items = plan.stage.aps
+			aps += plan.stage.items.length
 			ams += plan.stage.ams.length
 			if (plan.details.controllers.length) {
 				ctrl = plan.details.controllers[0] // TODO: maybe some projects require multiple controllers ?
 			}
 			if (plan.details.lic) lic = plan.details.lic
-			_.each(plan.stage.aps, (ap, i) => {
-				if (!_.get(ap, 'inventory.name')) _.set(ap, 'inventory.name', `AP${i}`)
-			})
-			_.each(plan.stage.ams, (am, i) => {
-				if (!_.get(am, 'inventory.name')) _.set(am, 'inventory.name', `AM${i}`)
+			_.each(plan.stage.items, (ap, i) => {
+				if (ap.itemType === 'ap' && !_.get(ap, 'inventory.name')) _.set(ap, 'inventory.name', `AP${i}`)
+				if (ap.itemType === 'am' && !_.get(am, 'inventory.name')) _.set(ao, 'inventory.name', `AM${i}`)
 			})
 
 			plans.push(plan)
