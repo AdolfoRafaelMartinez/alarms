@@ -196,7 +196,7 @@ angular.module('plans')
 				}).progress(function (event) {
 					$scope.uploadProgress = Math.floor(event.loaded / event.total)
 					$scope.$apply()
-					console.log($scope.uploadProgress)
+					console.log('uploadprogress', $scope.uploadProgress)
 				}).success(function (data, status, headers, config) {
 					console.log('Photo uploaded!')
 				}).error(function (err) {
@@ -457,7 +457,6 @@ angular.module('plans')
 					delete bldg.new
 					$scope.selected.project.$update()
 						.then(() => {
-							console.log(bldg, $scope.selected.project)
 							$location.path(`building/${building._id}`)
 						})
 				}, errorResponse => {
@@ -566,6 +565,11 @@ angular.module('plans')
 				$scope.flooplan_name = plan.title
 				if (typeof plan.details !== 'object') plan.details = {}
 				if (!plan.details.contacts) plan.details.contacts = []
+				if (plan.details.controller) {
+					if (!_.get(plan, 'details.controllers[0]')) $scope.addController()
+					plan.details.controllers[0].country = plan.details.country
+					plan.details.controllers[0].sku = plan.details.controller
+				}
 				Drawing.loadPlan(plan, $scope.settings.signal_radius, $scope.updateControls)
 				$timeout(() => {
 					$scope.settings.show_heatmap = false
@@ -657,12 +661,14 @@ angular.module('plans')
 				$scope.savePlan()
 			}
 
-			$scope.addController = function () {
-				$scope.pp_edit.controllers = true
+			$scope.addController = function (edit) {
+				if (edit) $scope.pp_edit.controllers = true
 				var newController = {
 					lic: {
 						ap: {}
-					}
+					},
+					country: $scope.plan.details.country,
+					sku: $scope.plan.details.controller
 				}
 				$scope.edit_prop = newController
 				if (!$scope.plan.details.controllers) $scope.plan.details.controllers = []
@@ -671,7 +677,7 @@ angular.module('plans')
 
 			$scope.checkController = function () {
 				if (!$scope.plan.details.controllers) {
-					$scope.addController()
+					$scope.addController(true)
 				} else {
 					$scope.savePlanProperties()
 				}
@@ -689,7 +695,7 @@ angular.module('plans')
 			}
 
 			$scope.updateLicenses = function () {
-				$scope.plan.details.controllers[0].lic.ap.qty = $scope.plan.stage.aps.length
+				$scope.plan.details.controllers[0].lic.ap.qty = $scope.plan.stage.items ? _.filter($scope.plan.stage.items, i => i.itemType === 'ap').length : 0
 			}
 
 			$scope.toggleMDF = function () {
@@ -702,6 +708,7 @@ angular.module('plans')
 
 			$scope.savePlanProperties = function () {
 				var details = _.omit($scope.plan.details, ['controllers', 'ctrlPresent', 'lic', 'stage'])
+				console.log($scope.plans)
 				_.each($scope.plans, plan => {
 					_.each(details, (obj, key) => {
 						plan.details[key] = obj
@@ -710,9 +717,9 @@ angular.module('plans')
 				})
 
 				/* TODO: add unique designers to project / site / building */
-				$scope.project.details  = _.defaultsDeep($scope.project.details, _.omit(details, ['project', 'site', 'building', 'address', 'city', 'state', 'zipcode', 'contacts']))
-				$scope.site.details     = _.defaultsDeep($scope.site.details, _.omit(details, ['site', 'building', 'contacts']))
-				$scope.building.details = _.defaultsDeep($scope.building.details, details)
+				$scope.project.details  = _.defaults($scope.project.details, _.omit(details, ['project', 'site', 'building', 'address', 'city', 'state', 'zipcode', 'contacts']))
+				$scope.site.details     = _.defaults($scope.site.details, _.omit(details, ['site', 'building', 'contacts']))
+				$scope.building.details = _.defaults($scope.building.details, details)
 
 				$scope.project.$update(project => {
 					$scope.project = project

@@ -122,6 +122,8 @@ exports.update = function (req, res) {
 							_.set(plan, 'details.building', bldg.name)
 							_.set(plan, 'details.client', project.details.client)
 							_.set(plan, 'details.vendor', _.get(bldg, 'details.inventory.vendor'))
+							_.set(plan, 'details.controller', _.get(bldg, 'details.inventory.controller'))
+							_.set(plan, 'details.country', _.get(bldg, 'details.inventory.country'))
 							_.set(plan, 'details.aps', _.get(bldg, 'details.inventory.aps'))
 							_.set(plan, 'details.ams', _.get(bldg, 'details.inventory.ams'))
 							if (!_.get(plan.stage.items)) plan.stage.items = plan.stage.aps

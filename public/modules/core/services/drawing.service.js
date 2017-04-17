@@ -1094,14 +1094,15 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			return newCanvas.toDataURL()
 		}
 
-		this.loadPlan = function (plan, signal_radius, updateControls) {
-			var plan_id = plan._id
-			var data = plan.stage
-			this.plan = plan
+		this.loadPlan = function (planResource, signal_radius, updateControls) {
+			var plan_id = planResource._id
+			var data = planResource.stage
+			this.plan = planResource
+			console.log('loadPlan', this.plan)
 			this.updateControls = updateControls
 			$timeout(function () {
 				if (data.plan) plan = data.plan
-				plan._id = plan_id
+				plan._id = this.plan.id
 				var stage_scale = _.get(plan, 'stage.stage_scale')
 				this.initBoard(signal_radius)
 				if (data.floorplan) {
@@ -1118,7 +1119,6 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 				stage.regY = _.get(data.plan, 'stage.regY')
 
 				if (!data.items && data.aps) data.items = data.aps
-				console.log('loadPlan', data)
 				_.each(data.items, function (item) {
 					this.addAP(item.x, item.y, signal_radius, item)
 				}.bind(this))
