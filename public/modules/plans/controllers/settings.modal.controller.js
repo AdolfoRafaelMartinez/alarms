@@ -3,9 +3,9 @@
 angular.module('plans')
 	.controller('settingsModalController', ['$scope', 'close', 'item', 'type', 'project', 'ModalService', 'Vendors', 'APs', 'Mounts', 'Controllers',
 		function ($scope, close, item, type, project, ModalService, Vendors, APs, Mounts, Controllers) {
-			$scope.item = item
 			$scope.type = type
 			$scope.project = project
+			$scope.item = item
 
 			$scope.sma = {
 				details: true,
@@ -29,10 +29,10 @@ angular.module('plans')
 			}
 
 			$scope.saveContact = function () {
-				if (typeof $scope.item.details !== 'object') $scope.item.details = {}
-				if (!$scope.item.details.contacts) $scope.item.details.contacts = []
+				if (typeof item.details !== 'object') item.details = {}
+				if (!item.details.contacts) item.details.contacts = []
 				if (newContact.name) {
-					$scope.item.details.contacts.push(_.clone(newContact))
+					item.details.contacts.push(_.clone(newContact))
 					newContact = {}
 				}
 				$scope.save()
@@ -41,7 +41,7 @@ angular.module('plans')
 
 			$scope.askDeleteContact = function (contactIndex, $event) {
 				$event.stopPropagation()
-				var contact = $scope.item.details.contacts[contactIndex]
+				var contact = item.details.contacts[contactIndex]
 
 				ModalService.showModal({
 					templateUrl: 'deleteModal.html',
@@ -59,7 +59,7 @@ angular.module('plans')
 			}
 
 			$scope.removeContact = function (index) {
-				$scope.item.details.contacts.splice(index, 1)
+				item.details.contacts.splice(index, 1)
 				$scope.save()
 			}
 

@@ -67,6 +67,7 @@ exports.pdfReport = function (req, res, next) {
 	var ams = 0
 	var ctrl = {}
 	var lic = {}
+	var parts = {}
 	let promises = []
 	_.each(req.building.plans, bplan => {
 		let deferred = Q.defer()
@@ -91,7 +92,11 @@ exports.pdfReport = function (req, res, next) {
 			if (plan.details.lic) lic = plan.details.lic
 			_.each(plan.stage.items, (ap, i) => {
 				if (ap.itemType === 'ap' && !_.get(ap, 'inventory.name')) _.set(ap, 'inventory.name', `AP${i}`)
-				if (ap.itemType === 'am' && !_.get(am, 'inventory.name')) _.set(ao, 'inventory.name', `AM${i}`)
+				if (ap.itemType === 'am' && !_.get(ap, 'inventory.name')) _.set(ap, 'inventory.name', `AM${i}`)
+				if (ap.sku) {
+					if (!parts[ap.sku]) parts[ap.sku] = 0
+					parts[ap.sku]++
+				}
 			})
 
 			plans.push(plan)
@@ -108,6 +113,8 @@ exports.pdfReport = function (req, res, next) {
 			if (!req.building.details.designer) req.building.details.designer = {}
 			if (!req.building.details.msp) req.building.details.msp = {}
 
+			console.log('parts are'); console.dir(parts)
+
 			const PUGDIR = `${__dirname}/../pug`
 			pug.renderFile(`${PUGDIR}/sf01.pug`,
 				{
@@ -118,6 +125,7 @@ exports.pdfReport = function (req, res, next) {
 					apms: parseInt(aps) + parseInt(ams),
 					ctrl: ctrl,
 					lic: lic,
+					parts: parts,
 					today: new Date().toUTCString().substr(0, 16),
 					assetsDir: `${PUGDIR}/assets`
 				}, (err, result) => {

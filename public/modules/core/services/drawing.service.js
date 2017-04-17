@@ -1049,6 +1049,8 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 						json.items.push({
 							name: ap.name,
 							itemType: ap.itemType,
+							sku: ap.inventory.sku,
+							vendor: ap.inventory.vendor,
 							x: ap.x,
 							y: ap.y
 						})
@@ -1062,6 +1064,8 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 					})
 				}
 			}
+
+			console.log('toJSON', json)
 
 			return json
 		}

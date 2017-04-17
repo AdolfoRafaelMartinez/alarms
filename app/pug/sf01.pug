@@ -90,7 +90,7 @@ html(lang="en")
 						div.cardtitlefull.darkblue
 							span Controllers
 
-						p.controllers=`${ctrl.country} - ${ctrl.model}`
+						p.controllers=`${ctrl.country} - ${ctrl.sku}`
 							if ctrl.ha
 								= '- HA (TWO Controllers)'
 						p=ctrl.description
@@ -114,11 +114,11 @@ html(lang="en")
 									th(width='70%' align='left') Description
 									th(width='8%' align='center') Qty
 
-								each part in building.details.parts
+								each qty, part in parts
 									tr(valign='top')
-										td(align='left')=part.name
+										td(align='left')=part
 										td=part.desc
-										td(align='center')=part.nr
+										td(align='center')=qty
 
 				div.footer
 					img.msplogo(src=building.details.msp.logo)
@@ -142,14 +142,15 @@ html(lang="en")
 						div.full
 							div.placements
 								dl
-									each am, ami in plan.stage.ams
-										div.am
-											dt=`${ami + 1}:`
-											dd=`${am.inventory.name}`
-									each ap, api in plan.stage.aps
-										div.ap
-											dt=`${api + 1}:`
-											dd=`${ap.inventory.name}`
+									each ap, api in plan.stage.items
+										if (ap.itemType === 'am')
+											div.am
+												dt=`${api + 1}:`
+												dd=`${ap.inventory.name}`
+										if (ap.itemType === 'ap')
+											div.ap
+												dt=`${api + 1}:`
+												dd=`${ap.inventory.name}`
 					div.footer
 						img.msplogo(src=building.details.msp.logo)
 						img.pjlogo(src=`${assetsDir}/pbpj.png`)

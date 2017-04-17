@@ -559,17 +559,30 @@ angular.module('plans')
 				$location.path(`plans/${plan._id}`)
 			}
 
+			function updateWifiDetails (plan) {
+				if (plan.details.controller) {
+					if (!_.get(plan, 'details.controllers[0]')) $scope.addController()
+					plan.details.controllers[0].country = plan.details.country
+					plan.details.controllers[0].sku = plan.details.controller
+				}
+				if (!plan.stage.items) plan.stage.items = plan.stage.aps
+				_.each(plan.stage.items, item => {
+					if (!item.sku) {
+						if (item.itemType === 'ap') item.sku = plan.details.aps
+						if (item.itemType === 'am') item.sku = plan.details.ams
+						item.vendor = plan.details.vendor
+					}
+				})
+				console.log('updated', plan.stage.items)
+			}
+
 			$scope.showPlan = (plan) => {
 				$scope.plan = plan
 				$scope.settings = plan.settings
 				$scope.flooplan_name = plan.title
 				if (typeof plan.details !== 'object') plan.details = {}
 				if (!plan.details.contacts) plan.details.contacts = []
-				if (plan.details.controller) {
-					if (!_.get(plan, 'details.controllers[0]')) $scope.addController()
-					plan.details.controllers[0].country = plan.details.country
-					plan.details.controllers[0].sku = plan.details.controller
-				}
+				updateWifiDetails(plan)
 				Drawing.loadPlan(plan, $scope.settings.signal_radius, $scope.updateControls)
 				$timeout(() => {
 					$scope.settings.show_heatmap = false
@@ -589,6 +602,7 @@ angular.module('plans')
 					_.set(plan, 'details.project', $scope.project.title)
 					_.set(plan, 'details.site', $scope.site.name)
 					_.set(plan, 'details.building', $scope.building.name)
+					updateWifiDetails(plan)
 					if (!$scope.settings) $scope.showPlan(plan)
 				}))
 			}

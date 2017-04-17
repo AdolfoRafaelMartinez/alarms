@@ -42,8 +42,8 @@ module.exports = {
 				'public/lib/blueimp-file-upload/js/jquery.fileupload-angular.js'
 			]
 		},
-		css: 'public/dist/application.min.css',
-		js: 'public/dist/application.min.js'
+		css: 'public/dist/application.min.css?v=1.0',
+		js: 'public/dist/application.min.js?v=1.0'
 	},
 	facebook: {
 		clientID: process.env.FACEBOOK_ID || 'APP_ID',

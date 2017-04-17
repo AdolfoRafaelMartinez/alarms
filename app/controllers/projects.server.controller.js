@@ -121,11 +121,28 @@ exports.update = function (req, res) {
 							_.set(plan, 'details.site', site.name)
 							_.set(plan, 'details.building', bldg.name)
 							_.set(plan, 'details.client', project.details.client)
+
+							_.set(plan, 'details.country', _.get(bldg, 'details.inventory.country'))
+							_.set(plan, 'details.address', _.get(bldg, 'details.address'))
+							_.set(plan, 'details.city', _.get(bldg, 'details.city'))
+							_.set(plan, 'details.state', _.get(bldg, 'details.state'))
+							_.set(plan, 'details.zipcode', _.get(bldg, 'details.zipcode'))
+
+							_.defaultsDeep(plan.details, {
+								designer: _.get(bldg, 'details.designer'),
+								msp: _.get(bldg, 'details.msp'),
+								contacts: _.get(bldg, 'details.contacts')
+							})
+
+							if (typeof plan.details.contacts === 'object' && !plan.details.contacts.length) {
+								plan.details.contacts = bldg.details.contacts
+							}
+
 							_.set(plan, 'details.vendor', _.get(bldg, 'details.inventory.vendor'))
 							_.set(plan, 'details.controller', _.get(bldg, 'details.inventory.controller'))
-							_.set(plan, 'details.country', _.get(bldg, 'details.inventory.country'))
 							_.set(plan, 'details.aps', _.get(bldg, 'details.inventory.aps'))
 							_.set(plan, 'details.ams', _.get(bldg, 'details.inventory.ams'))
+							if (bldg.name === 'Kenya Oval') { console.log('plan', bldg.name); console.dir(bldg, {depth: null}) }
 							if (!_.get(plan.stage.items)) plan.stage.items = plan.stage.aps
 							_.each(plan.stage.items, ap => {
 								if (['ap', undefined].includes(ap.itemType)) {
