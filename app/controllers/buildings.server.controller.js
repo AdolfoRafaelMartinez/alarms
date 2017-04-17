@@ -2,6 +2,9 @@ const mongoose = require('mongoose')
 const _        = require('lodash')
 const Project  = mongoose.model('Project')
 const Plan     = mongoose.model('Plan')
+// const AP       = mongoose.model('AP')
+// const Ctrl     = mongoose.model('Controller')
+// const Mount    = mongoose.model('Mount')
 const pug      = require('pug')
 const shortid  = require('shortid')
 const fs       = require('fs')
@@ -84,18 +87,27 @@ exports.pdfReport = function (req, res, next) {
 			if (!plan.details.contacts) plan.details.contacts = []
 			if (!plan.details.designer) plan.details.designer = {}
 			if (!plan.stage.items) plan.stage.items = plan.stage.aps
-			aps += plan.stage.items.length
+			plan.stage.aps = _.filter(plan.stage.items, i => i.itemType === 'ap')
+			plan.stage.ams = _.filter(plan.stage.items, i => i.itemType === 'am')
+			aps += plan.stage.aps.length
 			ams += plan.stage.ams.length
 			if (plan.details.controllers.length) {
 				ctrl = plan.details.controllers[0] // TODO: maybe some projects require multiple controllers ?
 			}
 			if (plan.details.lic) lic = plan.details.lic
-			_.each(plan.stage.items, (ap, i) => {
-				if (ap.itemType === 'ap' && !_.get(ap, 'inventory.name')) _.set(ap, 'inventory.name', `AP${i}`)
-				if (ap.itemType === 'am' && !_.get(ap, 'inventory.name')) _.set(ap, 'inventory.name', `AM${i}`)
+			_.each(plan.stage.aps, (ap, i) => {
+				if (!ap.name) ap.name = `AM${i + 1}`
 				if (ap.sku) {
-					if (!parts[ap.sku]) parts[ap.sku] = 0
-					parts[ap.sku]++
+					if (!parts[ap.sku]) parts[ap.sku] = { qty: 0, desc: '' }
+					parts[ap.sku].qty++
+				}
+			})
+
+			_.each(plan.stage.ams, (am, i) => {
+				if (!am.name) am.name = `AM${i + 1}`
+				if (am.sku) {
+					if (!parts[am.sku]) parts[am.sku] = { qty: 0, desc: '' }
+					parts[am.sku].qty++
 				}
 			})
 
@@ -106,14 +118,15 @@ exports.pdfReport = function (req, res, next) {
 
 	Q.all(promises)
 		.then(() => {
+			return
+		})
+		.then(() => {
 			if (!req.building.details) req.building.details = {}
 			if (!req.building.details.client) req.building.details.client = {}
 			if (!req.building.details.parts) req.building.details.parts = []
 			if (!req.building.details.contacts) req.building.details.contacts = []
 			if (!req.building.details.designer) req.building.details.designer = {}
 			if (!req.building.details.msp) req.building.details.msp = {}
-
-			console.log('parts are'); console.dir(parts)
 
 			const PUGDIR = `${__dirname}/../pug`
 			pug.renderFile(`${PUGDIR}/sf01.pug`,

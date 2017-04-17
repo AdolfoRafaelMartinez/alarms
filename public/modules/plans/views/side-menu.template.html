@@ -45,6 +45,11 @@
 		<div class="tools">
 
 			<div class="actionf">
+				<input type="text" ng-model="plan.floor" class="elem elem-green input" value="1"><br>
+				<div>Floor #</div>
+			</div>
+
+			<div class="actionf">
 				<form id="fileupload" data-ng-controller="pjFileUploadController"
 						  action="/upload" method="POST" enctype="multipart/form-data" data-file-upload="options" 
 																	 ng-class="{'fileupload-processing': processing() || loadingFiles}">
@@ -55,11 +60,6 @@
 						<input type="file" name="files[]" multiple ng-disabled="disabled">
 					</button>
 				</form>
-			</div>
-
-			<div class="actionf">
-				<input type="text" ng-model="plan.floor" class="elem elem-green input" value="1"><br>
-				<div>Floor #</div>
 			</div>
 
 			<div class="actionf">

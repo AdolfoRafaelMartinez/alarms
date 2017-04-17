@@ -39,6 +39,7 @@ body {
 	color: #333333;
 	margin: 0;
 	padding: 0;
+	background: #eee;
 }
 
 #container {
@@ -120,6 +121,7 @@ End Class Examples*/
 	border: #cdc9c8 4px solid;
 	box-shadow: 0px 8px 16px 0px #cdc9c8;
 	float: left;
+	background-color: white;
 }
 
 .halfleft {
@@ -199,18 +201,12 @@ End Class Examples*/
 
 .details {
 	height: 450px;
-	background-image:url(../assets/tile1.png);
+	background: white;
 }
 
 .contacts { /*Still working on getting the spacing right for this...*/
 	max-height: 450px;
-	background-image:url(../assets/tile1.png);
-	column-count: 3;
-	-webkit-column-count: 3;
-	-moz-column-count: 3;
-	column-fill: balance;
-	-webkit-column-fill: balance;
-	-moz-column-fill: balance;
+	background: white;
 	font-size: 48px;
 	line-height: 60px;
 }
@@ -227,6 +223,7 @@ End Class Examples*/
 	color: #11a04c;
 	background: url(../assets/ap@4x.png);
 	background-repeat: no-repeat;
+	background-color: white;
 }
 
 .ams {
@@ -237,10 +234,11 @@ End Class Examples*/
 	color: #205299;
 	background: url(../assets/am@4x.png);
 	background-repeat: no-repeat;
+	background-color: white;
 }
 
 .mounts {
-	background-image:url(../assets/tile1.png);
+	background: white;
 	height: 152px;
 	text-align: right;
 	font-size: 150px;
@@ -249,7 +247,7 @@ End Class Examples*/
 }
 
 .sfps {
-	background-image:url(../assets/tile1.png);
+	background: white;
 	height: 152px;
 	text-align: right;
 	font-size: 150px;
@@ -258,12 +256,12 @@ End Class Examples*/
 }
 
 .controllers {
-	background-image:url(../assets/tile1.png);
+	background: white;
 	text-align: justify;
 }
 
 .licenses {
-	background-image:url(../assets/tile1.png);
+	background: white;
 	font-size: 56px;
 }
 
@@ -273,7 +271,7 @@ End Class Examples*/
 }
 
 .bom {
-	background-image:url(../assets/tile1.png);
+	background: white;
 	border-collapse: collapse;
     width: 100%;
 }
@@ -303,37 +301,46 @@ End Class Examples*/
 }
 
 .placements {
-	background-image:url(../assets/tile1.png);
-	height: 640px;
+	background: white;
 	font-size: 44px;
+	padding: 20px;
 	column-count: 3;
 	-webkit-column-count: 3;
-	-moz-column-count: 3;
 }
 
 .placements div {
-    display: inline-block;
+    display: table;
     padding: 10px 40px;
 }
 
-.placements .ap dt {
-    border: 8px solid #248;
+.placements .ap, .placements .am {
+	width: 30%;
+	display: inline-block;
 }
 
-.placements .am dt {
+.placements .am div:first-child {
     border: 8px solid #284;
+    border-radius: 50%;
 }
 
-.placements dt {
+.placements .ap div:first-child {
+    border: 8px solid #248;
     border-radius: 10px;
+}
+
+.placements .ap div:first-child,
+.placements .am div:first-child {
     float: left;
     padding: 5px 20px;
+	display: block;
 }
 
-.placements dd {
+.placements .ap div:last-child,
+.placements .am div:last-child {
     float: left;
     padding: 13px 0;
     margin-left: 30px;
+	display: block;
 }
 
 
@@ -354,7 +361,6 @@ End Class Examples*/
 	width: 1840px;
 	height: 800px;
 	background-color: #205299;
-	background-image: url(../assets/tile2.png);
 	box-shadow: 0px 8px 16px 0px #cdc9c8;
 }
 

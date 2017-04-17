@@ -1047,8 +1047,8 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 				if (layers[i].layer_type === 'ap') {
 					_.each(layers[i].children, function (ap) {
 						json.items.push({
-							name: ap.name,
-							itemType: ap.itemType,
+							name: ap.inventory.name,
+							itemType: ap.inventory.itemType,
 							sku: ap.inventory.sku,
 							vendor: ap.inventory.vendor,
 							x: ap.x,
@@ -1064,8 +1064,6 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 					})
 				}
 			}
-
-			console.log('toJSON', json)
 
 			return json
 		}
@@ -1102,7 +1100,6 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			var plan_id = planResource._id
 			var data = planResource.stage
 			this.plan = planResource
-			console.log('loadPlan', this.plan)
 			this.updateControls = updateControls
 			$timeout(function () {
 				if (data.plan) plan = data.plan

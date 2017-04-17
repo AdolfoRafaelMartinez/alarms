@@ -561,7 +561,7 @@ angular.module('plans')
 
 			function updateWifiDetails (plan) {
 				if (plan.details.controller) {
-					if (!_.get(plan, 'details.controllers[0]')) $scope.addController()
+					if (!_.get(plan, 'details.controllers[0]')) $scope.addController(false, plan)
 					plan.details.controllers[0].country = plan.details.country
 					plan.details.controllers[0].sku = plan.details.controller
 				}
@@ -675,18 +675,19 @@ angular.module('plans')
 				$scope.savePlan()
 			}
 
-			$scope.addController = function (edit) {
+			$scope.addController = function (edit, plan) {
+				if (!plan) plan = $scope.plan
 				if (edit) $scope.pp_edit.controllers = true
 				var newController = {
 					lic: {
 						ap: {}
 					},
-					country: $scope.plan.details.country,
-					sku: $scope.plan.details.controller
+					country: plan.details.country,
+					sku: plan.details.controller
 				}
 				$scope.edit_prop = newController
-				if (!$scope.plan.details.controllers) $scope.plan.details.controllers = []
-				$scope.plan.details.controllers.push(newController)
+				if (!plan.details.controllers) plan.details.controllers = []
+				plan.details.controllers.push(newController)
 			}
 
 			$scope.checkController = function () {
