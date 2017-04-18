@@ -95,14 +95,21 @@ exports.update = function (req, res) {
 			project_data.screenshot = pic.file
 			project = _.extend(project, project_data)
 			var promises = []
+			var newsite, newbldg
 			_.each(project.sites, site => {
 				_.set(site, 'details.project', project.title)
 				site.details.client = project.details.client
 				if (!_.get(site, 'details.msp.name')) _.set(site, 'details.msp', project.details.msp)
 				if (!_.get(site, 'details.designer.name')) _.set(site, 'details.designer', project.details.designer)
-				if (!site._id) site._id = mongoose.Types.ObjectId().toString()
+				if (!site._id) {
+					newsite = site._id = mongoose.Types.ObjectId().toString()
+					delete site.new
+				}
 				_.each(site.buildings, b => {
-					if (!b._id) b._id = mongoose.Types.ObjectId().toString()
+					if (!b._id) {
+						newbldg = b._id = mongoose.Types.ObjectId().toString()
+						delete b.new
+					}
 				})
 				_.each(site.buildings, bldg => {
 					_.set(bldg, 'details.project', project.title)
@@ -142,7 +149,6 @@ exports.update = function (req, res) {
 							_.set(plan, 'details.controller', _.get(bldg, 'details.inventory.controller'))
 							_.set(plan, 'details.aps', _.get(bldg, 'details.inventory.aps'))
 							_.set(plan, 'details.ams', _.get(bldg, 'details.inventory.ams'))
-							if (bldg.name === 'Kenya Oval') { console.log('plan', bldg.name); console.dir(bldg, {depth: null}) }
 							if (!_.get(plan.stage.items)) plan.stage.items = plan.stage.aps
 							_.each(plan.stage.items, ap => {
 								if (['ap', undefined].includes(ap.itemType)) {
@@ -163,15 +169,23 @@ exports.update = function (req, res) {
 			})
 			let deferred = Q.defer()
 			promises.push(deferred.promise)
-			Project.findOneAndUpdate({_id: project._id}, project).exec(err => {
+			Project.findOneAndUpdate({_id: project._id}, project, {new: true}, (err, savedProject) => {
 				if (err) {
 					deferred.reject(err)
 				} else {
+					project = savedProject
 					deferred.resolve()
-					res.json(project)
 				}
 			})
-			return Q.all(promises)
+			return Q.all(promises).then(() => {
+				if (newbldg || newsite) {
+					_.set(project, 'details.newbldg', newbldg)
+					_.set(project, 'details.newsite', newsite)
+				}
+				console.log(newbldg, newsite)
+				console.dir(project.details)
+				res.json(project)
+			})
 		})
 		.catch(err => {
 			console.dir(err)

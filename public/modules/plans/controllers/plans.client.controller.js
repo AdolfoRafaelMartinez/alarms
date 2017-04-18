@@ -315,6 +315,7 @@ angular.module('plans')
 			$scope.selected = {}
 
 			$scope.create = ($event, item) => {
+				$event.stopPropagation()
 				switch (item) {
 					case 'project':
 						if (!$scope.new.project.title) break
@@ -334,11 +335,7 @@ angular.module('plans')
 						$scope.selected.project.sites.push($scope.selected.site)
 						$scope.sort.sites = '-created'
 						$scope.new.building = { created: new Date() }
-						$scope.selected.project.$update(project => {
-							$scope.selected.site = _.find(project.sites, s => s.new)
-							delete $scope.selected.site.new
-							updateProject()
-						})
+						updateProject()
 						break
 
 					case 'building':
@@ -350,17 +347,10 @@ angular.module('plans')
 						}
 						$scope.selected.site.buildings.push($scope.selected.building)
 						$scope.sort.buildings = '-created'
-						var siteId = $scope.selected.site._id
-						$scope.selected.project.$update(project => {
-							$scope.selected.site = _.find(project.sites, s => s._id === siteId)
-							$scope.selected.building = _.find($scope.selected.site.buildings, b => b.new)
-							delete $scope.selected.building.new
-							updateProject()
-						})
+						updateProject()
 						break
 				}
 				$scope.new[item] = null
-				$event.stopPropagation()
 			}
 
 			var planSkeleton = {
@@ -404,9 +394,7 @@ angular.module('plans')
 					$scope.plan = response
 					$scope.plan.title = 'Untitled'
 					$scope.building.plans.push({_id: $scope.plan._id, title: $scope.plan.title})
-					$scope.project.$update(response => {
-						$scope.project = response
-					})
+					updateProject()
 					$scope.plans.push($scope.plan)
 					$scope.settings = {
 						units: 'ft',
@@ -454,11 +442,9 @@ angular.module('plans')
 					bldg.plans.push({
 						_id: response._id
 					})
-					delete bldg.new
-					$scope.selected.project.$update()
-						.then(() => {
-							$location.path(`building/${building._id}`)
-						})
+					updateProject().then(() => {
+						$location.path(`building/${building._id}`)
+					})
 				}, errorResponse => {
 					$scope.error = errorResponse.data.message
 				})
@@ -525,28 +511,32 @@ angular.module('plans')
 						break
 
 					case 'site':
-						$scope.selectSite(_.find($scope.selected.project.sites, s => s._id === item._id))
+						item = $scope.selectSite(item)
 						break
 
 					case 'bldg':
-						item = _.find($scope.selected.site.buildings, b => b._id === item._id)
+						item = $scope.selectBuilding(item)
 						break
 				}
 				ModalService.showModal({
 					templateUrl: 'modules/plans/views/settings.modal.html',
 					controller: 'settingsModalController',
-					inputs: { item: item, type: type, project: $scope.selected.project }
+					inputs: { item: item, type: type }
 				})
 					.then(function (modal) {
 						modal.element.modal()
-						/*
 						modal.element.on('hidden.bs.modal', () => {
-							modal.scope.close()
+							if (type === 'site') {
+								_.each($scope.selected.project.sites, (s, i) => {
+									if (s._id === item._id) $scope.selected.project.sites[i] = modal.scope.getItem()
+								})
+							} else if (type === 'building') {
+								_.each($scope.selected.site.buildings, (b, i) => {
+									if (b._id === item._id) $scope.selected.site.buildings[i] = modal.scope.getItem()
+								})
+							}
+							updateProject()
 						})
-						modal.close.then(function (project) {
-							$scope.selected.project = project
-						})
-						*/
 					})
 			}
 
@@ -573,7 +563,6 @@ angular.module('plans')
 						item.vendor = plan.details.vendor
 					}
 				})
-				console.log('updated', plan.stage.items)
 			}
 
 			$scope.showPlan = (plan) => {
@@ -661,6 +650,7 @@ angular.module('plans')
 				$scope.edit_prop = newContact
 			}
 
+			/* Only called from the plan view */
 			$scope.saveContact = function () {
 				if (!$scope.plan.details.contacts) $scope.plan.details.contacts = []
 				if (newContact.name) {
@@ -723,7 +713,6 @@ angular.module('plans')
 
 			$scope.savePlanProperties = function () {
 				var details = _.omit($scope.plan.details, ['controllers', 'ctrlPresent', 'lic', 'stage'])
-				console.log($scope.plans)
 				_.each($scope.plans, plan => {
 					_.each(details, (obj, key) => {
 						plan.details[key] = obj
@@ -736,9 +725,7 @@ angular.module('plans')
 				$scope.site.details     = _.defaults($scope.site.details, _.omit(details, ['site', 'building', 'contacts']))
 				$scope.building.details = _.defaults($scope.building.details, details)
 
-				$scope.project.$update(project => {
-					$scope.project = project
-				})
+				updateProject()
 				$scope.savePlan() // save current plan
 				$scope.pp_edit = {}
 			}
@@ -760,9 +747,7 @@ angular.module('plans')
 								})
 								_.remove($scope.plans, p => p._id === plan._id)
 								plan.$delete()
-								$scope.project.$update(project => {
-									$scope.project = project
-								})
+								updateProject()
 							}
 						})
 					})
@@ -800,7 +785,7 @@ angular.module('plans')
 								delete $scope.selected.site
 								delete $scope.selected.building
 								_.remove($scope.selected.project.sites, s => s._id === site._id)
-								$scope.selected.project.$update()
+								updateProject()
 							}
 						})
 					})
@@ -834,9 +819,15 @@ angular.module('plans')
 			}
 
 			$scope.selectSite = site => {
-				$scope.selected.site = site
+				$scope.selected.site = _.find($scope.selected.project.sites, s => s._id === site._id)
 				$scope.sort.buildings = 'name'
 				delete $scope.selected.building
+				return $scope.selected.site
+			}
+
+			$scope.selectBuilding = bldg => {
+				$scope.selected.building = _.find(_.get($scope.selected, 'site.buildings'), b => b._id === bldg._id)
+				return $scope.selected.building
 			}
 
 			$scope.report = function () {
@@ -852,10 +843,23 @@ angular.module('plans')
 			}
 
 			function updateProject () {
+				var deferred = $q.defer()
 				$scope.selected.project.$update(project => {
-					$scope.selected.site = _.find(project.sites, s => s._id === $scope.selected.site._id)
-					$scope.selected.building = _.find($scope.selected.site.buildings, b => b._id === $scope.selected.building._id)
+					var newsite = _.get(project, 'details.newsite') || _.get($scope.selected, 'site._id')
+					var newbldg = _.get(project, 'details.newbldg') || _.get($scope.selected, 'building._id')
+					if (_.get(project, 'details.newsite')) delete project.details.newsite
+					if (_.get(project, 'details.newbldg')) delete project.details.newbldg
+					$scope.selected.project = project
+					_.each($scope.projects, (p, i) => {
+						if (p._id === project.id) $scope.projects[i] = project
+					})
+					$scope.selected.site = _.find(project.sites, s => s._id === newsite)
+					$scope.selected.building = _.find(_.get($scope.selected, 'site.buildings'), b => b._id === newbldg)
+
+					deferred.resolve()
 				})
+
+				return deferred.promise
 			}
 
 			$scope.onOrphanDrop = function (event, ui) {

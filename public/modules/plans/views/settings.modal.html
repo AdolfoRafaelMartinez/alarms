@@ -132,7 +132,8 @@
 									</div>
 								</div>
 								<div class="form-group col-log-12" ng-if="!item.details.contacts.length">
-									<i>Please add some contacts.</i>
+									<i>No contacts.</i>
+									<a href ng-click="addContact($event)"> <i class="glyphicon glyphicon-plus-sign"></i> Add a new contact.</a>
 								</div>
 							</div>
 						</div>

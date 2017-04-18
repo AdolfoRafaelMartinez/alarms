@@ -1,10 +1,9 @@
 'use strict'
 
 angular.module('plans')
-	.controller('settingsModalController', ['$scope', 'close', 'item', 'type', 'project', 'ModalService', 'Vendors', 'APs', 'Mounts', 'Controllers',
-		function ($scope, close, item, type, project, ModalService, Vendors, APs, Mounts, Controllers) {
+	.controller('settingsModalController', ['$scope', 'close', 'item', 'type', 'ModalService', 'Vendors', 'APs', 'Mounts', 'Controllers',
+		function ($scope, close, item, type, ModalService, Vendors, APs, Mounts, Controllers) {
 			$scope.type = type
-			$scope.project = project
 			$scope.item = item
 
 			$scope.sma = {
@@ -19,6 +18,10 @@ angular.module('plans')
 				if (obj) $scope.edit_prop = obj
 			}
 
+			$scope.getItem = function() {
+				return $scope.item
+			}
+
 			var newContact = {}
 			$scope.addContact = function ($event) {
 				$event.stopPropagation()
@@ -29,10 +32,10 @@ angular.module('plans')
 			}
 
 			$scope.saveContact = function () {
-				if (typeof item.details !== 'object') item.details = {}
-				if (!item.details.contacts) item.details.contacts = []
+				if (typeof $scope.item.details !== 'object') $scope.item.details = {}
+				if (!$scope.item.details.contacts) $scope.item.details.contacts = []
 				if (newContact.name) {
-					item.details.contacts.push(_.clone(newContact))
+					$scope.item.details.contacts.push(_.clone(newContact))
 					newContact = {}
 				}
 				$scope.save()
@@ -41,7 +44,7 @@ angular.module('plans')
 
 			$scope.askDeleteContact = function (contactIndex, $event) {
 				$event.stopPropagation()
-				var contact = item.details.contacts[contactIndex]
+				var contact = $scope.item.details.contacts[contactIndex]
 
 				ModalService.showModal({
 					templateUrl: 'deleteModal.html',
@@ -59,12 +62,11 @@ angular.module('plans')
 			}
 
 			$scope.removeContact = function (index) {
-				item.details.contacts.splice(index, 1)
+				$scope.item.details.contacts.splice(index, 1)
 				$scope.save()
 			}
 
 			$scope.save = function () {
-				$scope.project.$update()
 				$scope.pp_edit = {}
 			}
 

@@ -127,6 +127,7 @@ exports.pdfReport = function (req, res, next) {
 			if (!req.building.details.contacts) req.building.details.contacts = []
 			if (!req.building.details.designer) req.building.details.designer = {}
 			if (!req.building.details.msp) req.building.details.msp = {}
+			// TODO: convert undefined values to empty strings (or get pug to do it automatically)
 
 			const PUGDIR = `${__dirname}/../pug`
 			pug.renderFile(`${PUGDIR}/sf01.pug`,
