@@ -103,7 +103,7 @@ md-sidenav .md-button ng-md-icon {
 }
 
 md-sidenav #fileupload input {
-	font-size: small !important;
+	font-size: 70px !important;
 }
 
 md-sidenav #fileupload .large {

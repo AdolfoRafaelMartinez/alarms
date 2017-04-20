@@ -999,8 +999,8 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			img.src = url.replace('public/', '')
 			request.open("GET", img.src, true);
 			request.onprogress = function (event) {
-				this.uploadProgress(100 + 100 * event.loaded / event.total)
-			}.bind(this)
+				self.uploadProgress(100 + 100 * event.loaded / event.total)
+			}
 			request.send(null);
 			img.onload = function (event) {
 				var t = event.target
@@ -1017,14 +1017,14 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 				} else {
 					self.scale(scaleX * 100)
 				}
-				this.plan.stage.floorplan = url
+				self.plan.stage.floorplan = url
 				floorplan.removeAllChildren()
 				floorplan.addChild(f)
 				update = true
 				$timeout(function () {
 					defer.resolve()
 				}, 0)
-			}.bind(this)
+			}
 
 			return defer.promise
 		}
