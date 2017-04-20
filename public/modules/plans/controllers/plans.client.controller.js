@@ -602,6 +602,7 @@ angular.module('plans')
 			}
 
 			$scope.getBuilding = () => {
+				$scope.percentDone = 1
 				if ($stateParams.planID) {
 					$scope.plan = Plans.get({planId: $stateParams.planID}, function () {
 						$scope.plans = []

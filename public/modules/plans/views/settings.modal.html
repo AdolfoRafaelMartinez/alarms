@@ -15,7 +15,7 @@
 						</uib-accordion-heading>
 
 						<div class="form-group" ng-if="!pp_edit['details']">
-							<div class="clickable list-group-item" ng-click="toggleEdit('details')">
+							<div class="clickable list-group-item" ng-click="edit('details')">
 								<div><span>Client:</span> <em ng-bind="item.details.client.name"></em></div>
 								<div ng-if="item.details.client.logo" class="small-logo">
 									<img ng-src="{{ item.details.client.logo }}" />
@@ -96,7 +96,7 @@
 									<div class="form-group row">
 										<div class="col-sm-offset-2 col-sm-10">
 											<button type="submit" class="btn btn-primary" ng-click="save();">Save</button>
-											<button type="submit" class="btn btn-default pull-right" ng-click="toggleEdit('details')">Cancel</button>
+											<button type="submit" class="btn btn-default pull-right" ng-click="cancel()">Cancel</button>
 										</div>
 									</div>
 								</div>
@@ -115,7 +115,7 @@
 
 						<div class="form-group row contacts" ng-hide="pp_edit['contacts']">
 							<div class="col-lg-12">
-								<div class="col-lg-3 clickable list-group-item" ng-repeat="(contactIndex, contact) in item.details.contacts" ng-click="toggleEdit('contacts', contact)">
+								<div class="col-lg-3 clickable list-group-item" ng-repeat="(contactIndex, contact) in item.details.contacts" ng-click="edit('contacts', contact)">
 									<div class="topright text-right">
 										<a href ng-click="askDeleteContact(contactIndex, $event)">
 											<i class="glyphicon glyphicon-remove"></i>
@@ -164,7 +164,7 @@
 									<div class="form-group row">
 										<div class="col-sm-offset-2 col-sm-10">
 											<button type="submit" class="btn btn-primary" ng-click="saveContact();">Save</button>
-											<button class="btn btn-default pull-right" ng-click="toggleEdit('contacts')">Cancel</button>
+											<button class="btn btn-default pull-right" ng-click="cancel('contacts')">Cancel</button>
 										</div>
 									</div>
 								</div>
@@ -179,7 +179,7 @@
 							<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': sma.wifi, 'glyphicon-chevron-right': !sma.wifi}"></i>
 						</uib-accordion-heading>
 
-						<div class="form-group row" ng-hide="pp_edit['wifi']" ng-click="toggleEdit('wifi')">
+						<div class="form-group row" ng-hide="pp_edit['wifi']" ng-click="edit('wifi')">
 							<div class="col-lg-12">
 								<div class="col-lg-3 clickable list-group-item">
 									<div class="form-group" ng-if="item.details.inventory">
@@ -267,7 +267,7 @@
 									<div class="form-group row">
 										<div class="col-sm-offset-2 col-sm-10">
 											<button type="submit" class="btn btn-primary" ng-click="save();">Save</button>
-											<button class="btn btn-default pull-right" ng-click="toggleEdit('wifi')">Cancel</button>
+											<button class="btn btn-default pull-right" ng-click="cancel()">Cancel</button>
 										</div>
 									</div>
 								</div>

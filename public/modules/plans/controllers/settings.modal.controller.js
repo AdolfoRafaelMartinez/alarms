@@ -4,7 +4,8 @@ angular.module('plans')
 	.controller('settingsModalController', ['$scope', 'close', 'item', 'type', 'ModalService', 'Vendors', 'APs', 'Mounts', 'Controllers',
 		function ($scope, close, item, type, ModalService, Vendors, APs, Mounts, Controllers) {
 			$scope.type = type
-			$scope.item = item
+			$scope.item = _.cloneDeep(item)
+			$scope.original = item
 
 			$scope.sma = {
 				details: true,
@@ -13,9 +14,17 @@ angular.module('plans')
 			}
 
 			$scope.pp_edit = {}
-			$scope.toggleEdit = function (prop, obj) {
-				$scope.pp_edit[prop] = !$scope.pp_edit[prop]
+			$scope.edit = function (prop, obj) {
+				$scope.pp_edit = {}
+				$scope.pp_edit[prop] = true
+				console.log($scope.pp_edit)
 				if (obj) $scope.edit_prop = obj
+			}
+
+			$scope.cancel = function() {
+				$scope.pp_edit = {}
+				$scope.edit_prop = {}
+				$scope.item = _.cloneDeep($scope.original)
 			}
 
 			$scope.getItem = function() {
@@ -68,6 +77,7 @@ angular.module('plans')
 
 			$scope.save = function () {
 				$scope.pp_edit = {}
+				_.each($scope.item, (p, k) => $scope.original[k] = p)
 			}
 
 			$scope.getAPs         = search => APs.query({search: search}).$promise
