@@ -6,6 +6,7 @@ const Q        = require('q')
 
 const errorHandler = require('./errors.server.controller')
 const Project = mongoose.model('Project')
+const Plan = mongoose.model('Plan')
 
 function saveThumb (thumb, pid) {
 	if (!thumb) return Q.resolve({})
@@ -93,23 +94,101 @@ exports.update = function (req, res) {
 			project_data.thumb = pic.thumb
 			project_data.screenshot = pic.file
 			project = _.extend(project, project_data)
+			var promises = []
+			var newsite, newbldg
 			_.each(project.sites, site => {
-				if (!site._id) site._id = mongoose.Types.ObjectId().toString()
+				_.set(site, 'details.project', project.title)
+				site.details.client = project.details.client
+				if (!_.get(site, 'details.msp.name')) _.set(site, 'details.msp', project.details.msp)
+				if (!_.get(site, 'details.designer.name')) _.set(site, 'details.designer', project.details.designer)
+				if (!site._id) {
+					newsite = site._id = mongoose.Types.ObjectId().toString()
+					delete site.new
+				}
 				_.each(site.buildings, b => {
-					if (!b._id) b._id = mongoose.Types.ObjectId().toString()
+					if (!b._id) {
+						newbldg = b._id = mongoose.Types.ObjectId().toString()
+						delete b.new
+					}
+				})
+				_.each(site.buildings, bldg => {
+					_.set(bldg, 'details.project', project.title)
+					bldg.details.site = site.name
+					bldg.details.client = project.details.client
+					if (!_.get(bldg, 'details.msp.name')) _.set(bldg, 'details.msp', project.details.msp)
+					if (!_.get(bldg, 'details.designer.name')) _.set(bldg, 'details.designer', project.details.designer)
+					_.each(bldg.plans, plan => {
+						let deferred = Q.defer()
+						promises.push(deferred.promise)
+						Plan.findOne({_id: plan._id}, (err, plan) => {
+							if (err) {
+								return deferred.reject(err)
+							}
+							_.set(plan, 'details.project', project.title)
+							_.set(plan, 'details.site', site.name)
+							_.set(plan, 'details.building', bldg.name)
+							_.set(plan, 'details.client', project.details.client)
+
+							_.set(plan, 'details.country', _.get(bldg, 'details.inventory.country'))
+							_.set(plan, 'details.address', _.get(bldg, 'details.address'))
+							_.set(plan, 'details.city', _.get(bldg, 'details.city'))
+							_.set(plan, 'details.state', _.get(bldg, 'details.state'))
+							_.set(plan, 'details.zipcode', _.get(bldg, 'details.zipcode'))
+
+							_.defaultsDeep(plan.details, {
+								designer: _.get(bldg, 'details.designer'),
+								msp: _.get(bldg, 'details.msp'),
+								contacts: _.get(bldg, 'details.contacts')
+							})
+
+							if (typeof plan.details.contacts === 'object' && !plan.details.contacts.length) {
+								plan.details.contacts = bldg.details.contacts
+							}
+
+							_.set(plan, 'details.vendor', _.get(bldg, 'details.inventory.vendor'))
+							_.set(plan, 'details.controller', _.get(bldg, 'details.inventory.controller'))
+							_.set(plan, 'details.aps', _.get(bldg, 'details.inventory.aps'))
+							_.set(plan, 'details.ams', _.get(bldg, 'details.inventory.ams'))
+							if (!_.get(plan.stage.items)) plan.stage.items = plan.stage.aps
+							_.each(plan.stage.items, ap => {
+								if (['ap', undefined].includes(ap.itemType)) {
+									_.set(ap, 'inventory.vendor', _.get(bldg, 'details.inventory.vendor'))
+									_.set(ap, 'inventory.sku', _.get(bldg, 'details.inventory.aps'))
+								}
+								if (ap.itemType === 'am') {
+									_.set(ap, 'inventory.vendor', _.get(bldg, 'details.inventory.vendor'))
+									_.set(ap, 'inventory.sku', _.get(bldg, 'details.inventory.ams'))
+								}
+							})
+							Plan.findOneAndUpdate({_id: plan._id}, plan).exec(() => {
+								deferred.resolve()
+							})
+						})
+					})
 				})
 			})
-			return project.save(function (err) {
+			let deferred = Q.defer()
+			promises.push(deferred.promise)
+			Project.findOneAndUpdate({_id: project._id}, project, {new: true}, (err, savedProject) => {
 				if (err) {
-					return res.status(400).send({
-						message: errorHandler.getErrorMessage(err)
-					})
+					deferred.reject(err)
 				} else {
-					res.json(project)
+					project = savedProject
+					deferred.resolve()
 				}
+			})
+			return Q.all(promises).then(() => {
+				if (newbldg || newsite) {
+					_.set(project, 'details.newbldg', newbldg)
+					_.set(project, 'details.newsite', newsite)
+				}
+				console.log(newbldg, newsite)
+				console.dir(project.details)
+				res.json(project)
 			})
 		})
 		.catch(err => {
+			console.dir(err)
 			res.status(500).send({
 				message: errorHandler.getErrorMessage(err),
 				err: err
@@ -138,7 +217,7 @@ exports.delete = function (req, res) {
  * List of Projects
  */
 exports.list = function (req, res) {
-	let query
+	var query
 	if (req.query.buildingId) {
 		let search = {
 			'sites.buildings._id': req.query.buildingId

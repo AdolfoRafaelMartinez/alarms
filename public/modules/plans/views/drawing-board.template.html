@@ -1,4 +1,15 @@
 <div class="overlay-sheet sheet-bg loading" ng-hide="planReady"><spinner active=1></spinner></div>
+<div class="overlay-sheet sheet-bg uploadDND" ng-if="!plan.stage.floorplan || percentDone">
+	<div ng-if="!percentDone">Browse or drag-and-drop a floorplan (jpg or png)</div>
+	<div ng-if="percentDone">
+		<div class="full clear">
+			<div class="progress progress-striped active">
+				<div class="progress-bar progress-bar-success" data-ng-style="{width: percentDone + '%'}"></div>
+			</div>
+		</div>
+		<strong data-ng-show="uploadfile.error" class="error text-danger">{{uploadfile.error}}</strong>
+	</div>
+</div>
 <canvas ng-right-click="getCurrentAP()" style="position: absolute; left: 20px; right: 40px; z-index: 1"></canvas>
 
 <!-- plan properties -->
@@ -16,8 +27,9 @@
                 </div>
                 <div id="collapseClient" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="pp_client">
                     <div class="panel-body">
-                        <div class="form-group" ng-if="!pp_edit['client']">
+                        <div class="form-group client" ng-if="!pp_edit['client']">
                             <div class="clickable list-group-item" ng-click="toggleEdit('client')">
+								<div class="topright text-right"><i class="glyphicon glyphicon-edit"></i></div>
                                 <div><span>Client:</span> <em ng-bind="plan.details.client.name"></em></div>
                                 <div ng-if="plan.details.client.logo" class="small-logo">
                                     <img ng-src="{{ plan.details.client.logo }}" />
@@ -42,7 +54,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div ng-show="pp_edit['client']" class="plan-property-item">
+                        <form ng-show="pp_edit['client']" class="plan-property-item">
                             <div class="form-group row">
                                 <label class="col-sm-2 ptop5 text-right form-control-label">Client</label>
                                 <div class="col-sm-10"><input type="text" ng-model="plan.details.client.name" class="form-control" placeholder="client name ..." /></div>
@@ -102,7 +114,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -195,22 +207,22 @@
                                     <div>
                                         <label class="form-control-label">Controller Present?</label>
                                         <md-switch aria-label="controller present" ng-change="checkController()" ng-model="plan.details.ctrlPresent">
-                                            {{ plan.details.ctrlPresent ? 'YES' : 'No (Instant Cluster)' }}
+                                            {{ plan.details.ctrlPresent ? 'YES' : 'Not on this floor' }}
                                         </md-switch>
                                     </div>
                                 </div>
                                 <div class="col-lg-3 clickable list-group-item" ng-repeat="(ctrlIndex, ctrl) in plan.details.controllers" ng-if="plan.details.ctrlPresent" ng-click="toggleEdit('controllers', ctrl)">
 									<div class="topright text-right">
-										<a href ng-click="removeController(ctrlIndex)" style="padding-left: 1em;">
+										<!-- a href ng-click="removeController(ctrlIndex)" style="padding-left: 1em;">
 											<i class="glyphicon glyphicon-remove"></i>
-										</a>
+										</a -->
 									</div>
                                     <div class="form-group">
                                         <div>
                                             <span>Country Code:</span> <em ng-bind="ctrl.country"></em>
                                         </div>
 
-                                        <div><span>Model:</span> <em ng-bind="ctrl.model"></em></div>
+                                        <div><span>Model:</span> <em ng-bind="ctrl.sku"></em></div>
                                         <div><span>Description:</span> <em ng-bind="ctrl.description"></em></div>
                                         <div><span>HA:</span>
                                             <span ng-if="ctrl.ha"><i class="glyphicon glyphicon-ok-circle green"></i></span>
@@ -239,7 +251,7 @@
                                     </div>
                                     <div class="form-group row">
                                         <label class="col-sm-6 ptop5 text-right form-control-label">Model</label>
-                                        <div class="col-sm-6"><input type="text" ng-model="edit_prop.model" class="form-control" placeholder="Model"/></div>
+                                        <div class="col-sm-6"><input type="text" ng-model="edit_prop.sku" class="form-control" placeholder="Model"/></div>
                                     </div>
                                     <div class="form-group row">
                                         <label class="col-sm-6 ptop5 text-right form-control-label">Description</label>
@@ -322,12 +334,12 @@
                     <div class="col-sm-10"><input type="text" ng-model="selectedItem.inventory.name" class="form-control" placeholder="e.g. AP-hall-01..." /></div>
                 </div>
                 <div class="form-group row">
-                    <label class="col-sm-2 form-control-label">Brand</label>
-                    <div class="col-sm-10"><input type="text" ng-model="selectedItem.inventory.brand" class="form-control" placeholder="name..." /></div>
+                    <label class="col-sm-2 form-control-label">Vendor</label>
+                    <div class="col-sm-10"><input type="text" ng-model="selectedItem.inventory.vendor" class="form-control" placeholder="name..." /></div>
                 </div>
                 <div class="form-group row">
                     <label class="col-sm-2 form-control-label">Model</label>
-                    <div class="col-sm-10"><input type="text" ng-model="selectedItem.inventory.model" class="form-control" placeholder="number..." /></div>
+                    <div class="col-sm-10"><input type="text" ng-model="selectedItem.inventory.sku" class="form-control" placeholder="number..." /></div>
                 </div>
                 <div class="form-group row">
                     <div class="col-sm-12">
@@ -345,12 +357,12 @@
                     <div class="col-sm-10"><input type="text" ng-model="selectedItem.inventory.name" class="form-control" placeholder="e.g. AM-hall-01..." /></div>
                 </div>
                 <div class="form-group row">
-                    <label class="col-sm-2 form-control-label">Brand</label>
-                    <div class="col-sm-10"><input type="text" ng-model="selectedItem.inventory.brand" class="form-control" placeholder="name..." /></div>
+                    <label class="col-sm-2 form-control-label">Vendor</label>
+                    <div class="col-sm-10"><input type="text" ng-model="selectedItem.inventory.vendor" class="form-control" placeholder="name..." /></div>
                 </div>
                 <div class="form-group row">
                     <label class="col-sm-2 form-control-label">Model</label>
-                    <div class="col-sm-10"><input type="text" ng-model="selectedItem.inventory.model" class="form-control" placeholder="number..." /></div>
+                    <div class="col-sm-10"><input type="text" ng-model="selectedItem.inventory.sku" class="form-control" placeholder="number..." /></div>
                 </div>
                 <div class="form-group row">
                     <div class="col-sm-12">

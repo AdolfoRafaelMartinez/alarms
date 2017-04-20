@@ -387,7 +387,6 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			var names
 
 			function mousedown (evt) {
-				console.log('mousedown', selectedAP)
 				if (evt.nativeEvent.button === 2) {
 					selectedAP = ap
 					contextMenu.switchMenu(ap.itemType)
@@ -690,7 +689,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			current_wall = false
 		}
 
-		this.addAP = function (x, y, signal_radius, itemType) {
+		this.addAP = function (x, y, signal_radius, item) {
 			if (is_dragging) {
 				is_dragging = false
 				return
@@ -706,7 +705,14 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			container.y = y
 			container.realx = mperpx * container.x
 			container.realy = mperpx * container.y
-			container.itemType = itemType
+
+			var itemType
+			if (typeof item === 'object') {
+				item.itemType = item.itemType || 'ap'
+			} else {
+				item = { itemType: item || 'ap' }
+			}
+			container.itemType = itemType = item.itemType
 
 			addHandlers.call(this, container)
 
@@ -715,6 +721,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 
 			switch (itemType) {
 				case 'ap':
+					item = _.defaults(item, {vendor: this.plan.details.vendor, sku: this.plan.details.aps})
 					itemIndex = plan.item_index[itemType]
 					text = new createjs.Text(itemIndex, '12px Arial', TEXT_RGB[itemType])
 					var overlaps = new createjs.Container()
@@ -737,6 +744,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 					break
 
 				case 'am':
+					item = _.defaults(item, {vendor: this.plan.details.vendor, sku: this.plan.details.ams})
 					itemIndex = plan.item_index[itemType]
 					text = new createjs.Text(itemIndex, '12px Arial', TEXT_RGB[itemType])
 					var circle = new createjs.Shape()
@@ -784,9 +792,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 					break
 			}
 
-			container.inventory = {
-				number: plan.item_index[itemType]
-			}
+			container.inventory = _.defaults({ number: plan.item_index[itemType] }, item)
 			if (itemType === 'mdf') container.inventory.mdf = true
 			plan.item_index[itemType]++
 
@@ -852,7 +858,6 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 		}
 
 		this.deleteSelectedItem = function () {
-			console.log('deleteSelectedAP', selectedAP)
 			if (!selectedAP) return
 			contextMenu.close()
 			var i, j, k
@@ -959,7 +964,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 		}
 
 		this.scale = function (percent) {
-			if (!percent) return
+			if (!percent || percent < 10 || percent > 800) return
 			plan.stage_scale = percent
 			if (this.updateControls) this.updateControls('scale', Math.round(plan.stage_scale))
 			// plan.stage_ppm = plan.floor_width_px / plan.floor_width;
@@ -977,7 +982,6 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 							child.children[i].children[3].scaleX = child.children[i].children[3].scaleY = 100 / plan.stage_scale
 							child.children[i].children[4].scaleX = child.children[i].children[4].scaleY = 100 / plan.stage_scale
 						} else {
-							console.log(child.children[i])
 							child.children[i].children[2].scaleX = child.children[i].children[2].scaleY = 100 / plan.stage_scale
 							child.children[i].children[3].scaleX = child.children[i].children[3].scaleY = 100 / plan.stage_scale
 						}
@@ -991,7 +995,13 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			var img = new Image()
 			var defer = $q.defer()
 			img.setAttribute('crossOrigin', 'anonymous')
+			var request = new XMLHttpRequest();
 			img.src = url.replace('public/', '')
+			request.open("GET", img.src, true);
+			request.onprogress = function (event) {
+				self.uploadProgress(100 + 100 * event.loaded / event.total)
+			}
+			request.send(null);
 			img.onload = function (event) {
 				var t = event.target
 				var f = new createjs.Bitmap(t)
@@ -1007,6 +1017,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 				} else {
 					self.scale(scaleX * 100)
 				}
+				self.plan.stage.floorplan = url
 				floorplan.removeAllChildren()
 				floorplan.addChild(f)
 				update = true
@@ -1043,8 +1054,10 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 				if (layers[i].layer_type === 'ap') {
 					_.each(layers[i].children, function (ap) {
 						json.items.push({
-							name: ap.name,
-							itemType: ap.itemType,
+							name: ap.inventory.name,
+							itemType: ap.inventory.itemType,
+							sku: ap.inventory.sku,
+							vendor: ap.inventory.vendor,
 							x: ap.x,
 							y: ap.y
 						})
@@ -1090,11 +1103,15 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			return newCanvas.toDataURL()
 		}
 
-		this.loadPlan = function (plan_id, data, signal_radius, updateControls) {
+		this.loadPlan = function (planResource, signal_radius, updateControls, uploadProgress) {
+			var plan_id = planResource._id
+			var data = planResource.stage
+			this.uploadProgress = uploadProgress
+			this.plan = planResource
 			this.updateControls = updateControls
 			$timeout(function () {
 				if (data.plan) plan = data.plan
-				plan._id = plan_id
+				plan._id = this.plan.id
 				var stage_scale = _.get(plan, 'stage.stage_scale')
 				this.initBoard(signal_radius)
 				if (data.floorplan) {
@@ -1110,9 +1127,11 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 				stage.regX = _.get(data.plan, 'stage.regX')
 				stage.regY = _.get(data.plan, 'stage.regY')
 
+				console.log(data)
 				if (!data.items && data.aps) data.items = data.aps
 				_.each(data.items, function (item) {
-					this.addAP(item.x, item.y, signal_radius, item.itemType || 'ap')
+					console.log('adding item', item)
+					this.addAP(item.x, item.y, signal_radius, item)
 				}.bind(this))
 				this.reindexItems()
 				_.each(data.walls, function (wall) {
@@ -1186,7 +1205,6 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 		}
 
 		function redrawIDF (idf) {
-			console.log('redrawIDF', idf)
 			var text = _.find(idf.children, c => c.text !== undefined)
 			if (idf.itemType === 'idf') {
 				idf.children[2].graphics.clear().beginFill(BUBBLE_RGB.idf).drawRoundRect(0 - IDF_VISUAL_RADIUS_PRINT, 0 - IDF_VISUAL_RADIUS_PRINT / 2, IDF_VISUAL_RADIUS_PRINT * 2, IDF_VISUAL_RADIUS_PRINT, 2, 2).endFill()

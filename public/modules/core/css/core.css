@@ -8,6 +8,11 @@ body {
   background-size: cover;
 }
 
+header {
+	padding-left: 20px;
+	padding-right: 20px;
+}
+
 ::-webkit-scrollbar-track
 {
 	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
@@ -86,7 +91,7 @@ section > div > div {
     right: 0;
 }
 
-.topright .glyphicon-trash, .topright .glyphicon-remove {
+.topright .glyphicon {
     font-size: 19px;
     border-radius: 50%;
     background: #eee;
@@ -99,7 +104,7 @@ section > div > div {
     box-shadow: inset 1px 1px 6px rgba(0,0,80,0.4);
 }
 
-.topright .glyphicon-trash:hover, .topright .glyphicon-remove:hover {
+.topright .glyphicon:hover {
   color: #a88;
   background: #fef;
 }
@@ -119,7 +124,6 @@ section > div > div {
 
 .bottomright .glyphicon:hover {
   color: #a88;
-  background: #fef;
 }
 
 .padtop {

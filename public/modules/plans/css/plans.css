@@ -72,6 +72,27 @@ md-switch {
 	margin: 0 15px;
 }
 
+.uploadDND {
+	text-align: center;
+	bottom: 160px;
+	min-height: auto;
+	opacity: 0.9;
+}
+
+.uploadDND > div {
+	font-size: 32px;
+    color: gray;
+    width: 450px;
+    margin: auto;
+    margin-top: 20%;
+    padding: 20px 40px;
+    border: 4px dashed;
+}
+
+.uploadDND > div:hover {
+	color: black;
+}
+
 plan-list .search {
 	width: 50%;
 }
@@ -270,6 +291,23 @@ button.selected {
 
 .panel-heading a {
 	padding-right: 20px;
+}
+
+.client .list-group-item {
+	min-width: 400px;
+}
+
+.settings .list-group-item {
+	width: 95%;
+}
+
+.settings .contacts .list-group-item {
+	width: 40%;
+	min-width: 220px;
+}
+
+.settings a:focus {
+    outline: 0;
 }
 
 .floors {

@@ -7,7 +7,7 @@
 		</uib-accordion-heading>
 
 		<div class="pull-right">
-			<a href ng-click="plan_properties = !plan_properties"><ng-md-icon icon="settings"></ng-md-icon></a><br />
+			<a href ng-click="togglePlanProperties()"><ng-md-icon icon="settings"></ng-md-icon></a><br />
 		</div>
 		{{ plan.details.client.name || '(project details not set)' }}<br />
 		<span>Project:</span> {{ plan.details.project }}<br />
@@ -19,11 +19,11 @@
 		</div>
 
 		<span>Floor:</span> {{ plan.floor || 'N/A' }}<br />
-		<span> Vendor (Aruba / Cisco / Aeorhive / Ruckus)</span><br />
+		<span> Vendor: {{ plan.details.vendor }}</span><br />
 		<span>AP count:</span> {{ getTotalAPs() }}<br />
 		<span>AM count:</span> {{ getTotalAMs() }}
 
-		<uib-accordion-group class="panel-inner" is-open="apgroups.open">
+		<!-- uib-accordion-group class="panel-inner" is-open="apgroups.open">
 			<uib-accordion-heading>
 				AP/AM Groups <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': apgroups.open, 'glyphicon-chevron-right': !apgroups.open}"></i>
 			</uib-accordion-heading>
@@ -33,7 +33,7 @@
 				<p /> AP Group 2: (APcount2)
 				<p /> AM Group 1: (AMcount1)
 			</div>
-		</uib-accordion-group>
+		</uib-accordion-group -->
 
 	</uib-accordion-group>
 
@@ -44,37 +44,43 @@
 		</uib-accordion-heading>
 		<div class="tools">
 
-			<form class="actionf" id="fileupload" data-ng-controller="pjFileUploadController"
-				action="/upload" method="POST" enctype="multipart/form-data" data-file-upload="options" 
-				ng-class="{'fileupload-processing': processing() || loadingFiles}">
-
-				<button class="fileinput-button" ng-class="{disabled: disabled}">
-					<i class="glyphicon large glyphicon-cloud-upload"></i>
-					<span>Upload</span>
-					<input type="file" name="files[]" multiple ng-disabled="disabled">
-				</button>
-
-			</form>
-
 			<div class="actionf">
 				<input type="text" ng-model="plan.floor" class="elem elem-green input" value="1"><br>
-				Floor #
+				<div>Floor #</div>
 			</div>
-			<button class="actionf" ng-click="savePlan()">
-				<i class="glyphicon large glyphicon-floppy-save"></i>
-				Save
-			</button>
 
-			<div class="full fade clear" data-ng-class="{in: active()}">
-				<br />
-				<!-- The global progress bar -->
-				<div class="progress progress-striped active" data-file-upload-progress="progress()">
-					<div class="progress-bar progress-bar-success" data-ng-style="{width: num + '%'}"></div>
-				</div>
-				<!-- The extended global progress state -->
-				<div class="progress-extended">&nbsp;</div>
+			<div class="actionf">
+				<form id="fileupload" data-ng-controller="pjFileUploadController"
+						  action="/upload" method="POST" enctype="multipart/form-data" data-file-upload="options" 
+																	 ng-class="{'fileupload-processing': processing() || loadingFiles}">
+
+					<button class="fileinput-button" ng-class="{disabled: disabled}">
+						<i class="glyphicon large glyphicon-cloud-upload"></i>
+						<div>Upload</div>
+						<input type="file" name="files[]" multiple ng-disabled="disabled">
+					</button>
+				</form>
 			</div>
-			<strong data-ng-show="file.error" class="error text-danger">{{file.error}}</strong>
+
+			<div class="actionf">
+				<form>
+					<button ng-click="savePlan()"><i class="glyphicon large glyphicon-floppy-save"></i><div>Save</div></button>
+				</form>
+			</div>
+
+			<div class="uploadStatus" ng-if="percentDone">
+				<div class="full clear">
+					<br />
+					<!-- The global progress bar -->
+					<div class="progress progress-striped active">
+						<div class="progress-bar progress-bar-success" data-ng-style="{width: percentDone + '%'}"></div>
+					</div>
+					<!-- The extended global progress state -->
+					<div class="progress-extended">&nbsp;</div>
+				</div>
+				<strong data-ng-show="file.error" class="error text-danger">{{file.error}}</strong>
+			</div>
+
 		</div>
 	</uib-accordion-group>
 

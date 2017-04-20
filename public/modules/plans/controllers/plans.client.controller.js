@@ -97,7 +97,6 @@ angular.module('plans')
 
 			$scope.getCurrentAP = function () {
 				$scope.selectedItem = Drawing.getCurrentItem()
-				console.log('getCurrentItem', $scope.selectedItem)
 				$scope.menu.mode = $scope.selectedItem ? $scope.selectedItem.itemType : 'plan'
 			}
 
@@ -179,31 +178,18 @@ angular.module('plans')
 				Drawing.updateSignalStrength($scope.settings.signal_radius)
 			}
 
-			$scope.onFileSelect = function (image) {
-				$scope.uploadInProgress = true
-				$scope.uploadProgress = 0
-
-				if (angular.isArray(image)) {
-					image = image[0]
+			$scope.uploadProgress = function(percentDone) {
+				function updateProgress(percent) {
+					$scope.percentDone = percentDone / 2
+					if ($scope.percentDone === 100) $scope.percentDone = 0
 				}
-
-				$scope.upload = $upload.upload({
-					url: '/upload',
-					method: 'POST',
-					data: {
-						type: 'floorplan'
-					},
-					file: image
-				}).progress(function (event) {
-					$scope.uploadProgress = Math.floor(event.loaded / event.total)
-					$scope.$apply()
-					console.log($scope.uploadProgress)
-				}).success(function (data, status, headers, config) {
-					console.log('Photo uploaded!')
-				}).error(function (err) {
-					$scope.uploadInProgress = false
-					console.log('Error uploading file: ' + err.message || err)
-				})
+				if ($scope.$$phase) {
+					updateProgress(percentDone)
+				} else {
+					$scope.$apply(function () {
+						updateProgress(percentDone)
+					})
+				}
 			}
 
 			$scope.getTotalAPs = function () {
@@ -269,6 +255,7 @@ angular.module('plans')
 						}, 3000)
 						deferred.resolve(response)
 					}, errorResponse => {
+						console.log(errorResponse)
 						$scope.error = errorResponse.data.message
 						deferred.reject(errorResponse)
 					})
@@ -316,6 +303,7 @@ angular.module('plans')
 			$scope.selected = {}
 
 			$scope.create = ($event, item) => {
+				$event.stopPropagation()
 				switch (item) {
 					case 'project':
 						if (!$scope.new.project.title) break
@@ -335,11 +323,7 @@ angular.module('plans')
 						$scope.selected.project.sites.push($scope.selected.site)
 						$scope.sort.sites = '-created'
 						$scope.new.building = { created: new Date() }
-						$scope.selected.project.$update(project => {
-							$scope.selected.site = _.find(project.sites, s => s.new)
-							delete $scope.selected.site.new
-							updateProject()
-						})
+						updateProject()
 						break
 
 					case 'building':
@@ -351,17 +335,10 @@ angular.module('plans')
 						}
 						$scope.selected.site.buildings.push($scope.selected.building)
 						$scope.sort.buildings = '-created'
-						var siteId = $scope.selected.site._id
-						$scope.selected.project.$update(project => {
-							$scope.selected.site = _.find(project.sites, s => s._id === siteId)
-							$scope.selected.building = _.find($scope.selected.site.buildings, b => b.new)
-							delete $scope.selected.building.new
-							updateProject()
-						})
+						updateProject()
 						break
 				}
 				$scope.new[item] = null
-				$event.stopPropagation()
 			}
 
 			var planSkeleton = {
@@ -405,9 +382,7 @@ angular.module('plans')
 					$scope.plan = response
 					$scope.plan.title = 'Untitled'
 					$scope.building.plans.push({_id: $scope.plan._id, title: $scope.plan.title})
-					$scope.project.$update(response => {
-						$scope.project = response
-					})
+					updateProject()
 					$scope.plans.push($scope.plan)
 					$scope.settings = {
 						units: 'ft',
@@ -430,20 +405,32 @@ angular.module('plans')
 			}
 
 			$scope.createPlanAndLoad = function (building) {
+				if (!building) {
+					console.log("No building provided")
+					return
+				}
 				var plan = new Plans(planSkeleton)
-				var promises = []
-				plan.$save(response => {
-					plan.stage._id = response._id
-					promises.push(plan.$update())
-					if (building) {
-						if (!building.plans) building.plans = []
-						building.plans.push({
-							_id: response._id
-						})
-						delete building.new
-						promises.push($scope.selected.project.$update())
+				var project = $scope.selected.project
+				var site = _.find(project.sites, s => s._id === $scope.selected.site._id)
+				var bldg = _.find(site.buildings, b => b._id === building._id)
+				_.set(plan, 'details.project', project.title)
+				_.set(plan, 'details.site', site.name)
+				_.set(plan, 'details.building', bldg.name)
+				_.set(plan, 'details.client', project.details.client)
+				_.set(plan, 'details.vendor', _.get(bldg, 'details.inventory.vendor'))
+				_.each(plan.stage.items, ap => {
+					if (['ap', 'am', undefined].includes(ap.itemType)) {
+						_.set(ap, 'inventory.vendor', _.get(bldg, 'details.inventory.vendor'))
+						_.set(ap, 'inventory.sku', _.get(bldg, 'details.inventory.aps'))
 					}
-					$q.all(promises).then(() => {
+				})
+
+				plan.$save(response => {
+					if (!bldg.plans) bldg.plans = []
+					bldg.plans.push({
+						_id: response._id
+					})
+					updateProject().then(() => {
 						$location.path(`building/${building._id}`)
 					})
 				}, errorResponse => {
@@ -478,6 +465,7 @@ angular.module('plans')
 			}
 
 			$scope.updateControls = function (key, val) {
+				$scope.settings[key] = val
 				if ($scope.$$phase) {
 					$scope.settings[key] = val
 				} else {
@@ -503,29 +491,66 @@ angular.module('plans')
 				})
 			}
 
-			$scope.showSettings = function (item) {
+			$scope.showSettings = function (type, item, $event) {
+				$event.stopPropagation()
+				switch (type) {
+					case 'project':
+						$scope.selectProject(item)
+						break
+
+					case 'site':
+						item = $scope.selectSite(item)
+						break
+
+					case 'bldg':
+						item = $scope.selectBuilding(item)
+						break
+				}
 				ModalService.showModal({
-					templateUrl: 'settingsModal.html',
+					templateUrl: 'modules/plans/views/settings.modal.html',
 					controller: 'settingsModalController',
-					inputs: { item: item }
+					inputs: { item: item, type: type }
 				})
 					.then(function (modal) {
 						modal.element.modal()
-						modal.close.then(function (save) {
-							if (save) {
-								console.log('SAVE')
+						modal.element.on('hidden.bs.modal', () => {
+							if (type === 'site') {
+								_.each($scope.selected.project.sites, (s, i) => {
+									if (s._id === item._id) $scope.selected.project.sites[i] = modal.scope.getItem()
+								})
+							} else if (type === 'building') {
+								_.each($scope.selected.site.buildings, (b, i) => {
+									if (b._id === item._id) $scope.selected.site.buildings[i] = modal.scope.getItem()
+								})
 							}
+							updateProject()
 						})
 					})
 			}
 
 			$scope.showBuilding = (building) => {
-				if (!building.plans) $scope.createPlanAndLoad($scope.selected.building)
+				if (!building.plans) $scope.createPlanAndLoad(building)
 				else $location.path(`building/${building._id}`)
 			}
 
 			$scope.gotoPlan = (plan) => {
 				$location.path(`plans/${plan._id}`)
+			}
+
+			function updateWifiDetails (plan) {
+				if (plan.details.controller) {
+					if (!_.get(plan, 'details.controllers[0]')) $scope.addController(false, plan)
+					plan.details.controllers[0].country = plan.details.country
+					plan.details.controllers[0].sku = plan.details.controller
+				}
+				if (!plan.stage.items) plan.stage.items = plan.stage.aps
+				_.each(plan.stage.items, item => {
+					if (!item.sku) {
+						if (item.itemType === 'ap') item.sku = plan.details.aps
+						if (item.itemType === 'am') item.sku = plan.details.ams
+						item.vendor = plan.details.vendor
+					}
+				})
 			}
 
 			$scope.showPlan = (plan) => {
@@ -534,7 +559,8 @@ angular.module('plans')
 				$scope.flooplan_name = plan.title
 				if (typeof plan.details !== 'object') plan.details = {}
 				if (!plan.details.contacts) plan.details.contacts = []
-				Drawing.loadPlan(plan._id, plan.stage, $scope.settings.signal_radius, $scope.updateControls)
+				updateWifiDetails(plan)
+				Drawing.loadPlan(plan, $scope.settings.signal_radius, $scope.updateControls, $scope.uploadProgress)
 				$timeout(() => {
 					$scope.settings.show_heatmap = false
 					Drawing.heatmap('off')
@@ -553,6 +579,7 @@ angular.module('plans')
 					_.set(plan, 'details.project', $scope.project.title)
 					_.set(plan, 'details.site', $scope.site.name)
 					_.set(plan, 'details.building', $scope.building.name)
+					updateWifiDetails(plan)
 					if (!$scope.settings) $scope.showPlan(plan)
 				}))
 			}
@@ -575,6 +602,7 @@ angular.module('plans')
 			}
 
 			$scope.getBuilding = () => {
+				$scope.percentDone = 1
 				if ($stateParams.planID) {
 					$scope.plan = Plans.get({planId: $stateParams.planID}, function () {
 						$scope.plans = []
@@ -611,6 +639,7 @@ angular.module('plans')
 				$scope.edit_prop = newContact
 			}
 
+			/* Only called from the plan view */
 			$scope.saveContact = function () {
 				if (!$scope.plan.details.contacts) $scope.plan.details.contacts = []
 				if (newContact.name) {
@@ -625,21 +654,24 @@ angular.module('plans')
 				$scope.savePlan()
 			}
 
-			$scope.addController = function () {
-				$scope.pp_edit.controllers = true
+			$scope.addController = function (edit, plan) {
+				if (!plan) plan = $scope.plan
+				if (edit) $scope.pp_edit.controllers = true
 				var newController = {
 					lic: {
 						ap: {}
-					}
+					},
+					country: plan.details.country,
+					sku: plan.details.controller
 				}
 				$scope.edit_prop = newController
-				if (!$scope.plan.details.controllers) $scope.plan.details.controllers = []
-				$scope.plan.details.controllers.push(newController)
+				if (!plan.details.controllers) plan.details.controllers = []
+				plan.details.controllers.push(newController)
 			}
 
 			$scope.checkController = function () {
 				if (!$scope.plan.details.controllers) {
-					$scope.addController()
+					$scope.addController(true)
 				} else {
 					$scope.savePlanProperties()
 				}
@@ -657,7 +689,7 @@ angular.module('plans')
 			}
 
 			$scope.updateLicenses = function () {
-				$scope.plan.details.controllers[0].lic.ap.qty = $scope.plan.stage.aps.length
+				$scope.plan.details.controllers[0].lic.ap.qty = $scope.plan.stage.items ? _.filter($scope.plan.stage.items, i => i.itemType === 'ap').length : 0
 			}
 
 			$scope.toggleMDF = function () {
@@ -678,13 +710,11 @@ angular.module('plans')
 				})
 
 				/* TODO: add unique designers to project / site / building */
-				$scope.project.details  = _.omit(details, ['project', 'site', 'building', 'address', 'city', 'state', 'zipcode', 'contacts'])
-				$scope.site.details     = _.omit(details, ['site', 'building', 'contacts'])
-				$scope.building.details = details
+				$scope.project.details  = _.defaults($scope.project.details, _.omit(details, ['project', 'site', 'building', 'address', 'city', 'state', 'zipcode', 'contacts']))
+				$scope.site.details     = _.defaults($scope.site.details, _.omit(details, ['site', 'building', 'contacts']))
+				$scope.building.details = _.defaults($scope.building.details, details)
 
-				$scope.project.$update(project => {
-					$scope.project = project
-				})
+				updateProject()
 				$scope.savePlan() // save current plan
 				$scope.pp_edit = {}
 			}
@@ -706,9 +736,7 @@ angular.module('plans')
 								})
 								_.remove($scope.plans, p => p._id === plan._id)
 								plan.$delete()
-								$scope.project.$update(project => {
-									$scope.project = project
-								})
+								updateProject()
 							}
 						})
 					})
@@ -746,7 +774,7 @@ angular.module('plans')
 								delete $scope.selected.site
 								delete $scope.selected.building
 								_.remove($scope.selected.project.sites, s => s._id === site._id)
-								$scope.selected.project.$update()
+								updateProject()
 							}
 						})
 					})
@@ -776,11 +804,19 @@ angular.module('plans')
 
 			$scope.selectProject = project => {
 				$scope.selected = {project: project}
+				$scope.sort.sites = 'name'
 			}
 
 			$scope.selectSite = site => {
-				$scope.selected.site = site
+				$scope.selected.site = _.find($scope.selected.project.sites, s => s._id === site._id)
+				$scope.sort.buildings = 'name'
 				delete $scope.selected.building
+				return $scope.selected.site
+			}
+
+			$scope.selectBuilding = bldg => {
+				$scope.selected.building = _.find(_.get($scope.selected, 'site.buildings'), b => b._id === bldg._id)
+				return $scope.selected.building
 			}
 
 			$scope.report = function () {
@@ -796,10 +832,23 @@ angular.module('plans')
 			}
 
 			function updateProject () {
+				var deferred = $q.defer()
 				$scope.selected.project.$update(project => {
-					$scope.selected.site = _.find(project.sites, s => s._id === $scope.selected.site._id)
-					$scope.selected.building = _.find($scope.selected.site.buildings, b => b._id === $scope.selected.building._id)
+					var newsite = _.get(project, 'details.newsite') || _.get($scope.selected, 'site._id')
+					var newbldg = _.get(project, 'details.newbldg') || _.get($scope.selected, 'building._id')
+					if (_.get(project, 'details.newsite')) delete project.details.newsite
+					if (_.get(project, 'details.newbldg')) delete project.details.newbldg
+					$scope.selected.project = project
+					_.each($scope.projects, (p, i) => {
+						if (p._id === project.id) $scope.projects[i] = project
+					})
+					$scope.selected.site = _.find(project.sites, s => s._id === newsite)
+					$scope.selected.building = _.find(_.get($scope.selected, 'site.buildings'), b => b._id === newbldg)
+
+					deferred.resolve()
 				})
+
+				return deferred.promise
 			}
 
 			$scope.onOrphanDrop = function (event, ui) {
