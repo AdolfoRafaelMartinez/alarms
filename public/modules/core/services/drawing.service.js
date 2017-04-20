@@ -995,7 +995,13 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			var img = new Image()
 			var defer = $q.defer()
 			img.setAttribute('crossOrigin', 'anonymous')
+			var request = new XMLHttpRequest();
 			img.src = url.replace('public/', '')
+			request.open("GET", img.src, true);
+			request.onprogress = function (event) {
+				this.uploadProgress(100 + 100 * event.loaded / event.total)
+			}.bind(this)
+			request.send(null);
 			img.onload = function (event) {
 				var t = event.target
 				var f = new createjs.Bitmap(t)
@@ -1011,13 +1017,14 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 				} else {
 					self.scale(scaleX * 100)
 				}
+				this.plan.stage.floorplan = url
 				floorplan.removeAllChildren()
 				floorplan.addChild(f)
 				update = true
 				$timeout(function () {
 					defer.resolve()
 				}, 0)
-			}
+			}.bind(this)
 
 			return defer.promise
 		}
@@ -1096,9 +1103,10 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			return newCanvas.toDataURL()
 		}
 
-		this.loadPlan = function (planResource, signal_radius, updateControls) {
+		this.loadPlan = function (planResource, signal_radius, updateControls, uploadProgress) {
 			var plan_id = planResource._id
 			var data = planResource.stage
+			this.uploadProgress = uploadProgress
 			this.plan = planResource
 			this.updateControls = updateControls
 			$timeout(function () {

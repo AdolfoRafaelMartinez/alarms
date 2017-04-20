@@ -102,6 +102,10 @@ md-sidenav .md-button ng-md-icon {
     line-height: 17px;
 }
 
+md-sidenav #fileupload input {
+	font-size: small !important;
+}
+
 md-sidenav #fileupload .large {
 	margin-top: -2px;
 	padding-bottom: 6px;

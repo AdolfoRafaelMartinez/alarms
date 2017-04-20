@@ -68,16 +68,19 @@
 				</form>
 			</div>
 
-			<div class="full fade clear" data-ng-class="{in: active()}">
-				<br />
-				<!-- The global progress bar -->
-				<div class="progress progress-striped active" data-file-upload-progress="progress()">
-					<div class="progress-bar progress-bar-success" data-ng-style="{width: num + '%'}"></div>
+			<div class="uploadStatus" ng-if="percentDone">
+				<div class="full clear">
+					<br />
+					<!-- The global progress bar -->
+					<div class="progress progress-striped active">
+						<div class="progress-bar progress-bar-success" data-ng-style="{width: percentDone + '%'}"></div>
+					</div>
+					<!-- The extended global progress state -->
+					<div class="progress-extended">&nbsp;</div>
 				</div>
-				<!-- The extended global progress state -->
-				<div class="progress-extended">&nbsp;</div>
+				<strong data-ng-show="file.error" class="error text-danger">{{file.error}}</strong>
 			</div>
-			<strong data-ng-show="file.error" class="error text-danger">{{file.error}}</strong>
+
 		</div>
 	</uib-accordion-group>
 

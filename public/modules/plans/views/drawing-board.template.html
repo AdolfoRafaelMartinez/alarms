@@ -1,4 +1,15 @@
 <div class="overlay-sheet sheet-bg loading" ng-hide="planReady"><spinner active=1></spinner></div>
+<div class="overlay-sheet sheet-bg uploadDND" ng-if="!plan.stage.floorplan">
+	<div ng-if="!percentDone">Browse or drag-and-drop a floorplan (jpg or png)</div>
+	<div ng-if="percentDone">
+		<div class="full clear">
+			<div class="progress progress-striped active">
+				<div class="progress-bar progress-bar-success" data-ng-style="{width: percentDone + '%'}"></div>
+			</div>
+		</div>
+		<strong data-ng-show="uploadfile.error" class="error text-danger">{{uploadfile.error}}</strong>
+	</div>
+</div>
 <canvas ng-right-click="getCurrentAP()" style="position: absolute; left: 20px; right: 40px; z-index: 1"></canvas>
 
 <!-- plan properties -->

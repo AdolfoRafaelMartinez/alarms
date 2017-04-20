@@ -178,31 +178,15 @@ angular.module('plans')
 				Drawing.updateSignalStrength($scope.settings.signal_radius)
 			}
 
-			$scope.onFileSelect = function (image) {
-				$scope.uploadInProgress = true
-				$scope.uploadProgress = 0
-
-				if (angular.isArray(image)) {
-					image = image[0]
+			$scope.uploadProgress = function(percentDone) {
+				if ($scope.$$phase) {
+					$scope.percentDone = percentDone / 2
+				} else {
+					$scope.$apply(function () {
+						$scope.percentDone = percentDone / 2
+					})
 				}
-
-				$scope.upload = $upload.upload({
-					url: '/upload',
-					method: 'POST',
-					data: {
-						type: 'floorplan'
-					},
-					file: image
-				}).progress(function (event) {
-					$scope.uploadProgress = Math.floor(event.loaded / event.total)
-					$scope.$apply()
-					console.log('uploadprogress', $scope.uploadProgress)
-				}).success(function (data, status, headers, config) {
-					console.log('Photo uploaded!')
-				}).error(function (err) {
-					$scope.uploadInProgress = false
-					console.log('Error uploading file: ' + err.message || err)
-				})
+				if ($scope.percentDone === 100) $scope.percentDone = 0
 			}
 
 			$scope.getTotalAPs = function () {
@@ -572,7 +556,7 @@ angular.module('plans')
 				if (typeof plan.details !== 'object') plan.details = {}
 				if (!plan.details.contacts) plan.details.contacts = []
 				updateWifiDetails(plan)
-				Drawing.loadPlan(plan, $scope.settings.signal_radius, $scope.updateControls)
+				Drawing.loadPlan(plan, $scope.settings.signal_radius, $scope.updateControls, $scope.uploadProgress)
 				$timeout(() => {
 					$scope.settings.show_heatmap = false
 					Drawing.heatmap('off')

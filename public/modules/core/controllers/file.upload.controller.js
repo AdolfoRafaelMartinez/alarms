@@ -22,41 +22,20 @@ function($scope, Drawing, $timeout, $http, $filter, $window) {
     $scope.options = {
         url: url
     };
+	$scope.percentDone = 0;
 
     $scope.$on('fileuploaddone', function(files, data){
         var url = data._response.result.files[0].url;
         $timeout(function() {
+			Drawing.uploadProgress($scope.percentDone);
             Drawing.addFloorPlan(url.replace('/Library/WebServer/projects/puddle/public', ''));
         }, 400);
     });
 
-    $scope.progress = function(percentDone) {
-        $scope.num = percentDone;
-        console.log('progress: ' + percentDone + '%');
-    };
-
-    $scope.done = function(files, data) {
-        $timeout(function() {
-            Drawing.addFloorPlan(data.replace('/Library/WebServer/projects/puddle/public', ''));
-        }, 400);
-    };
-
-    $scope.doneFinal = function(files, data) {
-        $timeout(function() {
-            Drawing.addFloorPlan(data.replace('/Library/WebServer/projects/puddle/public', ''));
-        }, 400);
-    };
-
-    $scope.getData = function(files) {
-        return {
-            msg: 'from the client',
-            date: new Date()
-        };
-    };
-
-    $scope.error = function(files, type, msg) {
-        // writeFiles(files);
-    };
+	$scope.$on('fileuploadprogress', function(e, data) {
+		$scope.percentDone = 100 * data.loaded / data.total
+		Drawing.uploadProgress($scope.percentDone);
+	});
 
 }
 ])
