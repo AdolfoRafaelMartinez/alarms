@@ -20,7 +20,7 @@
 	z-index: 10;
 	left: 0;
 	right: 0;
-	bottom: 160px;
+	min-height: 100%;
 	top: 0;
 	transition: all linear 0.2s;
 }
@@ -74,6 +74,9 @@ md-switch {
 
 .uploadDND {
 	text-align: center;
+	bottom: 160px;
+	min-height: auto;
+	opacity: 0.4;
 }
 
 .uploadDND > div {

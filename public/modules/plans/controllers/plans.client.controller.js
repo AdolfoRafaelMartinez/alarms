@@ -179,14 +179,17 @@ angular.module('plans')
 			}
 
 			$scope.uploadProgress = function(percentDone) {
-				if ($scope.$$phase) {
+				function updateProgress(percent) {
 					$scope.percentDone = percentDone / 2
+					if ($scope.percentDone === 100) $scope.percentDone = 0
+				}
+				if ($scope.$$phase) {
+					updateProgress(percentDone)
 				} else {
 					$scope.$apply(function () {
-						$scope.percentDone = percentDone / 2
+						updateProgress(percentDone)
 					})
 				}
-				if ($scope.percentDone === 100) $scope.percentDone = 0
 			}
 
 			$scope.getTotalAPs = function () {
@@ -252,6 +255,7 @@ angular.module('plans')
 						}, 3000)
 						deferred.resolve(response)
 					}, errorResponse => {
+						console.log(errorResponse)
 						$scope.error = errorResponse.data.message
 						deferred.reject(errorResponse)
 					})
