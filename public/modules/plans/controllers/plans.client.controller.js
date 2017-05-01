@@ -570,6 +570,7 @@ angular.module('plans')
 					Drawing.toggleDistances('on')
 					Drawing.toggleRadius('on')
 					$scope.planReady = true
+					if ($scope.percentDone === 1) $scope.percentDone = 0
 				}, 100)
 			}
 
