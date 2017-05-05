@@ -31,7 +31,8 @@ html(lang="en")
 							span Site Details
 						p.details=building.details.address
 							br
-							=`${building.details.city} ${building.details.state}, ${building.details.zipcode}`
+							if building.details.city
+								=`${building.details.city} ${building.details.state}, ${building.details.zipcode}`
 							br
 							=building.details.floors
 					div.full
@@ -134,7 +135,7 @@ html(lang="en")
 								br
 								=`${building.details.site}`
 								br
-								=`${building.details.building}`
+								=`${building.name}`
 						img.clientlogo(src=building.details.client.logo)
 					div.content
 						div.full

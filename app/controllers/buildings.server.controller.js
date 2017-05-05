@@ -2,14 +2,60 @@ const mongoose = require('mongoose')
 const _        = require('lodash')
 const Project  = mongoose.model('Project')
 const Plan     = mongoose.model('Plan')
-// const AP       = mongoose.model('AP')
-// const Ctrl     = mongoose.model('Controller')
-// const Mount    = mongoose.model('Mount')
 const pug      = require('pug')
 const shortid  = require('shortid')
 const fs       = require('fs')
 const exec     = require('child_process').exec
 const Q        = require('q')
+
+const BLDG_SCHEMA = {
+	details: {
+		address: '',
+		city: '',
+		state: '',
+		zipcode: '',
+		client: {
+			logo: '',
+			name: ''
+		},
+		parts: [],
+		contacts: [],
+		designer: {
+			name: '',
+			position: ''
+		},
+		msp: {
+			name: '',
+			logo: ''
+		}
+	}
+}
+
+const PLAN_SCHEMA = {
+	stage: {
+		items: []
+	},
+	details: {
+		controllers: [],
+		client: {
+			name: '',
+			logo: ''
+		},
+		parts: [],
+		contacts: [],
+		designer: {
+			name: '',
+			logo: ''
+		}
+	}
+}
+
+function filterSchema (obj, schema) {
+	_.map(schema, (def, key) => {
+		obj[key] = obj[key] || def
+		filterSchema(obj[key], def)
+	})
+}
 
 exports.buildingByID = function (req, res, next, id) {
 	Project.find({'sites.buildings._id': id})
@@ -60,8 +106,22 @@ exports.delete = function (req, res) {
 		})
 }
 
-exports.newPlan = function (req, res, next) {
-	res.send(mongoose.Types.ObjectId())
+exports.update = function (req, res, next) {
+	const building = req.building
+	_.each(req.project.sites, site => {
+		_.each(site.buildings, (b, i) => {
+			if (b._id === building._id) {
+				site.buildings[i] = req.body
+			}
+		})
+	})
+	Project.findOneAndUpdate({_id: mongoose.Types.ObjectId(req.project._id)}, {$set: {sites: req.project.sites}})
+		.exec((err, results) => {
+			if (err) {
+				throw new Error(`Could not update project when updating building ${building._id}`)
+			}
+			res.status(202).send()
+		})
 }
 
 exports.pdfReport = function (req, res, next) {
@@ -79,14 +139,9 @@ exports.pdfReport = function (req, res, next) {
 			if (err) deferred.reject(err)
 			if (!plan) deferred.reject(new Error('Failed to load plan ' + bplan._id))
 
-			if (!plan.stage.ams) plan.stage.ams = []
-			if (!plan.details) plan.details = {}
-			if (!plan.details.controllers) plan.details.controllers = []
-			if (!plan.details.client) plan.details.client = {}
-			if (!plan.details.parts) plan.details.parts = []
-			if (!plan.details.contacts) plan.details.contacts = []
-			if (!plan.details.designer) plan.details.designer = {}
-			if (!plan.stage.items) plan.stage.items = plan.stage.aps
+			filterSchema(plan, PLAN_SCHEMA)
+			if (!plan.stage.items && plan.stage.aps) plan.stage.items = plan.stage.aps // old plan format
+
 			plan.stage.aps = _.filter(plan.stage.items, i => i.itemType === 'ap')
 			plan.stage.ams = _.filter(plan.stage.items, i => i.itemType === 'am')
 			aps += plan.stage.aps.length
@@ -121,15 +176,8 @@ exports.pdfReport = function (req, res, next) {
 			return
 		})
 		.then(() => {
-			if (!req.building.details) req.building.details = {}
-			if (!req.building.details.client) req.building.details.client = {}
-			if (!req.building.details.parts) req.building.details.parts = []
-			if (!req.building.details.contacts) req.building.details.contacts = []
-			if (!req.building.details.designer) req.building.details.designer = {}
-			if (!req.building.details.msp) req.building.details.msp = {}
-			// TODO: convert undefined values to empty strings (or get pug to do it automatically)
-
 			const PUGDIR = `${__dirname}/../pug`
+			filterSchema(req.building, BLDG_SCHEMA)
 			pug.renderFile(`${PUGDIR}/sf01.pug`,
 				{
 					plans: plans,

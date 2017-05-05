@@ -1,6 +1,6 @@
 <div class="overlay-sheet sheet-bg loading" ng-hide="planReady"><spinner active=1></spinner></div>
 <div class="overlay-sheet sheet-bg uploadDND" ng-if="!plan.stage.floorplan || percentDone">
-	<div ng-if="!percentDone">Browse or drag-and-drop a floorplan (jpg or png)</div>
+	<div ng-if="!percentDone" ng-click="browseUpload()">Browse or drag-and-drop a floorplan (jpg or png)</div>
 	<div ng-if="percentDone">
 		<div class="full clear">
 			<div class="progress progress-striped active">

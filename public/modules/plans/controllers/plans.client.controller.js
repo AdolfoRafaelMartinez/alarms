@@ -178,6 +178,10 @@ angular.module('plans')
 				Drawing.updateSignalStrength($scope.settings.signal_radius)
 			}
 
+			$scope.browseUpload = function() {
+				$("#fileupload input").click()
+			}
+
 			$scope.uploadProgress = function(percentDone) {
 				function updateProgress(percent) {
 					$scope.percentDone = percentDone / 2
@@ -382,7 +386,8 @@ angular.module('plans')
 					$scope.plan = response
 					$scope.plan.title = 'Untitled'
 					$scope.building.plans.push({_id: $scope.plan._id, title: $scope.plan.title})
-					updateProject()
+					var b = new Buildings($scope.building)
+					b.$update()
 					$scope.plans.push($scope.plan)
 					$scope.settings = {
 						units: 'ft',
@@ -715,7 +720,6 @@ angular.module('plans')
 				$scope.site.details     = _.defaults($scope.site.details, _.omit(details, ['site', 'building', 'contacts']))
 				$scope.building.details = _.defaults($scope.building.details, details)
 
-				updateProject()
 				$scope.savePlan() // save current plan
 				$scope.pp_edit = {}
 			}

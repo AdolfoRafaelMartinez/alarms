@@ -1216,12 +1216,6 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 
 		var lastMDF
 		this.setupIDF = function (item) {
-			if (item.inventory.mdf) {
-				item.itemType = 'mdf'
-			} else {
-				item.itemType = 'idf'
-			}
-			redrawIDF(item)
 			var children, i, d, m, layers_length = layers.length
 			for (i = 0; i < layers_length; i++) {
 				if (layers[i].layer_type === 'ap') {
@@ -1233,13 +1227,20 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 								redrawIDF(ap)
 							} else if (item.itemType === 'idf' && lastMDF && ap.id === lastMDF) {
 								// TODO: maybe switch back option? -- only works for previous MDF assigned in current session (not loaded)
-								// ap.itemType = 'mdf'
-								// redrawIDF(ap)
 							}
 						}
 					})
 				}
 			}
+			if (item.inventory.mdf) {
+				item.itemType = 'mdf'
+				item.inventory.itemType = 'mdf'
+			} else {
+				item.itemType = 'idf'
+				item.inventory.itemType = 'idf'
+			}
+			console.log(item)
+			redrawIDF(item)
 			this.reindexItems()
 			update = true
 		}

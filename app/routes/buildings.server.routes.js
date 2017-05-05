@@ -8,8 +8,8 @@ module.exports = function (app) {
 	app.route('/buildings/:buildingId')
 		.delete(users.requiresLogin, buildings.hasAuthorization, buildings.delete)
 
-	app.route('/buildings/newPlan')
-		.get(users.requiresLogin, buildings.newPlan)
+	app.route('/buildings/:buildingId')
+		.put(users.requiresLogin, buildings.update)
 
 	app.route('/buildings/:buildingId/pdf')
 		.get(users.requiresLogin, buildings.hasAuthorization, buildings.pdfReport)
