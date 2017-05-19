@@ -313,6 +313,8 @@ button.selected {
 .floors {
 	margin: 5px 10px;
 	color: #aaa;
+    height: 100px;
+    overflow: auto;
 }
 
 .floors > div:first-child {

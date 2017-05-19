@@ -28,8 +28,8 @@ function($scope, Drawing, $timeout, $http, $filter, $window) {
         var url = data._response.result.files[0].url;
         $timeout(function() {
 			Drawing.uploadProgress($scope.percentDone);
-            Drawing.addFloorPlan(url.replace('/Library/WebServer/projects/puddle/public', ''));
-        }, 400);
+            Drawing.addFloorPlan(url);
+        }, 0);
     });
 
 	$scope.$on('fileuploadprogress', function(e, data) {

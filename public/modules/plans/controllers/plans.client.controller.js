@@ -183,16 +183,19 @@ angular.module('plans')
 			}
 
 			$scope.uploadProgress = function(percentDone) {
-				function updateProgress(percent) {
-					$scope.percentDone = percentDone / 2
-					if ($scope.percentDone === 100) $scope.percentDone = 0
-				}
 				if ($scope.$$phase) {
 					updateProgress(percentDone)
 				} else {
 					$scope.$apply(function () {
 						updateProgress(percentDone)
 					})
+				}
+				function updateProgress(percent) {
+					$scope.percentDone = percentDone / 2
+                    if ($scope.percentDone === 100) {
+                        $scope.percentDone = 0
+                        $timeout($scope.savePlan, 100)
+                    }
 				}
 			}
 
