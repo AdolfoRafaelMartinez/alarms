@@ -149,7 +149,7 @@ exports.update = function (req, res) {
 							_.set(plan, 'details.controller', _.get(bldg, 'details.inventory.controller'))
 							_.set(plan, 'details.aps', _.get(bldg, 'details.inventory.aps'))
 							_.set(plan, 'details.ams', _.get(bldg, 'details.inventory.ams'))
-							if (!_.get(plan.stage.items)) plan.stage.items = plan.stage.aps
+							if (!_.get(plan, 'stage.items')) plan.stage.items = plan.stage.aps
 							_.each(plan.stage.items, ap => {
 								if (['ap', undefined].includes(ap.itemType)) {
 									_.set(ap, 'inventory.vendor', _.get(bldg, 'details.inventory.vendor'))
