@@ -425,6 +425,7 @@ angular.module('plans')
 				_.set(plan, 'details.site', site.name)
 				_.set(plan, 'details.building', bldg.name)
 				_.set(plan, 'details.client', project.details.client)
+				_.set(plan, 'details.contacts', _.get(bldg, 'details.contacts'))
 				_.set(plan, 'details.vendor', _.get(bldg, 'details.inventory.vendor'))
 				_.each(plan.stage.items, ap => {
 					if (['ap', 'am', undefined].includes(ap.itemType)) {
@@ -588,6 +589,7 @@ angular.module('plans')
 					_.set(plan, 'details.project', $scope.project.title)
 					_.set(plan, 'details.site', $scope.site.name)
 					_.set(plan, 'details.building', $scope.building.name)
+					_.set(plan, 'details.contacts', _.get($scope.building, 'details.contacts'))
 					updateWifiDetails(plan)
 					if (!$scope.settings) $scope.showPlan(plan)
 				}))
@@ -722,6 +724,9 @@ angular.module('plans')
 				$scope.project.details  = _.defaults($scope.project.details, _.omit(details, ['project', 'site', 'building', 'address', 'city', 'state', 'zipcode', 'contacts']))
 				$scope.site.details     = _.defaults($scope.site.details, _.omit(details, ['site', 'building', 'contacts']))
 				$scope.building.details = _.defaults($scope.building.details, details)
+                var b = new Buildings($scope.building)
+                b.$update()
+                console.log('saved details', $scope.building.details, details)
 
 				$scope.savePlan() // save current plan
 				$scope.pp_edit = {}
