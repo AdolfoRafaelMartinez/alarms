@@ -846,25 +846,31 @@ angular.module('plans')
 
 			$scope.getControllers = search => Controllers.query({search: search}).$promise
 
-			function updateProject () {
-				var deferred = $q.defer()
-				$scope.selected.project.$update(project => {
-					var newsite = _.get(project, 'details.newsite') || _.get($scope.selected, 'site._id')
-					var newbldg = _.get(project, 'details.newbldg') || _.get($scope.selected, 'building._id')
-					if (_.get(project, 'details.newsite')) delete project.details.newsite
-					if (_.get(project, 'details.newbldg')) delete project.details.newbldg
-					$scope.selected.project = project
-					_.each($scope.projects, (p, i) => {
-						if (p._id === project.id) $scope.projects[i] = project
-					})
-					$scope.selected.site = _.find(project.sites, s => s._id === newsite)
-					$scope.selected.building = _.find(_.get($scope.selected, 'site.buildings'), b => b._id === newbldg)
+          function updateProject () {
+            var deferred = $q.defer()
+            if ($scope.selected && $scope.selected.project) $scope.selected.project.$update(refreshProject)
+            else $scope.project.$update(refreshProject)
 
-					deferred.resolve()
-				})
+            function refreshProject(project) {
+              var newsite = _.get(project, 'details.newsite') || _.get($scope.selected, 'site._id')
+              var newbldg = _.get(project, 'details.newbldg') || _.get($scope.selected, 'building._id')
+              if (_.get(project, 'details.newsite')) delete project.details.newsite
+              if (_.get(project, 'details.newbldg')) delete project.details.newbldg
+              $scope.project = project
+              if ($scope.selected) {
+                $scope.selected.project = project
+                _.each($scope.projects, (p, i) => {
+                  if (p._id === project.id) $scope.projects[i] = project
+                })
+                $scope.selected.site = _.find(project.sites, s => s._id === newsite)
+                $scope.selected.building = _.find(_.get($scope.selected, 'site.buildings'), b => b._id === newbldg)
+              }
 
-				return deferred.promise
-			}
+              deferred.resolve()
+            }
+
+            return deferred.promise
+          }
 
 			$scope.onOrphanDrop = function (event, ui) {
 				var plan = ui.draggable.scope().plan

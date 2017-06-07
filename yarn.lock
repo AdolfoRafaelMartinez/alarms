@@ -2926,7 +2926,7 @@ mongodb@^2.2.24:
     mongodb-core "2.1.8"
     readable-stream "2.1.5"
 
-mongoose@~3.8.8:
+mongoose@~3.8.40:
   version "3.8.40"
   resolved "https://registry.yarnpkg.com/mongoose/-/mongoose-3.8.40.tgz#032f5ba55582497559a87c1f3f4b3959c26406a7"
   dependencies:

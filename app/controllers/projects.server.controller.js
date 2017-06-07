@@ -161,6 +161,7 @@ exports.update = function (req, res) {
 								}
 							})
 							Plan.findOneAndUpdate({_id: plan._id}, plan).exec(() => {
+                                plan.save()
 								deferred.resolve()
 							})
 						})
