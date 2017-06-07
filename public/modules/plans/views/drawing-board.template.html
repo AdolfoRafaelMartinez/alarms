@@ -229,11 +229,13 @@
                                             <span ng-if="!ctrl.ha"><i class="glyphicon glyphicon-remove-circle red"></i></span>
                                         </div>
                                         <div><span>AP/AM Licenses:</span> <span ng-bind="ctrl.lic.ap.qty"></span></div>
-                                        <div><span>PEFNG License:</span>
+                                        <div ng-if="plan.details.vendor === 'ArubaHPE'">
+                                            <span>PEFNG License:</span>
                                             <span ng-if="plan.details.lic.pefng"><i class="glyphicon glyphicon-ok-circle green"></i></span>
                                             <span ng-if="!plan.details.lic.pefng"><i class="glyphicon glyphicon-remove-circle red"></i></span>
                                         </div>
-                                        <div><span>RFP License:</span>
+                                        <div ng-if="plan.details.vendor === 'ArubaHPE'">
+                                            <span>RFP License:</span>
                                             <span ng-if="plan.details.lic.rfp"><i class="glyphicon glyphicon-ok-circle green"></i></span>
                                             <span ng-if="!plan.details.lic.rfp"><i class="glyphicon glyphicon-remove-circle red"></i></span>
                                         </div>
@@ -251,7 +253,15 @@
                                     </div>
                                     <div class="form-group row">
                                         <label class="col-sm-6 ptop5 text-right form-control-label">Model</label>
-                                        <div class="col-sm-6"><input type="text" ng-model="edit_prop.sku" class="form-control" placeholder="Model"/></div>
+                                        <div class="col-sm-6">
+                                            <input type="text" ng-model="edit_prop.sku" placeholder="Controller part number" 
+                                                uib-typeahead="ap.sku for ap in getControllers($viewValue)" 
+                                                typeahead-loading="loadingControllers" typeahead-no-results="noControllerResults" class="form-control">
+                                            <i ng-show="loadingControllers" class="glyphicon glyphicon-refresh"></i>
+                                            <div ng-show="noControllerResults">
+                                                <i class="glyphicon glyphicon-remove"></i> No Results Found
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="form-group row">
                                         <label class="col-sm-6 ptop5 text-right form-control-label">Description</label>
@@ -263,11 +273,11 @@
                                             <md-switch aria-label="HA" ng-model="edit_prop.ha">HA</md-switch>
                                         </div>
                                     </div>
-                                    <div class="form-group row">
+                                    <div class="form-group row" ng-if="plan.details.vendor === 'ArubaHPE'">
                                         <label class="col-sm-6 text-right form-control-label">AP/AM spares</label>
                                         <div class="col-sm-6"><input type="number" ng-model="edit_prop.lic.ap.spares" class="form-control tight" placeholder="qty" /></div>
                                     </div>
-                                    <div class="form-group row">
+                                    <div class="form-group row" ng-if="plan.details.vendor === 'ArubaHPE'">
                                         <div class="col-sm-6 text-right"><label class="form-control-label">PEFNG License?</label></div>
                                         <div class="col-sm-6">
                                             <md-switch aria-label="PEFNG licences" ng-model="plan.details.lic.pefng">
@@ -275,7 +285,7 @@
                                             </md-switch>
                                         </div>
                                     </div>
-                                    <div class="form-group row">
+                                    <div class="form-group row" ng-if="plan.details.vendor === 'ArubaHPE'">
                                         <div class="col-sm-6 text-right"><label class="form-control-label">RFP License?</label></div>
                                         <div class="col-sm-6">
                                             <md-switch aria-label="RFP licences" ng-model="plan.details.lic.rfp">

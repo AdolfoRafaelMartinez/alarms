@@ -3,8 +3,8 @@
 
 angular.module('plans')
 	.controller('PlansController', [
-		'$scope', '$rootScope', '$state', '$stateParams', '$location', 'Authentication', 'Drawing', '$timeout', '$http', 'Projects', 'Plans', 'Buildings', 'contextMenu', '$q', 'ModalService',
-		function ($scope, $rootScope, $state, $stateParams, $location, Authentication, Drawing, $timeout, $http, Projects, Plans, Buildings, contextMenu, $q, ModalService) {
+		'$scope', '$rootScope', '$state', '$stateParams', '$location', 'Authentication', 'Drawing', '$timeout', '$http', 'Projects', 'Plans', 'Buildings', 'contextMenu', '$q', 'ModalService', 'Controllers',
+		function ($scope, $rootScope, $state, $stateParams, $location, Authentication, Drawing, $timeout, $http, Projects, Plans, Buildings, contextMenu, $q, ModalService, Controllers) {
 			$scope.authentication = Authentication
 
 			$scope.UNITS_STEP_FEET = 8
@@ -843,6 +843,8 @@ angular.module('plans')
 					}, 0)
 				})
 			}
+
+			$scope.getControllers = search => Controllers.query({search: search}).$promise
 
 			function updateProject () {
 				var deferred = $q.defer()

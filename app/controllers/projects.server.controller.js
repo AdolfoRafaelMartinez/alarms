@@ -182,8 +182,6 @@ exports.update = function (req, res) {
 					_.set(project, 'details.newbldg', newbldg)
 					_.set(project, 'details.newsite', newsite)
 				}
-				console.log(newbldg, newsite)
-				console.dir(project.details)
 				res.json(project)
 			})
 		})

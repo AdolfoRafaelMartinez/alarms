@@ -1075,16 +1075,18 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			return json
 		}
 
-		this.centerStage = () => {
-			let cw = canvas.width
-			let ch = canvas.height
-			let stageBounds = stage.getBounds()
-			let sw = cw / stageBounds.width
-			let sh = ch / stageBounds.height
-			this.scale(100 * (Math.min(sw, sh) - 0.05))
-			stage.x = stage.y = 20
-			update = true
-		}
+      this.centerStage = () => {
+        let cw = canvas.width
+        let ch = canvas.height
+        let stageBounds = stage.getBounds()
+        if (stageBounds) {
+          let sw = cw / stageBounds.width
+          let sh = ch / stageBounds.height
+          this.scale(100 * (Math.min(sw, sh) - 0.05))
+          stage.x = stage.y = 20
+          update = true
+        }
+      }
 
 		this.getPNG = () => {
 			return stage.toDataURL()
