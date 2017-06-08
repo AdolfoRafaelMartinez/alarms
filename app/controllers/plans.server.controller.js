@@ -6,6 +6,7 @@ const shortid  = require('shortid')
 
 const errorHandler = require('./errors.server.controller')
 const Plan = mongoose.model('Plan')
+const ObjectID = require('mongodb').ObjectID
 
 function saveImages (print, thumb, pid) {
 	if (!thumb || !print) return Q.when({pic: 'none.jpg', thumb: 'none.jpg'})
@@ -83,51 +84,55 @@ exports.create = function (req, res) {
  * Show the current plan
  */
 exports.read = function (req, res) {
-	res.json(req.plan)
+  console.log('init find one', req.plan)
+  res.json(req.plan)
 }
 
 /**
  * Plan
  */
 exports.planByID = function (req, res, next, id) {
-	Plan.findById(id).populate('user', 'displayName').exec(function (err, plan) {
-		if (err) return next(err)
-		if (!plan) return next(new Error('Failed to load plan ' + id))
-		req.plan = plan
-		next()
-	})
+  const plansCollection = global.mongodb.collection('plans')
+  plansCollection.findOne({_id: ObjectID(id)})
+    .then(plan => {
+      req.plan = plan
+      next()
+    })
+    .catch(err => {
+      throw new Error('Could not find plan with id' + req.id);
+    })
 }
 
 /**
  * Update a plan
  */
 exports.update = function (req, res) {
-	var plan = req.plan
-
-	var plan_data = req.body
-	saveImages(req.body.print, req.body.thumb, req.body._id)
-		.then(pics => {
-			if (pics) {
-				plan_data.thumb = pics.thumb + '?v=' + shortid.generate()
-				plan_data.print = pics.print
-			}
-			plan = _.extend(plan, plan_data)
-			Plan.findOneAndUpdate({_id: plan._id}, plan).exec(err => {
-				if (err) {
-					return res.status(400).send({
-						message: errorHandler.getErrorMessage(err)
-					})
-				} else {
-					res.json(plan)
-				}
-			})
-		})
-		.catch(err => {
-			res.status(500).send({
-				message: errorHandler.getErrorMessage(err),
-				err: err
-			})
-		})
+  const plansCollection = global.mongodb.collection('plans')
+  const plan = req.plan
+  var plan_data = req.body
+  saveImages(req.body.print, req.body.thumb, req.body._id)
+    .then(pics => {
+      if (pics) {
+        plan.thumb = pics.thumb + '?v=' + shortid.generate()
+        plan.print = pics.print
+      }
+      plan.settings = plan_data.settings
+      plan.stage = plan_data.stage
+      plan.title = plan_data.title
+      plan.floor = plan_data.floor
+      plan.details = plan_data.details
+      return plansCollection.findOneAndReplace({_id: plan._id}, plan, {returnNewDocument: true})
+        .then(p => {
+          res.json(p.value)
+        })
+    })
+    .catch(err => {
+      console.dir(err)
+      res.status(500).send({
+        message: errorHandler.getErrorMessage(err),
+        err: err
+      })
+    })
 }
 
 /**
@@ -186,66 +191,11 @@ exports.blueFloorPlan = function (req, res, next) {
 	})
 }
 
-var COVERAGE_POINT_GAP = 20
-var PUDDLE_PATTERN_GRANULARITY = Math.PI / 360 * 5
-var PUDDLE_POINT_RADIUS = 20
-function defaultAntenaPattern () {
-	var pattern = {}
-	for (var i = 0; i < Math.PI; i += PUDDLE_PATTERN_GRANULARITY) {
-		pattern[i] = {
-			s: 5 // Math.random()*5 - 10
-		}
-	}
-
-	return pattern
-}
-
-/**
- * Calculate signal coverage
- */
-exports.heatmap = function (req, res) {
-	var access_points = req.plan.stage.aps
-	// TEMP
-	access_points = req.body.points
-	var ap_strength = 1
-	var walls = req.plan.walls
-	var points = []
-	var r_inc // granularity
-	var p, strength
-	_.each(access_points, function (ap) {
-		var r_max = ap.radius * 2 // cut off distance
-		r_inc = r_max / 2
-		var antenna_pattern = defaultAntenaPattern()
-		var radius
-		points.push([{x: ap.x, y: ap.y, value: 100, radius: ap.radius}])
-		/*
-		for (radius = r_inc radius < r_max radius = r_inc) {
-			var radial_points = []
-			var pstep = Math.asin(COVERAGE_POINT_GAP/radius)
-			var closest = 0
-			var loss = 20*Math.log10(5550) + 20*Math.log10(0.000621371 * radius) + 36.6
-			for (p = 0 p <= 2*Math.PI p+=pstep) {
-				closest = Math.round(p/PUDDLE_PATTERN_GRANULARITY)
-				strength = ap_strength * antenna_pattern[closest]
-				radial_points.push({
-					x: (ap.x + radius * Math.sin(closest)),
-					y: (ap.y + radius * Math.cos(closest)),
-					value: 100 - loss,
-					radius: ap.radius/19
-				})
-			}
-			points.push(radial_points)
-		} */
-	})
-
-	res.json(points)
-}
-
 /**
  * Plan authorization middleware
  */
 exports.hasAuthorization = function (req, res, next) {
-	if (req.plan.user.id !== req.user.id) {
+	if (req.plan.user.toString() !== req.user._id.toString()) {
 		return res.status(403).send({
 			message: 'User is not authorized'
 		})

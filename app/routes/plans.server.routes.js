@@ -1,5 +1,6 @@
-const users = require('../../app/controllers/users.server.controller')
-const plans = require('../../app/controllers/plans.server.controller')
+const users  = require('../controllers/users.server.controller')
+const plans  = require('../controllers/plans.server.controller')
+const signal = require('../controllers/signal.server.controller')
 
 module.exports = function (app) {
 	app.route('/plans')
@@ -9,7 +10,7 @@ module.exports = function (app) {
 	app.route('/orphan-plans')
         .get(users.requiresLogin, plans.orphans)
 
-	app.route('/plans/:planId/coverage').post(users.requiresLogin, plans.hasAuthorization, plans.heatmap)
+	app.route('/plans/:planId/coverage').post(users.requiresLogin, plans.hasAuthorization, signal.heatmap)
 
 	app.route('/plans/:planId')
         .get(users.requiresLogin, plans.hasAuthorization, plans.read)
