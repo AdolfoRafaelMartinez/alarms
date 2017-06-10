@@ -84,7 +84,6 @@ exports.create = function (req, res) {
  * Show the current plan
  */
 exports.read = function (req, res) {
-  console.log('init find one', req.plan)
   res.json(req.plan)
 }
 
@@ -121,9 +120,9 @@ exports.update = function (req, res) {
       plan.title = plan_data.title
       plan.floor = plan_data.floor
       plan.details = plan_data.details
-      return plansCollection.findOneAndReplace({_id: plan._id}, plan, {returnNewDocument: true})
-        .then(p => {
-          res.json(p.value)
+      return plansCollection.findOneAndReplace({_id: plan._id}, plan)
+        .then(() => {
+          res.json(plan)
         })
     })
     .catch(err => {

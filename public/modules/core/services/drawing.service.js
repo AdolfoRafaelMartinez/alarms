@@ -991,9 +991,10 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 		}
 
 		this.addFloorPlan = function (url) {
+			var defer = $q.defer()
+            if (!url) return defer.resolve();
 			var self = this
 			var img = new Image()
-			var defer = $q.defer()
 			img.setAttribute('crossOrigin', 'anonymous')
 			var request = new XMLHttpRequest();
 			img.src = url.replace('public/', '')
@@ -1044,7 +1045,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			plan.stage.regY = stage.regY
 			var json = {
 				plan: plan,
-				floorplan: floorplan.children[0] ? floorplan.children[0].image.src : '',
+				floorplan: this.plan.stage.floorplan,
 				items: [],
 				walls: []
 			}
@@ -1145,7 +1146,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 					this.updateSignalStrength(plan.real_radius)
 					if (!plan.stage) initStage()
 				}.bind(this), 100)
-			}.bind(this), 100)
+			}.bind(this), 0)
 		}
 
 		function drawHeatmap (data) {
@@ -1181,6 +1182,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 		}
 
 		this.heatmap = function (state) {
+          return // TODO
 			if (state === 'off') {
 				coverage.removeAllChildren()
 				var layers_length = layers.length

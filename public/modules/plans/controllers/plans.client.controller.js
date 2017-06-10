@@ -217,6 +217,7 @@ angular.module('plans')
 			}
 
 			$scope.savePlan = function () {
+              console.log('save plan')
 				var overlaps = $scope.settings.show_overlaps
 				var distances = $scope.settings.show_distances
 				var deferred = $q.defer()
