@@ -834,6 +834,14 @@ angular.module('plans')
 			}
 
 			$scope.report = function () {
+              if (!_.get($scope.building, 'details.client.name') ||
+                !_.get($scope.building, 'details.msp.name') ||
+                !_.get($scope.building, 'details.inventory.vendor') ||
+                !_.get($scope.building, 'details.address') ||
+                !_.get($scope.building, 'details.city')) {
+
+                alert('Please fill out all the details of the building (client, MSP, address, vendor, etc');
+              } else {
 				$scope.savePlan().then(() => {
 					if ($scope.settings.show_heatmap) {
 						$scope.settings.show_heatmap = false
@@ -843,6 +851,7 @@ angular.module('plans')
 						window.open(`/buildings/${$scope.building._id}/pdf`, '_blank')
 					}, 0)
 				})
+              }
 			}
 
 			$scope.getControllers = search => Controllers.query({search: search}).$promise
