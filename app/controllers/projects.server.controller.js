@@ -121,7 +121,7 @@ exports.update = function (req, res) {
 						let deferred = Q.defer()
 						promises.push(deferred.promise)
 						Plan.findOne({_id: plan._id}, (err, plan) => {
-							if (err) {
+							if (err || !plan) {
 								return deferred.reject(err)
 							}
 							_.set(plan, 'details.project', project.title)

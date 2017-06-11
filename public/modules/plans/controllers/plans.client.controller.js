@@ -194,7 +194,6 @@ angular.module('plans')
 					$scope.percentDone = percentDone / 2
                     if ($scope.percentDone === 100) {
                         $scope.percentDone = 0
-                        $timeout($scope.savePlan, 100)
                     }
 				}
 			}
@@ -217,12 +216,12 @@ angular.module('plans')
 			}
 
 			$scope.savePlan = function () {
-              console.log('save plan')
 				var overlaps = $scope.settings.show_overlaps
 				var distances = $scope.settings.show_distances
 				var deferred = $q.defer()
 				var plan = new Plans(_.cloneDeep($scope.plan))
 				plan.thumb = Drawing.getThumb()
+                console.log('savePlan current', plan)
 
 				Drawing.toggleOverlaps('off')
 				Drawing.toggleDistances('off')
@@ -563,25 +562,54 @@ angular.module('plans')
 				})
 			}
 
+            $scope.checkSaveCurrent = function() {
+              if (!$scope.dirty) return $q.when()
+              return ModalService.showModal({
+                templateUrl: 'saveModal.html',
+                controller: 'deleteModalController',
+                inputs: { item: 1 }
+              })
+                .then(function (modal) {
+                  modal.element.modal()
+                  return modal.close.then(answer => {
+                    if (answer) {
+                      console.log('yes')
+                      return $scope.savePlan()
+                    }
+                    return $q.when()
+                  })
+                  .then(() => {
+                    $scope.dirty = false
+                  })
+                })
+            }
+
+            $scope.setDirty = () => {
+              $scope.dirty = true
+            }
+
 			$scope.showPlan = (plan) => {
-				$scope.plan = plan
-				$scope.settings = plan.settings
-				$scope.flooplan_name = plan.title
-				if (typeof plan.details !== 'object') plan.details = {}
-				if (!plan.details.contacts) plan.details.contacts = []
-				updateWifiDetails(plan)
-				Drawing.loadPlan(plan, $scope.settings.signal_radius, $scope.updateControls, $scope.uploadProgress)
-				$timeout(() => {
-					$scope.settings.show_heatmap = false
-					Drawing.heatmap('off')
-					$scope.settings.show_overlaps = true
-					Drawing.toggleOverlaps('on')
-					$scope.settings.show_distances = true
-					Drawing.toggleDistances('on')
-					Drawing.toggleRadius('on')
-					$scope.planReady = true
-					if ($scope.percentDone === 1) $scope.percentDone = 0
-				}, 100)
+              $scope.checkSaveCurrent()
+                .then(() => {
+                  $scope.plan = plan
+                  $scope.settings = plan.settings
+                  $scope.flooplan_name = plan.title
+                  if (typeof plan.details !== 'object') plan.details = {}
+                  if (!plan.details.contacts) plan.details.contacts = []
+                  updateWifiDetails(plan)
+                  Drawing.loadPlan(plan, $scope.settings.signal_radius, $scope.updateControls, $scope.uploadProgress, $scope.setDirty)
+                  $timeout(() => {
+                    $scope.settings.show_heatmap = false
+                    Drawing.heatmap('off')
+                    $scope.settings.show_overlaps = true
+                    Drawing.toggleOverlaps('on')
+                    $scope.settings.show_distances = true
+                    Drawing.toggleDistances('on')
+                    Drawing.toggleRadius('on')
+                    $scope.planReady = true
+                    if ($scope.percentDone === 1) $scope.percentDone = 0
+                  }, 0)
+                })
 			}
 
 			function initFloor (bplan) {
@@ -663,7 +691,7 @@ angular.module('plans')
 
 			$scope.removeContact = function (index) {
 				$scope.plan.details.contacts.splice(index, 1)
-				$scope.savePlan()
+				$scope.savePlanProperties()
 			}
 
 			$scope.addController = function (edit, plan) {
@@ -691,7 +719,7 @@ angular.module('plans')
 
 			$scope.removeController = function (index) {
 				$scope.plan.details.controllers.splice(index, 1)
-				$scope.savePlan()
+				$scope.savePlanProperties()
 			}
 
 			$scope.pp_edit = {}
@@ -718,6 +746,7 @@ angular.module('plans')
 					_.each(details, (obj, key) => {
 						plan.details[key] = obj
 					})
+                    console.log('save plan properties', plan.details, plan.stage)
 					plan.$update() // save plans in the same building
 				})
 
@@ -727,9 +756,8 @@ angular.module('plans')
 				$scope.building.details = _.defaults($scope.building.details, details)
                 var b = new Buildings($scope.building)
                 b.$update()
-                console.log('saved details', $scope.building.details, details)
 
-				$scope.savePlan() // save current plan
+				// $scope.savePlan() // save current plan
 				$scope.pp_edit = {}
 			}
 
@@ -840,7 +868,15 @@ angular.module('plans')
                 !_.get($scope.building, 'details.address') ||
                 !_.get($scope.building, 'details.city')) {
 
-                alert('Please fill out all the details of the building (client, MSP, address, vendor, etc');
+                /* TODO: modal not showing, probably because of a different scope
+                console.log('showing modal')
+				ModalService.showModal({
+					templateUrl: 'infoModal.html',
+					controller: 'infoModalController',
+                    inputs: { info: 'Please fill out all the details of the building (client, MSP, address, vendor, etc' }
+				})
+                */
+                alert('Please fill out all the details of the building (client, MSP, address, vendor, etc')
               } else {
 				$scope.savePlan().then(() => {
 					if ($scope.settings.show_heatmap) {

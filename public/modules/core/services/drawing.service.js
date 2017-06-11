@@ -25,6 +25,8 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 	function (contextMenu, $q, $http, $timeout, Heatmap) {
 		var canvas, stage, layers, current_layer, distances, coverage, floorplan
 
+        var self = this; // ugly hack for mouse move
+
 		var mouseTarget // the display object currently under the mouse, or being dragged
 		var dragStarted // indicates whether we are currently in a drag operation
 		var mouse_mode = 'ap'
@@ -126,6 +128,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 
 		var addWallHandlers = function (wall, index) {
 			function mousedown (evt) {
+                self.setFloorplanDirty();
 				if (evt.nativeEvent.button === 2) {
 					selectedWall = wall
 					contextMenu.switchMenu('wall')
@@ -307,6 +310,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 		}
 
 		this.touchStart = function (e) {
+            self.setFloorplanDirty();
 			mouse_last_position = { x: e.x, y: e.y }
 			mouse_last_click = { x: e.x, y: e.y }
 		}
@@ -314,6 +318,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 		this.touchMove = function (e) {
 			if (!mouse_last_click) return
 			if (itemTypes.includes(mouse_mode) || !ap_clicked) {
+              console.log('is_draggin', mouse_mode, ap_clicked)
 				is_dragging = true
 			}
 			if (!itemTypes.includes(mouse_mode) || !ap_clicked) {
@@ -387,6 +392,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			var names
 
 			function mousedown (evt) {
+                self.setFloorplanDirty();
 				if (evt.nativeEvent.button === 2) {
 					selectedAP = ap
 					contextMenu.switchMenu(ap.itemType)
@@ -637,6 +643,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 		}
 
 		this.startCalibration = function (cb) {
+            self.setFloorplanDirty();
 			mouse_prev_mode = mouse_mode
 			mouse_mode = 'calibration'
 			calibration_step = 1
@@ -859,6 +866,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 
 		this.deleteSelectedItem = function () {
 			if (!selectedAP) return
+            self.setFloorplanDirty();
 			contextMenu.close()
 			var i, j, k
 			var selected_distances_length = selectedAP.distances.length
@@ -896,6 +904,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 
 		this.deleteSelectedWall = function () {
 			if (!selectedWall) return
+            self.setFloorplanDirty();
 			contextMenu.close()
 			layers[1].removeChild(selectedWall)
 			update = true
@@ -990,9 +999,10 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			})
 		}
 
-		this.addFloorPlan = function (url) {
+		this.addFloorPlan = function (url, newimg) {
 			var defer = $q.defer()
             if (!url) return defer.resolve();
+            if (newimg) self.setFloorplanDirty();
 			var self = this
 			var img = new Image()
 			img.setAttribute('crossOrigin', 'anonymous')
@@ -1106,12 +1116,13 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			return newCanvas.toDataURL()
 		}
 
-		this.loadPlan = function (planResource, signal_radius, updateControls, uploadProgress) {
+		this.loadPlan = function (planResource, signal_radius, updateControls, uploadProgress, setDirty) {
 			var plan_id = planResource._id
 			var data = planResource.stage
 			this.uploadProgress = uploadProgress
 			this.plan = planResource
 			this.updateControls = updateControls
+            this.setFloorplanDirty = setDirty
 			$timeout(function () {
 				if (data.plan) plan = data.plan
 				plan._id = this.plan.id

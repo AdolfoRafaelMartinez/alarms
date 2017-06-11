@@ -84,3 +84,23 @@
     </div>
   </div>
 </script>
+
+<script type="text/ng-template" id="saveModal.html">
+  <div class="modal fade">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" ng-click="close('Cancel')" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h2 class="modal-title">Save changes?</h2>
+        </div>
+        <div class="modal-body">
+          <p>Do you want to save the changes you've made to this floorplan?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" ng-click="close()" class="btn btn-default" data-dismiss="modal">No</button>
+          <button type="button" ng-click="close('Yes')" class="btn btn-danger" data-dismiss="modal">Yes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</script>

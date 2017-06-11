@@ -28,7 +28,7 @@ function($scope, Drawing, $timeout, $http, $filter, $window) {
         var url = data._response.result.files[0].url;
         $timeout(function() {
 			Drawing.uploadProgress($scope.percentDone);
-            Drawing.addFloorPlan(url);
+            Drawing.addFloorPlan(url, true);
         }, 0);
     });
 
