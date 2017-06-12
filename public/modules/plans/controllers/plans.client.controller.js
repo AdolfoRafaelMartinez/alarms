@@ -573,7 +573,7 @@ angular.module('plans')
                   modal.element.modal()
                   return modal.close.then(answer => {
                     if (answer) {
-                      console.log('yes')
+                      $scope.planReady = false;
                       return $scope.savePlan()
                     }
                     return $q.when()

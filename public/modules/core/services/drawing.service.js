@@ -318,7 +318,6 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 		this.touchMove = function (e) {
 			if (!mouse_last_click) return
 			if (itemTypes.includes(mouse_mode) || !ap_clicked) {
-              console.log('is_draggin', mouse_mode, ap_clicked)
 				is_dragging = true
 			}
 			if (!itemTypes.includes(mouse_mode) || !ap_clicked) {
@@ -1254,7 +1253,6 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 				item.itemType = 'idf'
 				item.inventory.itemType = 'idf'
 			}
-			console.log(item)
 			redrawIDF(item)
 			this.reindexItems()
 			update = true
