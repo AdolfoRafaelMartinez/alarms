@@ -1002,7 +1002,6 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			var defer = $q.defer()
             if (!url) return defer.resolve();
             if (newimg) self.setFloorplanDirty();
-			var self = this
 			var img = new Image()
 			img.setAttribute('crossOrigin', 'anonymous')
 			var request = new XMLHttpRequest();
