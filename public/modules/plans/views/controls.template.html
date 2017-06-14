@@ -51,7 +51,6 @@
 	</div>
 
 	<div class="floors">
-		<div> <a href ng-click="newPlan()"> <i class="glyphicon glyphicon-plus"></i> <small>Add Floor</small> </a> </div>
 		<div ng-repeat="p in plans" ng-class="{'shadowItem': p != plan}" ng-click="showPlan(p)">
 			<a href>
 				<img ng-src="/ss/{{ p.thumb }}" />
@@ -62,6 +61,7 @@
 			  <a href ng-click="askDeleteFloorplan(p)"><i class="glyphicon glyphicon-remove"></i></a>
 			</div>
 		</div>
+		<div> <a href ng-click="newPlan()"> <i class="glyphicon glyphicon-plus"></i> <small>Add Floor</small> </a> </div>
 	</div>
 </div>
 

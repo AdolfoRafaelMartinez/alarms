@@ -707,6 +707,7 @@ angular.module('plans')
 				$scope.edit_prop = newController
 				if (!plan.details.controllers) plan.details.controllers = []
 				plan.details.controllers.push(newController)
+                plan.details.controllers = _.filter(plan.details.controllers)
 			}
 
 			$scope.checkController = function () {

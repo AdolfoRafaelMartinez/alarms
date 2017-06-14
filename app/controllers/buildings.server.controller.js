@@ -195,6 +195,7 @@ exports.pdfReport = function (req, res, next) {
 					let fileid = shortid.generate()
 					let htmlFilename = `${fileid}.html`
 					let pdfFilename = `${fileid}.pdf`
+                    let serveFilename = `${req.building.details.client.name}-${req.building.details.site}-${req.building.name}`
 					let htmlFullPath = `${PUGDIR}/tmp/${htmlFilename}`
 					fs.writeFile(htmlFullPath, result, function (err) {
 						if (err) return next(err)
@@ -204,7 +205,8 @@ exports.pdfReport = function (req, res, next) {
 							let file = fs.readFileSync(`${PUGDIR}/tmp/${pdfFilename}`, 'binary')
 							res.writeHead(200, {
 								'Content-Type': 'application/pdf',
-								'Access-Control-Allow-Origin': '*'
+								'Access-Control-Allow-Origin': '*',
+                                'Content-disposition': `attachment; filename=${serveFilename}.pdf`
 							})
 							res.write(file, 'binary')
 							res.end()
