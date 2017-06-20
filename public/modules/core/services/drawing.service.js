@@ -1027,6 +1027,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 					self.scale(scaleX * 100)
 				}
 				self.plan.stage.floorplan = url
+                self.uploadProgress(0, url)
 				floorplan.removeAllChildren()
 				floorplan.addChild(f)
 				update = true

@@ -182,18 +182,18 @@ angular.module('plans')
 				$("#fileupload input").click()
 			}
 
-			$scope.uploadProgress = function(percentDone) {
+			$scope.uploadProgress = function(percentDone, floorplan) {
 				if ($scope.$$phase) {
-					updateProgress(percentDone)
+					updateProgress(percentDone, floorplan)
 				} else {
 					$scope.$apply(function () {
-						updateProgress(percentDone)
+						updateProgress(percentDone, floorplan)
 					})
 				}
-				function updateProgress(percent) {
+				function updateProgress(percent, floorplan) {
 					$scope.percentDone = percentDone / 2
-                    if ($scope.percentDone === 100) {
-                        $scope.percentDone = 0
+                    if (floorplan) {
+                      $scope.plan.stage.floorplan = floorplan
                     }
 				}
 			}
@@ -220,6 +220,7 @@ angular.module('plans')
 				var distances = $scope.settings.show_distances
 				var deferred = $q.defer()
 				var plan = new Plans(_.cloneDeep($scope.plan))
+                $scope.planReady = false;
 				plan.thumb = Drawing.getThumb()
                 console.log('savePlan current', plan)
 
@@ -246,8 +247,10 @@ angular.module('plans')
 						$scope.plan = response
 						$location.path(`projects/${$scope.bldg._id}/${response._id}`)
 						deferred.resolve(response)
+                        $scope.planReady = true;
 					}, errorResponse => {
 						$scope.error = errorResponse.data.message
+                        $scope.planReady = true;
 						deferred.reject(errorResponse)
 					})
 				} else {
@@ -257,6 +260,7 @@ angular.module('plans')
 						$scope.plan = response
 						let index = _.findIndex($scope.plans, p => p._id === response._id)
 						$scope.plans[index] = response
+                        $scope.planReady = true;
 						$timeout(() => {
 							$scope.icons.save = iconset.save
 						}, 3000)
@@ -264,6 +268,7 @@ angular.module('plans')
 					}, errorResponse => {
 						console.log(errorResponse)
 						$scope.error = errorResponse.data.message
+                        $scope.planReady = true;
 						deferred.reject(errorResponse)
 					})
 				}
@@ -573,7 +578,6 @@ angular.module('plans')
                   modal.element.modal()
                   return modal.close.then(answer => {
                     if (answer) {
-                      $scope.planReady = false;
                       return $scope.savePlan()
                     }
                     return $q.when()
@@ -886,7 +890,7 @@ angular.module('plans')
 					}
 					$timeout(() => {
 						window.open(`/buildings/${$scope.building._id}/pdf`, '_blank')
-					}, 0)
+					}, 1000)
 				})
               }
 			}
