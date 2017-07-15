@@ -146,7 +146,7 @@ exports.delete = function (req, res) {
 				message: errorHandler.getErrorMessage(err)
 			})
 		} else {
-			res.json(plan)
+			res.status(202).send()
 		}
 	})
 }

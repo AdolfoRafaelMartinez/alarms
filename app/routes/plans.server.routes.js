@@ -10,7 +10,8 @@ module.exports = function (app) {
 	app.route('/orphan-plans')
         .get(users.requiresLogin, plans.orphans)
 
-	app.route('/plans/:planId/coverage').post(users.requiresLogin, plans.hasAuthorization, signal.heatmap)
+	app.route('/plans/:planId/coverage')
+        .post(users.requiresLogin, plans.hasAuthorization, signal.generate)
 
 	app.route('/plans/:planId')
         .get(users.requiresLogin, plans.hasAuthorization, plans.read)

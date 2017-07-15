@@ -3,9 +3,12 @@ const fs       = require('fs')
 const _        = require('lodash')
 const Q        = require('q')
 const shortid  = require('shortid')
+const sharp    = require('sharp')
 
 const errorHandler = require('./errors.server.controller')
 const Plan = mongoose.model('Plan')
+const Signal = mongoose.model('Signal')
+const ObjectID = require('mongodb').ObjectID
 
 var COVERAGE_POINT_GAP = 20
 var PUDDLE_PATTERN_GRANULARITY = Math.PI / 360 * 5
@@ -19,6 +22,90 @@ function defaultAntenaPattern () {
 	}
 
 	return pattern
+}
+
+/**
+ * Show the current plan' signal
+ */
+exports.read = function (req, res) {
+  res.json(req.signal)
+}
+
+exports.signalByPlanID = function (req, res, next, id) {
+  const signalCollection = global.mongodb.collection('signals')
+  console.log('getting signal for ' + id)
+  signalCollection.findOne({plan: ObjectID(id)})
+    .then(signal => {
+      req.signal = signal
+      next()
+    })
+    .catch(err => {
+      throw new Error('Could not find signal for plan with id' + id);
+    })
+}
+
+const MIN_GREY = 120
+function raiseObjects(info, img) {
+  let x, y
+  let blocks = []
+  for( y=0; y < info.height; y++ ) {
+    let row = info.width * y
+    for( x=0; x < info.width; x++ ) {
+      if (img[row + x] < MIN_GREY) addToNeighbors(x, y)
+    }
+  }
+
+  return blocks
+
+  function addToNeighbors(x, y) {
+    blocks.push([x,y])
+  }
+}
+
+function savePlanSignal(plan, blocks, res) {
+  const signalCollection = global.mongodb.collection('signals')
+  signalCollection.findOne({plan: ObjectID(plan._id)})
+    .then(signal => {
+      if (signal) {
+        signal.blocks = blocks
+        return signalCollection.findOneAndReplace({_id: signal._id}, signal)
+      } else {
+
+        let signal = new Signal({
+          plan: plan._id,
+          blocks: blocks
+        })
+        return signal.save(err => {
+          if (err) {
+            throw Error(errorHandler.getErrorMessage(err))
+          } else {
+            return res.status(202).send()
+          }
+        })
+      }
+    })
+    .then(() => {
+      return res.status(202).send()
+    })
+}
+
+exports.generate = function(req, res) {
+  let floorplan = __dirname + '/../../public/' + req.plan.stage.floorplan.replace(/http(s)?:\/\/[^\/]+/, '')
+  sharp(floorplan)
+    .resize(800, 800, {
+      kernel: sharp.kernel.nearest,
+      interpolator: sharp.interpolator.bilinear
+    })
+    .max()
+    .background('white')
+    .greyscale()
+    .toFormat('raw')
+    .toBuffer((err, data, info) => {
+      if (err) {
+        res.status(500).send()
+      }
+      return savePlanSignal(req.plan, raiseObjects(info, data), res)
+    })
 }
 
 /**
