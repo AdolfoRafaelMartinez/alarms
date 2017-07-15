@@ -7,6 +7,9 @@ const path       = require('path')
 module.exports = function (app) {
 	app.route('/').get(core.index)
 
+	app.route('/privacy.html').get(core.privacy)
+	app.route('/terms.html').get(core.terms)
+
 	app.post('/upload', function (req, res) {
 		var form = new multiparty.Form()
 		form.parse(req, function (err, fields, files) {

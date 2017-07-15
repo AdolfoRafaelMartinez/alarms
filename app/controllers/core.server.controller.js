@@ -4,3 +4,11 @@ exports.index = function (req, res) {
 		request: req
 	})
 }
+exports.terms = function(req, res) {
+    res.render('terms', {
+    })
+}
+exports.privacy = function(req, res) {
+    res.render('privacy', {
+    })
+}
