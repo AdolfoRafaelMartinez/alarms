@@ -186,8 +186,8 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 					.moveTo(obj.p_start.x, obj.p_start.y)
 					.lineTo(obj.p_end.x, obj.p_end.y)
 				obj.ptext.text = obj.pdistance.toFixed(2) + ' ft'
-				obj.pbubble.scaleX = obj.pbubble.scaleY = 100 / plan.stage_scale
-				obj.ptext.scaleX = obj.ptext.scaleY = 100 / plan.stage_scale
+				obj.pbubble.scaleX = obj.pbubble.scaleY = plan.stage_ppm / 4
+				obj.ptext.scaleX = obj.ptext.scaleY = plan.stage_ppm / 4
 				obj.ptext.x = obj.p_start.x + (obj.p_end.x - obj.p_start.x) / 2
 				obj.ptext.y = obj.p_start.y + (obj.p_end.y - obj.p_start.y) / 2
 				obj.pbubble.x = obj.ptext.x
@@ -278,7 +278,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 						text.y = c.p_start.y + (c.p_end.y - c.p_start.y) / 2 - 10
 						text.textBaseline = 'alphabetic'
 						text.name = 'value'
-						text.scaleX = text.scaleY = 100 / plan.stage_scale
+						text.scaleX = text.scaleY = plan.stage_ppm / 4
 						c.ptext = text
 
 						var bubble = addBubble(text, 'distance')
@@ -559,7 +559,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			var mousex = e.x - $(canvas)[0].offsetParent.offsetLeft - canvasMarginH / 2
 			var mousey = e.y - $(canvas)[0].offsetParent.offsetTop - canvasMarginH / 2
 			var new_scale = delta * plan.stage_scale
-			if (new_scale <= 200) {
+			if (new_scale <= 800) {
 				stage.x = mousex - delta * (mousex - stage.x)
 				stage.y = mousey - delta * (mousey - stage.y)
 				this.scale(delta * plan.stage_scale)
@@ -972,7 +972,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 		}
 
 		this.scale = function (percent) {
-			if (!percent || percent < 10 || percent > 800) return
+			if (!percent || percent < 10 || percent > 1800) return
 			plan.stage_scale = percent
 			if (this.updateControls) this.updateControls('scale', Math.round(plan.stage_scale))
 			// plan.stage_ppm = plan.floor_width_px / plan.floor_width;
