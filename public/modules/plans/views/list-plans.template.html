@@ -25,7 +25,7 @@
 		<h2>Projects <span ng-show="projects.length">({{ projects.length }})</span></h2>
 		<div>
 			<div ng-click="showCreate('project')" class="list-group-item create-new" ng-class="{'shadowItem': selected.project}">
-				<span ng-if="!new.project">Create</span>
+              <span ng-if="!new.project"><i class="glyphicon glyphicon-plus"></i> Create</span>
 				<div ng-show="new.project">
 					<form>
 						<div class="form-group"> <input type="text" class="form-control" placeholder="Project name..." focus-me="{{ new.project }}" ng-model="new.project.title" /> </div>
@@ -44,8 +44,8 @@
 					<a href ng-click="showSettings('project', project, $event)"><i class="glyphicon glyphicon-cog"></i></a>
 				</div>
 
-				<img ng-if="project.thumb" ng-src="{{ project.thumb }}" />
-				<img ng-if="!project.thumb" ng-src="/modules/core/img/brand/frog.png" />
+				<img ng-if="project.details.client.logo" ng-src="{{ project.details.client.logo }}" />
+				<img ng-if="!project.details.client.logo" ng-src="/modules/core/img/brand/frog.png" />
 				<h3 class="list-group-item-heading" data-ng-bind="project.title"></h3>
 				<small class="list-group-item-text">
 					<span data-ng-bind="project.created | date:'mediumDate'"></span>
@@ -61,7 +61,7 @@
 		<h2>Sites <span ng-show="selected.project.sites.length">({{ selected.project.sites.length }})</span></h2>
 		<div>
 			<div ng-click="showCreate('site')" class="list-group-item create-new" ng-show="selected.project" ng-class="{'shadowItem': selected.site, 'selected': new.site}">
-				<span ng-if="!new.site">Create</span>
+				<span ng-if="!new.site"><i class="glyphicon glyphicon-plus"></i> Create</span>
 				<div ng-show="new.site">
 					<form>
 						<div class="form-group"> <input type="text" class="form-control" placeholder="Site name..." focus-me="{{ new.site }}" ng-model="new.site.name" /> </div>
@@ -80,8 +80,8 @@
 				   <a href ng-click="showSettings('site', site, $event)"><i class="glyphicon glyphicon-cog"></i></a>
 			   </div>
 
-			   <img ng-if="site.thumb" ng-src="/uploads/{{ site.thumb }}" />
-			   <img ng-if="!site.thumb" ng-src="/modules/core/img/brand/frog.png" />
+               <img ng-if="site.details.client.logo" ng-src="{{ site.details.client.logo }}" />
+			   <img ng-if="!site.details.client.logo" ng-src="/modules/core/img/brand/frog.png" />
 			   <h3 class="list-group-item-heading" data-ng-bind="site.name"></h3>
 			   <small class="list-group-item-text">
 				   <span data-ng-bind="site.created | date:'mediumDate'"></span><br />
@@ -96,7 +96,7 @@
 		<div>
 			<div ng-click="showCreate('building')" class="list-group-item create-new" ng-show="selected.site"
 					ng-class="{'shadowItem': selected.building, 'selected': new.building}" >
-				<span ng-if="!new.building">Create</span>
+				<span ng-if="!new.building"><i class="glyphicon glyphicon-plus"></i> Create</span>
 				<div ng-show="new.building">
 					<form>
 						<div class="form-group"> <input type="text" class="form-control" placeholder="building name..." focus-me="{{ new.building }}" ng-model="new.building.name" /> </div>
@@ -114,8 +114,8 @@
 					<a href ng-click="showSettings('bldg', bldg, $event)"><i class="glyphicon glyphicon-cog"></i></a>
 				</div>
 
-				<img ng-if="bldg.thumb" ng-src="/uploads/{{ bldg.thumb }}" />
-				<img ng-if="!bldg.thumb" ng-src="/modules/core/img/brand/frog.png" />
+                <img ng-if="bldg.details.client.logo" ng-src="{{ bldg.details.client.logo }}" />
+				<img ng-if="!bldg.details.client.logo" ng-src="/modules/core/img/brand/frog.png" />
 				<h3 class="list-group-item-heading" data-ng-bind="bldg.name"></h3>
 				<small class="list-group-item-text">
 					<span data-ng-bind="bldg.created | date:'mediumDate'"></span><br />
