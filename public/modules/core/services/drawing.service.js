@@ -97,6 +97,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 
 		var addWallHandlers = function (wall, index) {
 			function mousedown (evt) {
+				console.log('mousedown')
 				if (evt.nativeEvent.button === 2) {
 					selectedWall = wall
 					contextMenu.switchMenu('wall')
@@ -107,6 +108,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			}
 
 			function mouseup (evt) {
+				console.log('mouseup')
 				wall_clicked = false
 			}
 
@@ -250,11 +252,13 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 		}
 
 		this.touchStart = function (e) {
+			console.log('touchStart');
 			mouse_last_position = { x: e.x, y: e.y }
 			mouse_last_click = { x: e.x, y: e.y }
 		}
 
 		this.touchMove = function (e) {
+			console.log('touchMove');
 			if (!mouse_last_click) return
 			if (mouse_mode === 'ap' || !ap_clicked) {
 				is_dragging = true
@@ -329,6 +333,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			var names
 
 			function mousedown (evt) {
+				console.log('mousedown')
 				if (evt.nativeEvent.button === 2) {
 					console.log('mousedown', ap)
 					selectedAP = ap
@@ -351,6 +356,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			}
 
 			function mousemove (evt) {
+				console.log('mousemove')
 				if (evt.nativeEvent.button === 2) return
 				if (mouse_mode !== 'ap') return
 				if (!ap.offset) return
@@ -380,6 +386,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			}
 
 			function mouseup (evt) {
+				console.log('mouseup')
 				ap_clicked = false
 			}
 
@@ -410,6 +417,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 		}
 
 		this.touchEnd = function (e) {
+			console.log('touchEnd');
 			contextMenu.disabled = false
 			if (e.button !== 2 && !is_dragging) {
 				if (mouse_last_click.x === e.x && mouse_last_click.y === e.y) {
@@ -439,6 +447,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 		}
 
 		this.mouseWheelEvent = function (e) {
+			console.log('mouseWheelEvent')
 			e = window.event || e
 			e.preventDefault()
 			e.stopPropagation()
