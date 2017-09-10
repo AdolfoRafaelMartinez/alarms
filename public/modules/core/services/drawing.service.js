@@ -74,6 +74,8 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			{ overlap: 14, color: 'rgba(0, 255, 0, 0.2)' },
 			{ overlap: 0,  color: 'rgba(240, 255, 40, 0.2)' }
 		]
+		var originX
+		var originY
 
 		var tick = function (event) {
 			// this set makes it so the stage only re-renders when an event handler indicates a change has happened.
@@ -259,7 +261,12 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 
 		this.touchMove = function (e) {
 			console.log('touchMove');
-			if (!mouse_last_click) return
+			if (!mouse_last_click) {
+				var x = (e.x - stage.x - canvas.offsetParent.offsetLeft - canvasMarginW / 2) * 100 / plan.stage_scale
+				var y = (e.y - stage.y - canvas.offsetParent.offsetTop - canvasMarginH / 2) * 100 / plan.stage_scale
+				this.calibrationLine(x, y, 1)
+				return
+			}
 			if (mouse_mode === 'ap' || !ap_clicked) {
 				is_dragging = true
 			}
@@ -529,13 +536,16 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 
 		this.calibrationLine = function (x, y, end) {
 			if (end) {
+				this.calibration_line.graphics.clear()
+				this.calibration_line.graphics.setStrokeStyle(4).beginStroke('#088').moveTo(originX, originY)
 				this.calibration_line.graphics.lineTo(x, y)
+				this.calibration_line.p_start = {x: originX, y: originY}
 				this.calibration_line.p_end = {x: x, y: y}
 				update = true
 			} else {
+				originX = x
+				originY = y
 				this.calibration_line = new createjs.Shape()
-				this.calibration_line.graphics.setStrokeStyle(4).beginStroke('#088').moveTo(x, y)
-				this.calibration_line.p_start = {x: x, y: y}
 				stage.addChild(this.calibration_line)
 			}
 		}
