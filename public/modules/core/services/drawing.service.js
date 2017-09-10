@@ -261,12 +261,12 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 
 		this.touchMove = function (e) {
 			console.log('touchMove');
-			if (!mouse_last_click) {
+			if (calibration_step == 2) {
 				var x = (e.x - stage.x - canvas.offsetParent.offsetLeft - canvasMarginW / 2) * 100 / plan.stage_scale
 				var y = (e.y - stage.y - canvas.offsetParent.offsetTop - canvasMarginH / 2) * 100 / plan.stage_scale
 				this.calibrationLine(x, y, 1)
-				return
 			}
+			if (!mouse_last_click) return
 			if (mouse_mode === 'ap' || !ap_clicked) {
 				is_dragging = true
 			}
@@ -440,6 +440,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 						} else if (calibration_step === 2) {
 							this.calibrationLine(x, y, 1)
 							this.calibrationDone()
+							calibration_step = 0
 						} else {
 							this.addAP(x, y, plan.real_radius)
 						}
