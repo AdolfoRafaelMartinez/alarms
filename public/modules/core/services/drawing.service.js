@@ -97,6 +97,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 			{ overlap: 14, color: 'rgba(0, 255, 0, 0.2)' },
 			{ overlap: 0,  color: 'rgba(240, 255, 40, 0.2)' }
 		]
+
 		var DISTANCE_STROKE_RGB = '#444'
 		var DISTANCE_CUT_OFF = 60
 		var AM_VISUAL_RADIUS = 60
@@ -105,6 +106,9 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 		var IDF_VISUAL_RADIUS_PRINT = 20
 		var MDF_VISUAL_RADIUS = 30
 		var MDF_VISUAL_RADIUS_PRINT = 20
+
+		var originX
+		var originY
 
 		var tick = function (event) {
 			// this set makes it so the stage only re-renders when an event handler indicates a change has happened.
@@ -316,6 +320,11 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 		}
 
 		this.touchMove = function (e) {
+			if (calibration_step == 2) {
+				var x = (e.x - stage.x - canvas.offsetParent.offsetLeft - canvasMarginW / 2) * 100 / plan.stage_scale
+				var y = (e.y - stage.y - canvas.offsetParent.offsetTop - canvasMarginH / 2) * 100 / plan.stage_scale
+				this.calibrationLine(x, y, 1)
+			}
 			if (!mouse_last_click) return
 			if (itemTypes.includes(mouse_mode) || !ap_clicked) {
 				is_dragging = true
@@ -515,6 +524,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 				if (mouse_last_click.x === e.x && mouse_last_click.y === e.y) {
 					var x = (e.x - stage.x - canvas.offsetParent.offsetLeft - canvasMarginW / 2) * 100 / plan.stage_scale
 					var y = (e.y - stage.y - canvas.offsetParent.offsetTop - canvasMarginH / 2) * 100 / plan.stage_scale
+
 					switch (mouse_mode) {
 						case 'wall':
 							contextMenu.disabled = true
@@ -528,6 +538,7 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 							} else if (calibration_step === 2) {
 								this.calibrationLine(x, y, 1)
 								this.calibrationDone()
+                                calibration_step = 0
 							}
 							break
 
@@ -651,13 +662,16 @@ angular.module('core').service('Drawing', ['contextMenu', '$q', '$http', '$timeo
 
 		this.calibrationLine = function (x, y, end) {
 			if (end) {
+				this.calibration_line.graphics.clear()
+				this.calibration_line.graphics.setStrokeStyle(4).beginStroke('#088').moveTo(originX, originY)
 				this.calibration_line.graphics.lineTo(x, y)
+				this.calibration_line.p_start = {x: originX, y: originY}
 				this.calibration_line.p_end = {x: x, y: y}
 				update = true
 			} else {
+				originX = x
+				originY = y
 				this.calibration_line = new createjs.Shape()
-				this.calibration_line.graphics.setStrokeStyle(4).beginStroke('#088').moveTo(x, y)
-				this.calibration_line.p_start = {x: x, y: y}
 				stage.addChild(this.calibration_line)
 			}
 		}
