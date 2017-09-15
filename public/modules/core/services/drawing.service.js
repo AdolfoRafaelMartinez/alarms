@@ -10,7 +10,9 @@ function ColorLuminance (hex, lum) {
 	lum = lum || 0;
 
 	// convert to decimal and change luminosity
-	let rgb = "#", c, i;
+	let rgb = "#";
+    let c;
+    let i;
 	for (i = 0; i < 3; i++) {
 		c = parseInt(hex.substr(i * 2, 2), 16);
 		c = Math.round(Math.min(Math.max(0, c + (c * lum)), 255)).toString(16);
@@ -223,6 +225,13 @@ color: "rgba(240, 255, 40, 0.2)" }
 			text.cursor = "pointer";
 			switch (itemType) {
 				case "ap":
+					bubble.graphics.beginFill(color).drawRoundRect(10, -25, textBounds.width + 10, textBounds.height + 10, 5, 5);
+					text.regX = -15 + textBounds.width / 2;
+					text.regY = 8;
+					bubble.regX = text.regX + 15;
+					bubble.regY = -13 + textBounds.height;
+					break;
+
 				case "distance":
 					bubble.graphics.beginFill(color).drawRoundRect(0, 0, textBounds.width + 10, textBounds.height + 10, 5, 5);
 					text.regX = textBounds.width / 2;
@@ -761,12 +770,11 @@ y: y });
 
 			let itemIndex = 0;
 			let text;
-            const AP_SQUARE_CORNER = -0.5 * plan.stage_ppm;
+            const AP_SQUARE_CORNER = 0.5 * plan.stage_ppm;
 
 			switch (itemType) {
 				case "ap":
-					item = _.defaults(item, { vendor: this.plan.details.vendor,
-sku: this.plan.details.aps });
+					item = _.defaults(item, { vendor: this.plan.details.vendor, sku: this.plan.details.aps });
 					itemIndex = plan.item_index[itemType];
 					text = new createjs.Text(itemIndex, "12px Arial", TEXT_RGB[itemType]);
 					var overlaps = new createjs.Container();
@@ -784,13 +792,12 @@ sku: this.plan.details.aps });
 					ap.overlaps = overlaps;
 					container.addChild(ap);
 					container.addChild(overlaps);
-					ap.graphics.beginFill("Blue").drawRect(AP_SQUARE_CORNER, AP_SQUARE_CORNER, -2 * AP_SQUARE_CORNER, -2 * AP_SQUARE_CORNER);
+					ap.graphics.beginFill("Blue").drawRect(-AP_SQUARE_CORNER, -AP_SQUARE_CORNER, 2 * AP_SQUARE_CORNER, 2 * AP_SQUARE_CORNER);
 					ap.puddleShape = "ap";
 					break;
 
 				case "am":
-					item = _.defaults(item, { vendor: this.plan.details.vendor,
-sku: this.plan.details.ams });
+					item = _.defaults(item, { vendor: this.plan.details.vendor, sku: this.plan.details.ams });
 					itemIndex = plan.item_index[itemType];
 					text = new createjs.Text(itemIndex, "12px Arial", TEXT_RGB[itemType]);
 					var circle = new createjs.Shape();
