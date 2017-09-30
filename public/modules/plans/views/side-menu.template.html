@@ -1,3 +1,11 @@
+<style>
+	.btn-view {
+		padding-top: 4px;
+		padding-right: : 4px;
+		padding-bottom: 4px;
+		padding-left: 4px; 
+	} 
+</style>
 <uib-accordion close-others="false">
 
 	<!-- Details -->
@@ -101,22 +109,28 @@
 					<img src="modules/plans/images/icons/AP-W.png" />
 					AP
 				</md-button>
+				<button class="button" ng-class="{'active': isActive[0]}" ng-click="selectView('ap')" type="button">View</button> 
 			</div>
 			<div class="action">
 				<md-button ng-click="show_walls=false; selectTool('am')" aria-label="am-placement-tool" ng-class="{'selected': mouse_mode === 'am'}">
 					<img src="modules/plans/images/icons/AM-W.png">
 					AM
 				</md-button>
+				<button class="button" ng-class="{'active': isActive[1]}" ng-click="selectView('am')" type="button">View</button> 
 			</div>
 			<div class="action">
 				<md-button ng-click="show_walls=false; selectTool('idf')" aria-label="mdf-placement-tool" ng-class="{'selected': mouse_mode === 'idf'}">
 					<img src="modules/plans/images/icons/MDFIDF-W.png">
 					IDF
 				</md-button>
+				<button class="button" ng-class="{'active': isActive[2]}" ng-click="selectView('idf')" type="button">View</button> 
 			</div>
 			<div class="action" ng-if="walls">
 				<md-button ng-click="show_walls= true; selectTool('wall')" aria-label="wall-placement-tool" ng-class="{'selected': mouse_mode === 'wall'}">
 					<img src="modules/plans/images/icons/MDFIDF-W.png">
+				</md-button>
+				<md-button ng-click="show_walls=false; selectTool('ap')" aria-label="ap-placement-tool" ng-class="{'selected': mouse_mode === 'ap'}">
+					<button class="btn btn-view btn-success full text-justify" ng-disabled="!planReady" ng-click="report()">View</button>
 				</md-button>
 			</div>
 			<div ng-show="show_walls">

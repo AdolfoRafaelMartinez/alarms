@@ -5,6 +5,14 @@ angular.module('plans')
   .controller('PlansController', [
     '$scope', '$rootScope', '$state', '$stateParams', '$location', 'Authentication', 'Drawing', '$timeout', '$http', 'Projects', 'Plans', 'Buildings', 'Signal', 'contextMenu', '$q', 'ModalService', 'Controllers',
     function ($scope, $rootScope, $state, $stateParams, $location, Authentication, Drawing, $timeout, $http, Projects, Plans, Buildings, Signal, contextMenu, $q, ModalService, Controllers) {
+      const AP_NODE_TYPE  = 0;
+      const AM_NODE_TYPE  = 1;
+      const IDF_NODE_TYPE = 2;
+      $scope.isActive = [];
+      $scope.isActive[AP_NODE_TYPE]  = true;
+      $scope.isActive[AM_NODE_TYPE]  = true;
+      $scope.isActive[IDF_NODE_TYPE] = true;
+
       $scope.authentication = Authentication
 
       $scope.UNITS_STEP_FEET = 8
@@ -672,8 +680,33 @@ angular.module('plans')
 
       $scope.mouse_mode = 'ap'
       $scope.selectTool = function (mode) {
+        $scope.isActive[AP_NODE_TYPE]  = true;
+        $scope.isActive[AM_NODE_TYPE]  = true;
+        $scope.isActive[IDF_NODE_TYPE] = true;
+        var view_code = 7
+        Drawing.selectView(view_code);
         $scope.mouse_mode = mode
         Drawing.selectTool(mode)
+      }  
+
+      $scope.selectView = function (view_node_type) {
+        switch(view_node_type) {
+          case 'ap':
+            $scope.isActive[AP_NODE_TYPE]  = !$scope.isActive[AP_NODE_TYPE];
+            break;
+          case 'am':
+            $scope.isActive[AM_NODE_TYPE]  = !$scope.isActive[AM_NODE_TYPE];
+            break;
+          case 'idf':
+            $scope.isActive[IDF_NODE_TYPE] = !$scope.isActive[IDF_NODE_TYPE];
+            break;
+        }
+        var view_code = 0; 
+        for(var i = 0; i < 3; i++){
+          var bit = $scope.isActive[i] ? 1 : 0;
+          view_code = view_code + bit * Math.pow(2, i);
+        }
+        Drawing.selectView(view_code); 
       }
 
       var newContact = {}
