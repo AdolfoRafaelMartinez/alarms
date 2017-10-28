@@ -143,3 +143,22 @@ md-sidenav .actionf input {
 md-sidenav .full {
 	width: 100%;
 }
+
+.button {
+  border: none;
+  color: #fff;
+  padding: 0px 10px 0px 10px;
+  margin: 5px 0px 0px 0px;
+  background: #444444;
+  font-weight: 700;
+  border-radius: 4px;
+}
+
+.active {
+  background: #098901;
+}
+
+.disabled {
+  background: #eee;
+  color: #aaa;
+}

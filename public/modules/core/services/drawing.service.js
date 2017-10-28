@@ -948,6 +948,31 @@ y: y });
 			this.reindexItems();
 		};
 
+		this.selectView = function(view_mode) {
+            self.setFloorplanDirty();
+
+			var link_count = distances.children.length; 
+			for (var link_pointer = 0; link_pointer != link_count; (link_pointer++)) {
+				var item_type; 
+				var view_code = { 'ap': 1, 'am': 2, 'idf': 4}; 
+
+				item_type = distances.children[link_pointer].ap_start.itemType; 
+				var left_view_code = view_code[item_type]; 
+				var show_left = (view_mode & left_view_code) != 0 ? true : false; 
+
+				item_type = distances.children[link_pointer].ap_end.itemType; 
+				var right_view_code = view_code[item_type]; 
+				var show_right = (view_mode & right_view_code) != 0 ? true : false; 
+
+				distances.children[link_pointer].ap_start.visible = show_left; 
+				distances.children[link_pointer].ap_end.visible   = show_right; 
+				distances.children[link_pointer].visible = show_left && show_right; 
+			}
+			this.toggleOverlaps()
+			update = true
+			this.toggleOverlaps()
+		}
+
 		this.deleteSelectedWall = function () {
 			if (!selectedWall) { return; }
             self.setFloorplanDirty();
