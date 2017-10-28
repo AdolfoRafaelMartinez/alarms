@@ -1,4 +1,7 @@
-
+/* eslint no-mixed-operators: 0 */
+/* eslint semi: 0 */
+/* eslint arrow-parens: 0 */
+/* eslint padding-line-between-statements: 0 */
 
 /* globals _ */
 function ColorLuminance (hex, lum) {
@@ -21,6 +24,32 @@ function ColorLuminance (hex, lum) {
 
 	return rgb;
 }
+
+function trimImageWhitespace (canvas, context) {
+	const data = context.getImageData(0, 0, canvas.width, canvas.height).data
+
+	const getRBG = (x, y) => Object({
+		r: data[(canvas.width * y + x) * 4],
+		g: data[(canvas.width * y + x) * 4 + 1],
+		b: data[(canvas.width * y + x) * 4 + 2]
+	})
+
+	const w = canvas.width -1
+	const h = canvas.height -1
+
+	const isWhitePixel = (rgb) => _.every(rgb, val => val === 0)
+	const isWhiteLine = (line) => _.every(line, isWhitePixel)
+	const getRow = (y) => _.range(0, w).map(x => getRBG(x,y))
+	const getCol = (x) => _.range(0, h).map(y => getRBG(x,y))
+
+	const cropTop   = _.findIndex(_.range(0, h),     (y) => !isWhiteLine(getRow(y)))
+	const cropBot   = _.findIndex(_.range(h, 0, -1), (y) => !isWhiteLine(getRow(y)))
+	const cropLeft  = _.findIndex(_.range(0, w),     (x) => !isWhiteLine(getCol(x)))
+	const cropRight = _.findIndex(_.range(w, 0, -1), (x) => !isWhiteLine(getCol(x)))
+
+  return [cropTop, w - cropRight, h - cropBot, cropLeft]
+}
+
 
 // Drawing service on HTML5 canvas
 angular.module("core").service("Drawing", ["contextMenu", "$q", "$http", "$timeout", "Heatmap",
@@ -95,12 +124,9 @@ angular.module("core").service("Drawing", ["contextMenu", "$q", "$http", "$timeo
 			mdf: "rgba(200, 100, 100, 0.2)"
 		};
 		const HASH_COLOR = [
-			{ overlap: 21,
-color: "rgba(255, 0, 0, 0.2)" },
-			{ overlap: 14,
-color: "rgba(0, 255, 0, 0.2)" },
-			{ overlap: 0,
-color: "rgba(240, 255, 40, 0.2)" }
+			{ overlap: 21, color: "rgba(255, 0, 0, 0.2)" },
+			{ overlap: 14, color: "rgba(0, 255, 0, 0.2)" },
+			{ overlap: 0, color: "rgba(240, 255, 40, 0.2)" }
 		];
 
 		const DISTANCE_STROKE_RGB = "#444";
@@ -204,8 +230,7 @@ color: "rgba(240, 255, 40, 0.2)" }
 				obj.pbubble.y = obj.ptext.y;
 				obj.ptext.visible = true;
 				obj.pbubble.visible = true;
-			}
- else {
+			} else {
 				obj.ptext.visible = false;
 				obj.pbubble.visible = false;
 				obj.pline.graphics.clear();
@@ -280,11 +305,9 @@ color: "rgba(240, 255, 40, 0.2)" }
 							m.graphics.setStrokeStyle(1).beginStroke(DISTANCE_STROKE_RGB).moveTo(ap.x, ap.y).lineTo(ap2.x, ap2.y);
 						}
 						c.name = getNewName();
-						c.p_start = { x: ap.x,
-y: ap.y };
+						c.p_start = { x: ap.x, y: ap.y };
 						c.ap_start = ap;
-						c.p_end = { x: ap2.x,
-y: ap2.y };
+						c.p_end = { x: ap2.x, y: ap2.y };
 						c.ap_end = ap2;
 						c.pdistance = d;
 						c.pline = m;
@@ -318,14 +341,12 @@ y: ap2.y };
 		this.addWall = function (x, y) {
 			if (current_wall) {
 				this.addWallSegment(x, y);
-			}
- else {
+			} else {
 				current_wall = new createjs.Shape();
 				current_wall.graphics.setStrokeStyle(this.wall_type.width).setStrokeDash(this.wall_type.dash).beginStroke(this.wall_type.color).moveTo(x, y);
 				current_wall.wall_type = this.wall_type;
 				if (current_wall.p_corners === undefined) { current_wall.p_corners = []; }
-				current_wall.p_corners.push({ x: x,
-y: y });
+				current_wall.p_corners.push({ x: x, y: y });
 				layers[1].addChild(current_wall);
 				addWallHandlers.call(this, current_wall, current_wall.p_corners.length);
 			}
@@ -333,10 +354,8 @@ y: y });
 
 		this.touchStart = function (e) {
             self.setFloorplanDirty();
-			mouse_last_position = { x: e.x,
-y: e.y };
-			mouse_last_click = { x: e.x,
-y: e.y };
+			mouse_last_position = { x: e.x, y: e.y };
+			mouse_last_click = { x: e.x, y: e.y };
 		};
 
 		this.touchMove = function (e) {
@@ -353,8 +372,7 @@ y: e.y };
 				stage.x += e.x - mouse_last_position.x;
 				stage.y += e.y - mouse_last_position.y;
 				update = true;
-				mouse_last_position = { x: e.x,
-y: e.y };
+				mouse_last_position = { x: e.x, y: e.y };
 			}
 		};
 
@@ -458,8 +476,7 @@ y: e.y };
 					if (ap === names[i].ap_start) {
 						names[i].p_start.x = ap.x;
 						names[i].p_start.y = ap.y;
-					}
- else {
+					} else {
 						names[i].p_end.x = ap.x;
 						names[i].p_end.y = ap.y;
 					}
@@ -558,8 +575,7 @@ y: e.y };
 							if (calibration_step === 1) {
 								calibration_step++;
 								this.calibrationLine(x, y, 0);
-							}
- else if (calibration_step === 2) {
+							} else if (calibration_step === 2) {
 								this.calibrationLine(x, y, 1);
 								this.calibrationDone();
                                 calibration_step = 0;
@@ -637,8 +653,7 @@ y: e.y };
 				stage.removeAllEventListeners();
 				stage.canvas = canvas;
 				stage.enableDOMEvents(true);
-			}
- else {
+			} else {
 				stage = new createjs.Stage(canvas);
 				createjs.Touch.enable(stage);
 				stage.enableMouseOver(5);
@@ -690,13 +705,10 @@ y: e.y };
 				this.calibration_line.graphics.clear();
 				this.calibration_line.graphics.setStrokeStyle(4).beginStroke("#088").moveTo(originX, originY);
 				this.calibration_line.graphics.lineTo(x, y);
-				this.calibration_line.p_start = { x: originX,
-y: originY };
-				this.calibration_line.p_end = { x: x,
-y: y };
+				this.calibration_line.p_start = { x: originX, y: originY };
+				this.calibration_line.p_end = { x: x, y: y };
 				update = true;
-			}
- else {
+			} else {
 				originX = x;
 				originY = y;
 				this.calibration_line = new createjs.Shape();
@@ -722,13 +734,11 @@ y: y };
 
 		this.addWallSegment = function (x, y) {
 			current_wall.graphics.lineTo(x, y).endStroke();
-			current_wall.p_corners.push({ x: x,
-y: y });
+			current_wall.p_corners.push({ x: x, y: y });
 			current_wall = new createjs.Shape();
 			current_wall.graphics.setStrokeStyle(this.wall_type.width).setStrokeDash(this.wall_type.dash).beginStroke(this.wall_type.color).moveTo(x, y);
 			if (current_wall.p_corners === undefined) { current_wall.p_corners = []; }
-			current_wall.p_corners.push({ x: x,
-y: y });
+			current_wall.p_corners.push({ x: x, y: y });
 			current_wall.wall_type = this.wall_type;
 			layers[1].addChild(current_wall);
 			addWallHandlers.call(this, current_wall, current_wall.p_corners.length);
@@ -760,8 +770,7 @@ y: y });
 			let itemType;
 			if (typeof item === "object") {
 				item.itemType = item.itemType || "ap";
-			}
- else {
+			} else {
 				item = { itemType: item || "ap" };
 			}
 			container.itemType = itemType = item.itemType;
@@ -951,22 +960,22 @@ y: y });
 		this.selectView = function(view_mode) {
             self.setFloorplanDirty();
 
-			var link_count = distances.children.length; 
+			var link_count = distances.children.length;
 			for (var link_pointer = 0; link_pointer != link_count; (link_pointer++)) {
-				var item_type; 
-				var view_code = { 'ap': 1, 'am': 2, 'idf': 4}; 
+				var item_type;
+				var view_code = { 'ap': 1, 'am': 2, 'idf': 4};
 
-				item_type = distances.children[link_pointer].ap_start.itemType; 
-				var left_view_code = view_code[item_type]; 
-				var show_left = (view_mode & left_view_code) != 0 ? true : false; 
+				item_type = distances.children[link_pointer].ap_start.itemType;
+				var left_view_code = view_code[item_type];
+				var show_left = (view_mode & left_view_code) != 0 ? true : false;
 
-				item_type = distances.children[link_pointer].ap_end.itemType; 
-				var right_view_code = view_code[item_type]; 
-				var show_right = (view_mode & right_view_code) != 0 ? true : false; 
+				item_type = distances.children[link_pointer].ap_end.itemType;
+				var right_view_code = view_code[item_type];
+				var show_right = (view_mode & right_view_code) != 0 ? true : false;
 
-				distances.children[link_pointer].ap_start.visible = show_left; 
-				distances.children[link_pointer].ap_end.visible   = show_right; 
-				distances.children[link_pointer].visible = show_left && show_right; 
+				distances.children[link_pointer].ap_start.visible = show_left;
+				distances.children[link_pointer].ap_end.visible   = show_right;
+				distances.children[link_pointer].visible = show_left && show_right;
 			}
 			this.toggleOverlaps()
 			update = true
@@ -1061,8 +1070,7 @@ y: y });
 						if (child.children[i].itemType === "ap") {
 							child.children[i].children[3].scaleX = child.children[i].children[3].scaleY = 100 / plan.stage_scale;
 							child.children[i].children[4].scaleX = child.children[i].children[4].scaleY = 100 / plan.stage_scale;
-						}
- else {
+						} else {
 							child.children[i].children[2].scaleX = child.children[i].children[2].scaleY = 100 / plan.stage_scale;
 							child.children[i].children[3].scaleX = child.children[i].children[3].scaleY = 100 / plan.stage_scale;
 						}
@@ -1096,8 +1104,7 @@ y: y });
 				const scaleY = canvas.height / this.height;
 				if (scaleX > scaleY) {
 					self.scale(scaleY * 100);
-				}
- else {
+				} else {
 					self.scale(scaleX * 100);
 				}
 				self.plan.stage.floorplan = url;
@@ -1146,8 +1153,7 @@ y: y });
 							y: ap.y
 						});
 					});
-				}
- else if (layers[i].layer_type === "walls") {
+				} else if (layers[i].layer_type === "walls") {
 					_.each(layers[i].children, (wall) => {
 						json.walls.push({
 							wall_type: wall.wall_type,
@@ -1173,20 +1179,46 @@ y: y });
         }
       };
 
-		this.getPNG = () => stage.toDataURL();
+      this.getPNG = () => {
+        const stageContext = stage.canvas.getContext('2d')
+        const crop = trimImageWhitespace(stage.canvas, stageContext)
+        const tWidth = Math.min(canvas.width, crop[1] - crop[3] + 40)
+        const tHeight = Math.min(canvas.height, crop[2] - crop[0] + 40)
 
-		this.getThumb = () => {
-			const thumbWidth = 150;
-			const thumbHeight = 150 * canvas.height / canvas.width;
-			const newCanvas = $("<canvas>")
-				.attr("width", thumbWidth)
-				.attr("height", thumbHeight)[0];
+        const newCanvas = $("<canvas>")
+          .attr("width", tWidth)
+          .attr("height", tHeight)[0]
+        newCanvas.setAttribute("width", tWidth);
+        newCanvas.setAttribute("height", tHeight);
+        newCanvas.getContext("2d").drawImage(stage.canvas, 0, 0)
 
-			const context = newCanvas.getContext("2d");
-			context.drawImage(stage.canvas, 0, 0, canvas.width, canvas.height, 0, 0, thumbWidth, thumbHeight);
+        return newCanvas.toDataURL();
+      }
 
-			return newCanvas.toDataURL();
-		};
+      this.getThumb = () => {
+        const stageContext = stage.canvas.getContext('2d')
+        const crop = trimImageWhitespace(stage.canvas, stageContext)
+        let tWidth = crop[1] - crop[3]
+        let tHeight = crop[2] - crop[0]
+				let tY = 0
+        const thumbWidth = 150
+        const thumbHeight = 150
+        if (tWidth/tHeight > thumbWidth/thumbHeight) {
+          let scale = tWidth / thumbWidth
+          tY = thumbHeight - tHeight / scale
+          tHeight = scale * thumbHeight
+        } else {
+          tWidth = thumbWidth * tHeight / thumbHeight
+        }
+        const newCanvas = $("<canvas>")
+          .attr("width", thumbWidth)
+          .attr("height", thumbHeight)[0]
+
+        const context = newCanvas.getContext("2d")
+        context.drawImage(stage.canvas, 0, 0, tWidth, tHeight, 0, tY, thumbWidth, thumbHeight)
+
+        return newCanvas.toDataURL()
+      }
 
 		this.loadPlan = function (planResource, signal_radius, updateControls, uploadProgress, setDirty) {
 			const plan_id = planResource._id;
@@ -1254,8 +1286,7 @@ y: y });
 				 */
 			}
 
-			$http.post(`/plans/${plan._id}/coverage`, { points: points,
-ppm: plan.stage_ppm })
+			$http.post(`/plans/${plan._id}/coverage`, { points: points, ppm: plan.stage_ppm })
 				.success((response) => {
 					const bitheat = new createjs.Bitmap(response);
 					bitheat.x = 0;
@@ -1296,8 +1327,7 @@ ppm: plan.stage_ppm })
 			if (idf.itemType === "idf") {
 				idf.children[2].graphics.clear().beginFill(BUBBLE_RGB.idf).drawRoundRect(0 - IDF_VISUAL_RADIUS_PRINT, 0 - IDF_VISUAL_RADIUS_PRINT / 2, IDF_VISUAL_RADIUS_PRINT * 2, IDF_VISUAL_RADIUS_PRINT, 2, 2).endFill();
 				idf.children[3].text = `IDF ${plan.item_index.idf++}`;
-			}
- else {
+			} else {
 				idf.children[2].graphics.clear().beginFill(BUBBLE_RGB.mdf).drawRoundRect(0 - MDF_VISUAL_RADIUS_PRINT, 0 - MDF_VISUAL_RADIUS_PRINT / 2, MDF_VISUAL_RADIUS_PRINT * 2, MDF_VISUAL_RADIUS_PRINT, 10, 10).endFill();
 				idf.children[2].graphics.beginStroke(BUBBLE_RGB.mdf).drawRoundRect(-4 - MDF_VISUAL_RADIUS_PRINT, -4 - MDF_VISUAL_RADIUS_PRINT / 2, MDF_VISUAL_RADIUS_PRINT * 2 + 8, MDF_VISUAL_RADIUS_PRINT + 8, 5, 5);
 				idf.children[3].text = "MDF";
@@ -1326,8 +1356,7 @@ ppm: plan.stage_ppm })
 			if (item.inventory.mdf) {
 				item.itemType = "mdf";
 				item.inventory.itemType = "mdf";
-			}
- else {
+			} else {
 				item.itemType = "idf";
 				item.inventory.itemType = "idf";
 			}

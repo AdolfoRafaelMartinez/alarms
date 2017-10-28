@@ -1,4 +1,14 @@
 /* global angular, $upload, _ */
+
+/* eslint quotes: 0 */
+/* eslint semi: 0 */
+/* eslint no-var: 0 */
+/* eslint camelcase: 0 */
+/* eslint brace-style: 0 */
+/* eslint curly: 0 */
+/* eslint arrow-parens: 0 */
+/* eslint no-multi-spaces: 0 */
+
 'use strict'
 
 angular.module('plans')
@@ -401,7 +411,7 @@ angular.module('plans')
         $scope.plan.$save(response => {
           $scope.plan = response
           $scope.plan.title = 'Untitled'
-          $scope.building.plans.push({_id: $scope.plan._id, title: $scope.plan.title})
+          $scope.building.plans.push({ _id: $scope.plan._id, title: $scope.plan.title })
           var b = new Buildings($scope.building)
           b.$update()
           $scope.plans.push($scope.plan)

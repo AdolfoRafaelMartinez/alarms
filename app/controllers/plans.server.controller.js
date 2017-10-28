@@ -1,6 +1,9 @@
+/* eslint quotes: 0 */
+/* eslint semi: 0 */
+/* eslint no-multi-spaces: 0 */
+
 const mongoose = require('mongoose')
 const fs       = require('fs')
-const _        = require('lodash')
 const Q        = require('q')
 const shortid  = require('shortid')
 
