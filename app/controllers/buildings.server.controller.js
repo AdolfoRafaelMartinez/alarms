@@ -151,7 +151,7 @@ exports.pdfReport = function (req, res, next) {
 			}
 			if (plan.details.lic) lic = plan.details.lic
 			_.each(plan.stage.aps, (ap, i) => {
-				if (!ap.name) ap.name = `AM${i + 1}`
+				if (!ap.name) ap.name = `AP${i + 1}`
 				if (ap.sku) {
 					if (!parts[ap.sku]) parts[ap.sku] = { qty: 0, desc: '' }
 					parts[ap.sku].qty++
