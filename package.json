@@ -6,8 +6,8 @@
   "license": "UNLICENSED",
   "repository": "http://plasma.signalforest.com/SignalForest/puddlejump",
   "engines": {
-    "node": "5.4.x",
-    "npm": "3.3.x"
+    "node": "6.11.x",
+    "npm": "3.10.x"
   },
   "scripts": {
     "start": "grunt",
@@ -59,7 +59,7 @@
     "uuid": "^2.0.1"
   },
   "devDependencies": {
-    "grunt": "*",
+    "grunt": "^1.0.2",
     "grunt-concurrent": "*",
     "grunt-contrib-clean": "^1.0.0",
     "grunt-contrib-copy": "^1.0.0",
