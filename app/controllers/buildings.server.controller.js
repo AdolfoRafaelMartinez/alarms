@@ -195,7 +195,7 @@ exports.pdfReport = function (req, res, next) {
 					let fileid = shortid.generate()
 					let htmlFilename = `${fileid}.html`
 					let pdfFilename = `${fileid}.pdf`
-                    let serveFilename = `${req.building.details.client.name}-${req.building.details.site}-${req.building.name}`
+          let serveFilename = `${req.building.details.client.name}-${req.building.details.site}-${req.building.name}`
 					let htmlFullPath = `${PUGDIR}/tmp/${htmlFilename}`
 					fs.writeFile(htmlFullPath, result, function (err) {
 						if (err) return next(err)

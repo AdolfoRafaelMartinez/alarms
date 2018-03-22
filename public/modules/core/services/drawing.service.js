@@ -1083,39 +1083,41 @@ angular.module("core").service("Drawing", ["contextMenu", "$q", "$http", "$timeo
 			const defer = $q.defer();
             if (!url) { return defer.resolve(); }
             if (newimg) { self.setFloorplanDirty(); }
-			const img = new Image();
-			img.setAttribute("crossOrigin", "anonymous");
 			const request = new XMLHttpRequest();
-			img.src = url.replace("public/", "");
-			request.open("GET", img.src, true);
-			request.onprogress = function (event) {
-				self.uploadProgress(100 + 100 * event.loaded / event.total);
-			};
+			const relURL = url.replace("public/", "").replace('https://pj.signalforest.com', '');
+			request.open("GET", relURL, true);
+      request.onprogress = (event) => self.uploadProgress(100 + 100 * event.loaded / event.total);
+      request.onerror = defer.reject;
+      request.onload = reloadImage;
 			request.send(null);
-			img.onload = function (event) {
-				const t = event.target;
-				const f = new createjs.Bitmap(t);
-				f.x = 0;
-				f.y = 0;
-				f.regX = 0;
-				f.regY = 0;
-				plan.floor_width_px = this.width;
-				const scaleX = canvas.width / this.width;
-				const scaleY = canvas.height / this.height;
-				if (scaleX > scaleY) {
-					self.scale(scaleY * 100);
-				} else {
-					self.scale(scaleX * 100);
-				}
-				self.plan.stage.floorplan = url;
-                self.uploadProgress(0, url);
-				floorplan.removeAllChildren();
-				floorplan.addChild(f);
-				update = true;
-				$timeout(() => {
-					defer.resolve();
-				}, 0);
-			};
+
+      function reloadImage() {
+        const img = new Image();
+        img.src = relURL;
+        img.setAttribute("crossOrigin", "anonymous");
+        img.onload = (event) => {
+          const t = event.target;
+          const f = new createjs.Bitmap(t);
+          f.x = 0;
+          f.y = 0;
+          f.regX = 0;
+          f.regY = 0;
+          plan.floor_width_px = this.width;
+          const scaleX = canvas.width / this.width;
+          const scaleY = canvas.height / this.height;
+          if (scaleX > scaleY) {
+            self.scale(scaleY * 100);
+          } else {
+            self.scale(scaleX * 100);
+          }
+          self.plan.stage.floorplan = url;
+          self.uploadProgress(0, url);
+          floorplan.removeAllChildren();
+          floorplan.addChild(f);
+          update = true;
+          $timeout(defer.resolve, 0);
+        };
+      }
 
 			return defer.promise;
 		};
@@ -1235,6 +1237,7 @@ angular.module("core").service("Drawing", ["contextMenu", "$q", "$http", "$timeo
 				if (data.floorplan) {
 					this.addFloorPlan(data.floorplan)
 						.then(() => {
+              console.log('DEBUG: floorplan added. Scaling.');
 							if (data.plan && data.plan.stage_scale) { this.scale(stage_scale); }
 							else { this.scale(100); }
 						});
