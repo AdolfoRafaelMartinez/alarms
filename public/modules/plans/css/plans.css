@@ -437,3 +437,33 @@ md-sidenav input {
 .clickable:hover {
 	background: #eff;
 }
+
+table.settings {
+	border: 1px solid #cccccc;
+	border-radius: 4px;
+	width: 100%;
+	font-size: 14px;
+	border-spacing: 0;
+	padding-bottom: 5px;
+	margin: 5px 0px 5px;
+}
+
+table.settings .header {
+	background: #eeeeee;
+	column-span: all;
+	padding-left: 10px;
+	border-bottom: 1px solid #cccccc;
+	text-align: left;
+	font-weight: bold;
+	color: #333333;
+}
+
+table.settings td {
+	text-align: left;
+	padding: 5px 0px 0px 5px;
+}
+
+table.settings tr:hover {
+	background: #cccccc;
+}
+

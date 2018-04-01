@@ -1,281 +1,209 @@
-<div class="modal fade">
+<div class="modal fade" style="display: block;">
 	<div class="modal-dialog settings">
 		<div class="modal-content">
 			<div class="modal-header">
-				<button type="button" class="close" ng-click="close('Cancel')" data-dismiss="modal" aria-hidden="true"><i class="glyphicon glyphicon-remove"></i></button>
-				<h2 class="modal-title">{{ item.name || item.title }} - Settings</h2>
+				<button type="button" class="close" ng-click="close('Cancel')" data-dismiss="modal" id="closeSettings" aria-hidden="true" tabindex="0">
+					<i class="glyphicon glyphicon-remove"></i>
+				</button>
+				<input type="text" ng-model="item.title" class="form-control" placeholder="Project Name" tabindex="0">
 			</div>
 			<div class="modal-body">
-				<uib-accordion close-others="false">
+				<form>
+					<!-- Project Details -->
+					<div class="panel-group">
+						<div class="panel-default panel panel-open">
+							<div class="panel-heading">
+								<h4 class="panel-title">
+									<span> <strong>Project Details</strong> </span>
+								</h4>
+							</div>
 
-					<!-- Item Details -->
-					<uib-accordion-group class="panel-default" is-open="sma.details">
-						<uib-accordion-heading>
-							Details <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': sma.details, 'glyphicon-chevron-right': !sma.details}"></i>
-						</uib-accordion-heading>
-
-						<div class="form-group" ng-if="!pp_edit['details']">
-							<div class="clickable list-group-item" ng-click="edit('details')">
-								<div><span>Client:</span> <em ng-bind="item.details.client.name"></em></div>
-								<div ng-if="item.details.client.logo" class="small-logo">
-									<img ng-src="{{ item.details.client.logo }}" />
-								</div>
-								<div ng-if="type === 'project'"><span>Project:</span> <em ng-bind="item.title"></em></div>
-								<div ng-if="type != 'project'"><span>Project:</span> <em ng-bind="item.details.project"></em></div>
-
-								<div ng-if="type === 'site'"><span>Site:</span> <em ng-bind="item.name"></em></div>
-								<div ng-if="type === 'bldg'"><span>Site:</span> <em ng-bind="item.details.site"></em></div>
-
-								<div ng-if="type === 'bldg'"><span>Building:</span> <em ng-bind="item.name"></em></div>
-
-								<div ng-if="type != 'project'">
-									<span>Address:</span> <em ng-bind="item.details.address"></em>
-									<em ng-bind="item.details.city"></em> <em ng-bind="item.details.state"></em> <em ng-bind="item.details.zipcode"></em>
-								</div>
+							<div class="panel-body">
 								<div>
-									<span>MSP:</span> <em ng-bind="item.details.msp.name"></em>
-									<div ng-if="item.details.msp.logo">
-										<img ng-src="{{ item.details.msp.logo }}" class="small-logo" />
+									<div class="form-group row">
+										<div class="col-sm-12">
+                      <label for="client_name">Client Name</label>
+											<input type="text" ng-model="item.details.client.name" class="form-control" id="client_name" placeholder="Client Name" tabindex="0">
+										</div>
+									</div>
+									<div class="form-group row">
+										<div class="col-sm-12">
+                      <label for="partner_name">Partner (MSP)</label>
+											<input type="text" ng-model="item.details.msp.name" class="form-control" id="partner_name" placeholder="Partner Name" tabindex="0">
+										</div>
 									</div>
 								</div>
+							</div>
+						</div>
+					</div>
+					<!-- Team Details -->
+					<div class="panel-group">
+						<div class="panel-default panel panel-open">
+							<div class="panel-heading">
+								<h4 class="panel-title">
+									<span class="ng-binding">
+										<span class=""><strong>Team Details</strong></span>
+									</span>
+								</h4>
+							</div>
+
+							<div class="panel-body">
+								<div ng-hide="pp_edit.personnel">
+									<table class="settings">
+										<tr class="header">
+											<td>Name</td>
+											<td>Email</td>
+											<td>Title</td>
+											<td class="center icon">Remove</td>
+										</tr>
+                    <tr ng-repeat="(personnelIndex, personnel) in item.details.personnel track by $index" ng-click="editPersonnel(personnel)">
+											<td><em ng-bind="personnel.name"></em></td>
+											<td><em ng-bind="personnel.email"></em></td>
+											<td><em ng-bind="personnel.title"></em></td>
+                      <td class="center">
+                        <a href ng-click="askDeletePersonnel(personnelIndex, $event)"> <i class="glyphicon glyphicon-remove"></i> </a>
+                      </td>
+                    </tr>
+									</table>
+								</div>
+                <button type="button" class="btn btn-primary btn-sm" ng-click="addPersonnel($event)" tabindex="0">Add Personnel</button>
+                <div class="form-group edit-contact" ng-show="pp_edit.personnel">
+                  <form>
+                    <div class="col-lg-12 plan-property-item">
+                      <div class="form-group row">
+                        <label class="col-sm-2 ptop5 text-right form-control-label">Name</label>
+                        <div class="col-sm-10"><input type="text" ng-model="newPersonnel.name" class="form-control" placeholder="Name"/></div>
+                      </div>
+                      <div class="form-group row">
+                        <label class="col-sm-2 ptop5 text-right form-control-label">Title</label>
+                        <div class="col-sm-10"><input type="text" ng-model="newPersonnel.title" class="form-control" placeholder="Title"/></div>
+                      </div>
+                      <div class="form-group row">
+                        <label class="col-sm-2 ptop5 text-right form-control-label">Email</label>
+                        <div class="col-sm-10"><input type="text" ng-model="newPersonnel.email" class="form-control" placeholder="Email"/></div>
+                      </div>
+                      <div class="form-group row">
+                        <div class="col-sm-offset-2 col-sm-10">
+                          <button type="submit" class="btn btn-primary" ng-click="savePersonnel();">Save</button>
+                          <button class="btn btn-default pull-right" ng-click="cancelPersonnel()">Cancel</button>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+							</div>
+            </div>
+					</div>
+					<!-- Contact Details -->
+					<div class="panel-group">
+						<div class="panel-default panel panel-open">
+							<div class="panel-heading">
+								<h4 class="panel-title">
+									<span class="ng-binding">
+										<span class=""><strong>Contact Details</strong></span>
+									</span>
+								</h4>
+							</div>
+
+							<div class="panel-body">
+								<div ng-hide="pp_edit.contact">
+									<table class="settings">
+										<tr class="header">
+											<td>Name</td>
+											<td>Position</td>
+											<td>Phone</td>
+											<td>Email</td>
+											<td class="center icon">Remove</td>
+										</tr>
+                    <tr ng-repeat="(contactIndex, contact) in item.details.contacts track by $index" ng-click="editContact(contact)">
+											<td><em ng-bind="contact.name"></em></td>
+											<td><em ng-bind="contact.position"></em></td>
+											<td><em ng-bind="contact.phone"></em></td>
+											<td><em ng-bind="contact.email"></em></td>
+                      <td class="center">
+                        <a href ng-click="askDeleteContact(contactIndex, $event)"> <i class="glyphicon glyphicon-remove"></i> </a>
+                      </td>
+                    </tr>
+									</table>
+									<button type="button" class="btn btn-primary btn-sm" ng-click="addContact($event)" tabindex="0">Add Contact</button>
+								</div>
+                <div class="form-group edit-contact" ng-show="pp_edit.contact">
+                  <form>
+                    <div class="col-lg-12 plan-property-item">
+                      <div class="form-group row">
+                        <label class="col-sm-2 ptop5 text-right form-control-label">Contact</label>
+                        <div class="col-sm-10"><input type="text" ng-model="newContact.name" class="form-control" placeholder="Name"/></div>
+                      </div>
+                      <div class="form-group row">
+                        <label class="col-sm-2 ptop5 text-right form-control-label">Position</label>
+                        <div class="col-sm-10"><input type="text" ng-model="newContact.position" class="form-control" placeholder="Position"/></div>
+                      </div>
+                      <div class="form-group row">
+                        <label class="col-sm-2 ptop5 text-right form-control-label">Phone</label>
+                        <div class="col-sm-10"><input type="text" ng-model="newContact.phone" class="form-control" placeholder="Phone"/></div>
+                      </div>
+                      <div class="form-group row">
+                        <label class="col-sm-2 ptop5 text-right form-control-label">Email</label>
+                        <div class="col-sm-10"><input type="text" ng-model="newContact.email" class="form-control" placeholder="Email"/></div>
+                      </div>
+                      <div class="form-group row">
+                        <div class="col-sm-offset-2 col-sm-10">
+                          <button type="submit" class="btn btn-primary" ng-click="saveContact()">Save</button>
+                          <button class="btn btn-default pull-right" ng-click="cancelContact()">Cancel</button>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+							</div>
+						</div>
+					</div>
+					<!-- Attachments -->
+					<div class="panel-group">
+						<div class="panel-default panel panel-open">
+							<div class="panel-heading">
+								<h4 class="panel-title">
+									<span class="ng-binding">
+										<span class=""><strong>Attachments (Need to include a search bar, right aligned)</strong></span>
+									</span>
+								</h4>
+							</div>
+
+							<div class="panel-body">
 								<div>
-									<span>Designer:</span> <em ng-bind="item.details.designer.name"></em>
-									<span ng-if="item.details.designer.position">, <em ng-bind="item.details.designer.position"></em> </span>
+									<table>
+										<tr class="header">
+											<td>File Name</td>
+											<td class="center">File Type</td>
+											<td>Date Added</td>
+											<td class="center icon">Download</td>
+											<td class="center icon">Remove</td>
+										</tr>
+										<tr>
+											<td>filename</td>
+											<td class="center">ext</td>
+											<td>mm/dd/yyyy hh:mm</td>
+											<td class="center"><i class="glyphicon glyphicon-download"></i></td>
+											<td class="center"><i class="glyphicon glyphicon-remove"></td>
+										</tr>
+										<tr>
+											<td>filename</td>
+											<td class="center">ext</td>
+											<td>mm/dd/yyyy hh:mm</td>
+											<td class="center"><i class="glyphicon glyphicon-download"></i></td>
+											<td class="center"><i class="glyphicon glyphicon-remove"></td>
+										</tr>
+									</table>
 								</div>
 							</div>
 						</div>
-						<div ng-show="pp_edit['details']" class="item-property-item">
-							<form>
-								<div class="form-group row">
-									<label class="col-sm-2 ptop5 text-right form-control-label">Client</label>
-									<div class="col-sm-10"><input type="text" ng-readonly="type !== 'project'" ng-model="item.details.client.name" class="form-control" placeholder="client name ..." /></div>
-								</div>
-								<div class="form-group row">
-									<label class="col-sm-2 ptop5 text-right form-control-label">Client Logo</label>
-									<div class="col-sm-10"><input type="text" ng-readonly="type !== 'project'" ng-model="item.details.client.logo" class="form-control" placeholder="Client logo URL ..." /></div>
-								</div>
-								<div class="form-group row" ng-if="type === 'project'">
-									<label class="col-sm-2 ptop5 text-right form-control-label">Project</label>
-									<div class="col-sm-10"><input type="text" ng-model="item.title" class="form-control" placeholder="project ..." /></div>
-								</div>
-								<div class="form-group row" ng-if="type === 'site'">
-									<label class="col-sm-2 ptop5 text-right form-control-label">Site</label>
-									<div class="col-sm-10"><input type="text" ng-model="item.name" class="form-control" placeholder="site ..." /></div>
-								</div>
-								<div class="form-group row" ng-if="type === 'bldg'">
-									<label class="col-sm-2 ptop5 text-right form-control-label">Building</label>
-									<div class="col-sm-10"><input type="text" ng-model="item.name" class="form-control" placeholder="building ..." /></div>
-								</div>
-								<div class="form-group row" ng-if="type === 'bldg'">
-									<label class="col-sm-2 ptop5 text-right form-control-label">Address</label>
-									<div class="col-sm-10"><input type="text" ng-model="item.details.address" class="form-control" placeholder="address"/></div>
-								</div>
-								<div class="form-group row" ng-if="type === 'bldg'">
-									<div class="col-sm-offset-2 col-sm-4"><input type="text" ng-model="item.details.city" class="form-control" placeholder="city" /></div>
-									<div class="col-sm-3"><input type="text" ng-model="item.details.state" class="form-control" placeholder="state" /></div>
-									<div class="col-sm-3"><input type="text" ng-model="item.details.zipcode" class="form-control" placeholder="zipcode" /></div>
-								</div>
-
-								<div class="form-group row">
-									<label class="col-sm-2 ptop5 text-right form-control-label">MSP</label>
-									<div class="col-sm-10"><input type="text" ng-model="item.details.msp.name" class="form-control" placeholder="MSP name"/></div>
-								</div>
-								<div class="form-group row">
-									<label class="col-sm-2 ptop5 text-right form-control-label">MSP logo</label>
-									<div class="col-sm-10"><input type="text" ng-model="item.details.msp.logo" class="form-control" placeholder="MSP logo URL (gif, jpg, png)"/></div>
-								</div>
-								<div class="form-group row">
-									<label class="col-sm-2 ptop5 text-right form-control-label">Designer</label>
-									<div class="col-sm-10"><input type="text" ng-model="item.details.designer.name" class="form-control" placeholder="Designer name"/></div>
-								</div>
-								<div class="form-group row">
-									<label class="col-sm-2 ptop5 text-right form-control-label">Designer position</label>
-									<div class="col-sm-10"><input type="text" ng-model="item.details.designer.position" class="form-control" placeholder="Designer position"/></div>
-								</div>
-								<div class="col-lg-12">
-									<div class="form-group row">
-										<div class="col-sm-offset-2 col-sm-10">
-											<button type="submit" class="btn btn-primary" ng-click="save();">Save</button>
-											<button type="submit" class="btn btn-default pull-right" ng-click="cancel()">Cancel</button>
-										</div>
-									</div>
-								</div>
-							</form>
-
+					</div>
+					<div class="form-group">
+						<div class="text-right">
+							<button type="submit" class="btn btn-primary" ng-click="save(true)" tabindex="0">Save</button>
 						</div>
-					</uib-accordion-group>
-
-					<!-- Item Contacts -->
-					<uib-accordion-group class="panel-default" is-open="sma.contacts">
-						<uib-accordion-heading>
-							Contacts 
-							<a href ng-click="addContact($event)"> <i class="glyphicon glyphicon-plus-sign"></i> </a>
-							<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': sma.contacts, 'glyphicon-chevron-right': !sma.contacts}"></i>
-						</uib-accordion-heading>
-
-						<div class="form-group row contacts" ng-hide="pp_edit['contacts']">
-							<div class="col-lg-12">
-								<div class="col-lg-3 clickable list-group-item" ng-repeat="(contactIndex, contact) in item.details.contacts" ng-click="edit('contacts', contact)">
-									<div class="topright text-right">
-										<a href ng-click="askDeleteContact(contactIndex, $event)">
-											<i class="glyphicon glyphicon-remove"></i>
-										</a>
-									</div>
-									<div class="form-group">
-										<div>
-											<span>Type:</span> <em ng-bind="contact.type"></em>
-										</div>
-										<div><span>Name:</span> <em ng-bind="contact.name"></em></div>
-										<div><span>Position:</span> <em ng-bind="contact.position"></em></div>
-										<div><span>Phone:</span> <em ng-bind="contact.phone"></em></div>
-										<div><span>Email:</span> <em ng-bind="contact.email"></em></div>
-									</div>
-								</div>
-								<div class="form-group col-log-12" ng-if="!item.details.contacts.length">
-									<i>No contacts.</i>
-									<a href ng-click="addContact($event)"> <i class="glyphicon glyphicon-plus-sign"></i> Add a new contact.</a>
-								</div>
-							</div>
-						</div>
-
-						<div class="form-group edit-contact" ng-show="pp_edit['contacts']">
-							<form>
-								<div class="col-lg-12 plan-property-item">
-									<div class="form-group row">
-										<label class="col-sm-2 ptop5 text-right form-control-label">Type</label>
-										<div class="col-sm-10"><input type="text" ng-model="edit_prop.type" class="form-control" placeholder="site contact, installer, etc..."/></div>
-									</div>
-									<div class="form-group row">
-										<label class="col-sm-2 ptop5 text-right form-control-label">Contact</label>
-										<div class="col-sm-10"><input type="text" ng-model="edit_prop.name" class="form-control" placeholder="Name"/></div>
-									</div>
-									<div class="form-group row">
-										<label class="col-sm-2 ptop5 text-right form-control-label">Position</label>
-										<div class="col-sm-10"><input type="text" ng-model="edit_prop.position" class="form-control" placeholder="Position"/></div>
-									</div>
-									<div class="form-group row">
-										<label class="col-sm-2 ptop5 text-right form-control-label">Phone</label>
-										<div class="col-sm-10"><input type="text" ng-model="edit_prop.phone" class="form-control" placeholder="Phone"/></div>
-									</div>
-									<div class="form-group row">
-										<label class="col-sm-2 ptop5 text-right form-control-label">Email</label>
-										<div class="col-sm-10"><input type="text" ng-model="edit_prop.email" class="form-control" placeholder="Email"/></div>
-									</div>
-									<div class="form-group row">
-										<div class="col-sm-offset-2 col-sm-10">
-											<button type="submit" class="btn btn-primary" ng-click="saveContact();">Save</button>
-											<button class="btn btn-default pull-right" ng-click="cancel('contacts')">Cancel</button>
-										</div>
-									</div>
-								</div>
-							</form>
-						</div>
-					</uib-accordion-group>
-
-					<!-- Item WiFi -->
-					<uib-accordion-group class="panel-default" is-open="sma.wifi" ng-if="type === 'bldg'">
-						<uib-accordion-heading>
-							WiFi Details 
-							<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': sma.wifi, 'glyphicon-chevron-right': !sma.wifi}"></i>
-						</uib-accordion-heading>
-
-						<div class="form-group row" ng-hide="pp_edit['wifi']" ng-click="edit('wifi')">
-							<div class="col-lg-12">
-								<div class="col-lg-3 clickable list-group-item">
-									<div class="form-group" ng-if="item.details.inventory">
-										<div><span>Country:</span> <em ng-bind="item.details.inventory.country"></em></div>
-										<div><span>Vendor:</span> <em ng-bind="item.details.inventory.vendor"></em></div>
-										<div><span>APs:</span> <em ng-bind="item.details.inventory.aps"></em></div>
-										<div><span>AMs:</span> <em ng-bind="item.details.inventory.ams"></em></div>
-										<div><span>Controllers:</span> <em ng-bind="item.details.inventory.controller"></em></div>
-										<div><span>Mounts:</span> <em ng-bind="item.details.inventory.mounts"></em></div>
-									</div>
-									<div ng-if="!item.details.inventory">No wifi details. Click to setup.</div>
-								</div>
-							</div>
-						</div>
-
-						<div class="form-group edit-contact" ng-show="pp_edit['wifi']">
-							<form>
-								<div class="col-lg-12 plan-property-item">
-									<div class="form-group row">
-										<label class="col-sm-2 ptop5 text-right form-control-label">Country</label>
-										<div class="col-sm-10">
-											<input type="text" ng-model="item.details.inventory.country" placeholder="country..." class="form-control">
-										</div>
-									</div>
-									<div class="form-group row">
-										<label class="col-sm-2 ptop5 text-right form-control-label">Vendor</label>
-										<div class="col-sm-10">
-											<select class="form-control" ng-model="item.details.inventory.vendor" title="Choose a WiFi vendor">
-												<option value="">---Please select---</option>
-												<option ng-repeat="vendor in vendors track by vendor.name" 
-													ng-selected="vendor.name === item.details.inventory.vendor" 
-													value="{{vendor.name}}">{{vendor.name}}
-												</option>
-											</select>
-										</div>
-									</div>
-									<div class="form-group row">
-										<label class="col-sm-2 ptop5 text-right form-control-label">AP</label>
-										<div class="col-sm-10">
-											<input type="text" ng-model="item.details.inventory.aps" placeholder="AP part number" 
-												uib-typeahead="ap.sku for ap in getAPs($viewValue)" 
-												typeahead-loading="loadingAPs" typeahead-no-results="noAPResults" class="form-control">
-											<i ng-show="loadingAPs" class="glyphicon glyphicon-refresh"></i>
-											<div ng-show="noAPResults">
-												<i class="glyphicon glyphicon-remove"></i> No Results Found
-											</div>
-										</div>
-									</div>
-									<div class="form-group row">
-										<label class="col-sm-2 ptop5 text-right form-control-label">AM</label>
-										<div class="col-sm-10">
-											<input type="text" ng-model="item.details.inventory.ams" placeholder="AM part number" 
-												uib-typeahead="ap.sku for ap in getAPs($viewValue)" 
-												typeahead-loading="loadingAMs" typeahead-no-results="noAMResults" class="form-control">
-											<i ng-show="loadingAMs" class="glyphicon glyphicon-refresh"></i>
-											<div ng-show="noAMResults">
-												<i class="glyphicon glyphicon-remove"></i> No Results Found
-											</div>
-										</div>
-									</div>
-									<div class="form-group row">
-										<label class="col-sm-2 ptop5 text-right form-control-label">Controller</label>
-										<div class="col-sm-10">
-											<input type="text" ng-model="item.details.inventory.controller" placeholder="Controller part number" 
-												uib-typeahead="ap.sku for ap in getControllers($viewValue)" 
-												typeahead-loading="loadingControllers" typeahead-no-results="noControllerResults" class="form-control">
-											<i ng-show="loadingControllers" class="glyphicon glyphicon-refresh"></i>
-											<div ng-show="noControllerResults">
-												<i class="glyphicon glyphicon-remove"></i> No Results Found
-											</div>
-										</div>
-									</div>
-									<div class="form-group row">
-										<label class="col-sm-2 ptop5 text-right form-control-label">Mounts</label>
-										<div class="col-sm-10">
-											<input type="text" ng-model="item.details.inventory.mounts" placeholder="Mounts part number" 
-												uib-typeahead="ap.sku for ap in getMounts($viewValue)" 
-												typeahead-loading="loadingMounts" typeahead-no-results="noMountResults" class="form-control">
-											<i ng-show="loadingMounts" class="glyphicon glyphicon-refresh"></i>
-											<div ng-show="noMountResults">
-												<i class="glyphicon glyphicon-remove"></i> No Results Found
-											</div>
-										</div>
-									</div>
-									<div class="form-group row">
-										<div class="col-sm-offset-2 col-sm-10">
-											<button type="submit" class="btn btn-primary" ng-click="save();">Save</button>
-											<button class="btn btn-default pull-right" ng-click="cancel()">Cancel</button>
-										</div>
-									</div>
-								</div>
-							</form>
-						</div>
-					</uib-accordion-group>
-				</uib-accordion>
-
+					</div>
+				</form>
 			</div>
 		</div>
 	</div>

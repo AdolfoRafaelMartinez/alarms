@@ -7,45 +7,33 @@ angular.module('plans')
 			$scope.item = _.cloneDeep(item)
 			$scope.original = item
 
-			$scope.sma = {
-				details: true,
-				contacts: false,
-				wifi: false
-			}
-
 			$scope.pp_edit = {}
-			$scope.edit = function (prop, obj) {
-				$scope.pp_edit = {}
-				$scope.pp_edit[prop] = true
-				console.log($scope.pp_edit)
-				if (obj) $scope.edit_prop = obj
-			}
-
-			$scope.cancel = function() {
-				$scope.pp_edit = {}
-				$scope.edit_prop = {}
-				$scope.item = _.cloneDeep($scope.original)
-			}
 
 			$scope.getItem = function() {
 				return $scope.item
 			}
 
-			var newContact = {}
 			$scope.addContact = function ($event) {
 				$event.stopPropagation()
-				$scope.sma.contacts = true
-				$scope.pp_edit.contacts = true
-				newContact = {}
-				$scope.edit_prop = newContact
+				$scope.pp_edit.contact = 2
+				$scope.newContact = {}
+			}
+
+			$scope.editContact = function (contact) {
+				$scope.pp_edit.contact = true
+				$scope.newContact = contact
+			}
+
+			$scope.cancelContact = function() {
+				$scope.pp_edit.contacts = false
 			}
 
 			$scope.saveContact = function () {
 				if (typeof $scope.item.details !== 'object') $scope.item.details = {}
 				if (!$scope.item.details.contacts) $scope.item.details.contacts = []
-				if (newContact.name) {
-					$scope.item.details.contacts.push(_.clone(newContact))
-					newContact = {}
+				if ($scope.pp_edit.contact === 2) {
+					$scope.item.details.contacts.push(_.clone($scope.newContact))
+					$scope.newContact = {}
 				}
 				$scope.save()
 				$scope.pp_edit.contacts = false
@@ -75,9 +63,60 @@ angular.module('plans')
 				$scope.save()
 			}
 
-			$scope.save = function () {
+			$scope.addPersonnel = function ($event) {
+				$event.stopPropagation()
+				$scope.pp_edit.personnel = 2
+				$scope.newPersonnel = {}
+			}
+
+			$scope.editPersonnel = function (contact) {
+				$scope.pp_edit.personnel = true
+				$scope.newPersonnel = contact
+			}
+
+			$scope.cancelPersonnel = function() {
+				$scope.pp_edit.personnel = false
+			}
+
+			$scope.savePersonnel = function () {
+				if (typeof $scope.item.details !== 'object') $scope.item.details = {}
+				if (!$scope.item.details.personnel) $scope.item.details.personnel = []
+				if ($scope.pp_edit.personnel === 2) {
+					$scope.item.details.personnel.push(_.clone($scope.newPersonnel))
+					$scope.newPersonnel = {}
+				}
+				$scope.save()
+				$scope.pp_edit.personnel = false
+			}
+
+			$scope.askDeletePersonnel = function (personnelIndex, $event) {
+				$event.stopPropagation()
+				var personnel = $scope.item.details.personnel[personnelIndex]
+
+				ModalService.showModal({
+					templateUrl: 'deleteModal.html',
+					controller: 'deleteModalController',
+					inputs: { item: `personnel: ${personnel.name}` }
+				})
+					.then(function (modal) {
+						modal.element.modal()
+						modal.close.then(function (answer) {
+							if (answer) {
+								$scope.removePersonnel(personnelIndex)
+							}
+						})
+					})
+			}
+
+			$scope.removePersonnel = function (index) {
+				$scope.item.details.personnel.splice(index, 1)
+				$scope.save()
+			}
+
+			$scope.save = function (exit) {
 				$scope.pp_edit = {}
-				_.each($scope.item, (p, k) => $scope.original[k] = p)
+        _.each($scope.item, (p, k) => $scope.original[k] = p)
+        if (exit) $('#closeSettings').click()
 			}
 
 			$scope.getAPs         = search => APs.query({search: search}).$promise
