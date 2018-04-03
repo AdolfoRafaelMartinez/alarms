@@ -31,3 +31,11 @@ angular.module('plans').factory('Controllers', ['$resource',
 		})
 	}
 ])
+
+angular.module('plans').factory('Files', ['$resource',
+	function ($resource) {
+    return $resource('projects/:projectId/files', {
+			projectId: '@_id'
+		})
+	}
+])

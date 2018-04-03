@@ -41,9 +41,7 @@
 						<div class="panel-default panel panel-open">
 							<div class="panel-heading">
 								<h4 class="panel-title">
-									<span class="ng-binding">
-										<span class=""><strong>Team Details</strong></span>
-									</span>
+                  <span class=""><strong>Team Details</strong></span>
 								</h4>
 							</div>
 
@@ -99,9 +97,7 @@
 						<div class="panel-default panel panel-open">
 							<div class="panel-heading">
 								<h4 class="panel-title">
-									<span class="ng-binding">
-										<span class=""><strong>Contact Details</strong></span>
-									</span>
+                  <span class=""><strong>Contact Details</strong></span>
 								</h4>
 							</div>
 
@@ -163,35 +159,51 @@
 						<div class="panel-default panel panel-open">
 							<div class="panel-heading">
 								<h4 class="panel-title">
-									<span class="ng-binding">
-										<span class=""><strong>Attachments (Need to include a search bar, right aligned)</strong></span>
-									</span>
+                  <span class=""><strong>Attachments</strong></span>
 								</h4>
 							</div>
 
+              <div class="actionf">
+                <div class="pull-right" style="padding: 20px"><input type="search" ng-model="fileSearch" placeholder="search..." /></div>
+                <form id="fileupload" data-ng-controller="pjFileUploadController"
+                    action="/upload" method="POST" enctype="multipart/form-data" data-file-upload="options" 
+                    ng-class="{'fileupload-processing': processing() || loadingFiles}" style="padding: 20px 20px 0;">
+                  <input type="hidden" name="project" value="{{ item._id }}">
+
+                  <button class="fileinput-button" ng-class="{disabled: disabled}">
+                    <i class="glyphicon large glyphicon-cloud-upload"></i>
+                    <div>Upload</div>
+                    <input type="file" name="files[]" multiple ng-disabled="disabled">
+                  </button>
+                  <div class="uploadstatus" ng-if="percentdone">
+                    <div class="full clear">
+                      <br />
+                      <!-- The global progress bar -->
+                      <div class="progress progress-striped active">
+                        <div class="progress-bar progress-bar-success" data-ng-style="{width: percentDone + '%'}"></div>
+                      </div>
+                      <!-- The extended global progress state -->
+                      <div class="progress-extended">&nbsp;</div>
+                    </div>
+                    <strong data-ng-show="file.error" class="error text-danger">{{file.error}}</strong>
+                  </div>
+                </form>
+              </div>
+
 							<div class="panel-body">
 								<div>
-									<table>
+									<table class="settings">
 										<tr class="header">
 											<td>File Name</td>
-											<td class="center">File Type</td>
 											<td>Date Added</td>
-											<td class="center icon">Download</td>
 											<td class="center icon">Remove</td>
 										</tr>
-										<tr>
-											<td>filename</td>
-											<td class="center">ext</td>
-											<td>mm/dd/yyyy hh:mm</td>
-											<td class="center"><i class="glyphicon glyphicon-download"></i></td>
-											<td class="center"><i class="glyphicon glyphicon-remove"></td>
-										</tr>
-										<tr>
-											<td>filename</td>
-											<td class="center">ext</td>
-											<td>mm/dd/yyyy hh:mm</td>
-											<td class="center"><i class="glyphicon glyphicon-download"></i></td>
-											<td class="center"><i class="glyphicon glyphicon-remove"></td>
+										<tr ng-repeat="file in files | filter: fileSearch">
+                      <td><a target="_blank" href="/usermedia/{{ item._id }}/{{ file.name }}">{{ file.name }}</a></td>
+                      <td>{{ file.time }}</td>
+                      <td class="pull-right">
+                        <a href ng-click="askDeleteFile(file, $event)"> <i class="glyphicon glyphicon-remove"></i> </a>
+                      </td>
 										</tr>
 									</table>
 								</div>

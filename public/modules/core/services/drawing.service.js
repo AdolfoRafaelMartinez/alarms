@@ -163,7 +163,7 @@ angular.module("core").service("Drawing", ["contextMenu", "$q", "$http", "$timeo
 
 		const addWallHandlers = function (wall, index) {
 			function mousedown (evt) {
-                self.setFloorplanDirty();
+        self.setFloorplanDirty();
 				if (evt.nativeEvent.button === 2) {
 					selectedWall = wall;
 					contextMenu.switchMenu("wall");
@@ -353,7 +353,7 @@ angular.module("core").service("Drawing", ["contextMenu", "$q", "$http", "$timeo
 		};
 
 		this.touchStart = function (e) {
-            self.setFloorplanDirty();
+      self.setFloorplanDirty();
 			mouse_last_position = { x: e.x, y: e.y };
 			mouse_last_click = { x: e.x, y: e.y };
 		};
@@ -439,7 +439,7 @@ angular.module("core").service("Drawing", ["contextMenu", "$q", "$http", "$timeo
 			let names;
 
 			function mousedown (evt) {
-                self.setFloorplanDirty();
+        self.setFloorplanDirty();
 				if (evt.nativeEvent.button === 2) {
 					selectedAP = ap;
 					contextMenu.switchMenu(ap.itemType);
@@ -693,7 +693,7 @@ angular.module("core").service("Drawing", ["contextMenu", "$q", "$http", "$timeo
 		};
 
 		this.startCalibration = function (cb) {
-            self.setFloorplanDirty();
+      self.setFloorplanDirty();
 			mouse_prev_mode = mouse_mode;
 			mouse_mode = "calibration";
 			calibration_step = 1;
@@ -921,7 +921,7 @@ angular.module("core").service("Drawing", ["contextMenu", "$q", "$http", "$timeo
 
 		this.deleteSelectedItem = function () {
 			if (!selectedAP) { return; }
-            self.setFloorplanDirty();
+      self.setFloorplanDirty();
 			contextMenu.close();
 			let i, j, k;
 			const selected_distances_length = selectedAP.distances.length;
@@ -958,7 +958,7 @@ angular.module("core").service("Drawing", ["contextMenu", "$q", "$http", "$timeo
 		};
 
 		this.selectView = function(view_mode) {
-            self.setFloorplanDirty();
+      self.setFloorplanDirty();
 
 			var link_count = distances.children.length;
 			for (var link_pointer = 0; link_pointer != link_count; (link_pointer++)) {
@@ -984,7 +984,7 @@ angular.module("core").service("Drawing", ["contextMenu", "$q", "$http", "$timeo
 
 		this.deleteSelectedWall = function () {
 			if (!selectedWall) { return; }
-            self.setFloorplanDirty();
+      self.setFloorplanDirty();
 			contextMenu.close();
 			layers[1].removeChild(selectedWall);
 			update = true;
@@ -1081,8 +1081,8 @@ angular.module("core").service("Drawing", ["contextMenu", "$q", "$http", "$timeo
 
 		this.addFloorPlan = function (url, newimg) {
 			const defer = $q.defer();
-            if (!url) { return defer.resolve(); }
-            if (newimg) { self.setFloorplanDirty(); }
+      if (!url) { return defer.resolve(); }
+      if (newimg) { self.setFloorplanDirty(); }
 			const request = new XMLHttpRequest();
 			const relURL = url.replace("public/", "").replace('https://pj.signalforest.com', '');
 			request.open("GET", relURL, true);
@@ -1228,7 +1228,7 @@ angular.module("core").service("Drawing", ["contextMenu", "$q", "$http", "$timeo
 			this.uploadProgress = uploadProgress;
 			this.plan = planResource;
 			this.updateControls = updateControls;
-            this.setFloorplanDirty = setDirty;
+      this.setFloorplanDirty = setDirty;
 			$timeout(() => {
 				if (data.plan) { plan = data.plan; }
 				plan._id = this.plan.id;

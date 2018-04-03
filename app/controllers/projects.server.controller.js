@@ -3,6 +3,7 @@ const gm       = require('gm')
 const fs       = require('fs')
 const _        = require('lodash')
 const Q        = require('q')
+const Path     = require('path')
 
 const errorHandler = require('./errors.server.controller')
 const Project = mongoose.model('Project')
@@ -68,6 +69,16 @@ exports.create = function (req, res) {
  */
 exports.read = function (req, res) {
 	res.json(req.project)
+}
+
+exports.files = function(req, res) {
+  var path = __dirname + '/../../public/usermedia/' + req.project._id
+
+  var files = fs
+    .readdirSync(path)
+    .map(v => Object({ name: v, time: fs.statSync(Path.join(path, v)).mtime.toISOString() }))
+
+  res.json(files)
 }
 
 /**

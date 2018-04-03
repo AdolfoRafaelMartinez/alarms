@@ -16,25 +16,30 @@ angular.module('core')
         });
     }
 ])
-.controller('pjFileUploadController', ['$scope', 'Drawing', '$timeout', '$http', '$filter', '$window',
-function($scope, Drawing, $timeout, $http, $filter, $window) {
-    const url = '/upload';
-    $scope.options = {
-        url: url
-    };
+.controller('pjFileUploadController', ['$scope', '$attrs', 'Drawing', '$timeout', '$http', '$filter', '$window',
+function($scope, $attrs, Drawing, $timeout, $http, $filter, $window) {
+  const url = '/upload';
+  $scope.options = {
+    url: url
+  };
 	$scope.percentDone = 0;
 
-    $scope.$on('fileuploaddone', function(files, data){
-        var url = data._response.result.files[0].url;
-        $timeout(function() {
-			Drawing.uploadProgress($scope.percentDone);
-            Drawing.addFloorPlan(url, true);
-        }, 0);
-    });
+  $scope.$on('fileuploaddone', function(files, data){
+    var url = data._response.result.files[0].url;
+    $timeout(function() {
+      if (Drawing.uploadProgress) {
+        Drawing.uploadProgress($scope.percentDone);
+        Drawing.addFloorPlan(url, true);
+      }
+      if ($scope.uploadComplete) {
+        $scope.uploadComplete(url)
+      }
+    }, 0);
+  });
 
 	$scope.$on('fileuploadprogress', function(e, data) {
 		$scope.percentDone = 100 * data.loaded / data.total
-		Drawing.uploadProgress($scope.percentDone);
+		if (Drawing.uploadProgress) Drawing.uploadProgress($scope.percentDone);
 	});
 
 }

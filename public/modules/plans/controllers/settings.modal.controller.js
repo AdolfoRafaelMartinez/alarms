@@ -1,8 +1,8 @@
 'use strict'
 
 angular.module('plans')
-	.controller('settingsModalController', ['$scope', 'close', 'item', 'type', 'ModalService', 'Vendors', 'APs', 'Mounts', 'Controllers',
-		function ($scope, close, item, type, ModalService, Vendors, APs, Mounts, Controllers) {
+	.controller('settingsModalController', ['$scope', 'close', 'item', 'type', 'ModalService', 'Vendors', 'APs', 'Mounts', 'Controllers', 'Files',
+		function ($scope, close, item, type, ModalService, Vendors, APs, Mounts, Controllers, Files) {
 			$scope.type = type
 			$scope.item = _.cloneDeep(item)
 			$scope.original = item
@@ -113,14 +113,45 @@ angular.module('plans')
 				$scope.save()
 			}
 
+			$scope.askDeleteFile = function (file, $event) {
+				$event.stopPropagation()
+
+				ModalService.showModal({
+					templateUrl: 'deleteModal.html',
+					controller: 'deleteModalController',
+					inputs: { item: `file: ${file.name}` }
+				})
+					.then(function (modal) {
+						modal.element.modal()
+						modal.close.then(function (answer) {
+							if (answer) {
+								$scope.deleteFile(file)
+							}
+						})
+					})
+			}
+
+      $scope.deleteFile = function(file) {
+        Files.delete({projectId: $scope.item._id, file: file.name})
+        $scope.files = Files.query({projectId: $scope.item._id})
+      }
+
 			$scope.save = function (exit) {
 				$scope.pp_edit = {}
         _.each($scope.item, (p, k) => $scope.original[k] = p)
-        if (exit) $('#closeSettings').click()
+        if (exit) setTimeout(() => {
+          $('.modal').modal('hide')
+        })
 			}
+
+      $scope.uploadComplete = function(file) {
+        console.log('uploadComplete', file)
+        $scope.files = Files.query({projectId: $scope.item._id})
+      }
 
 			$scope.getAPs         = search => APs.query({search: search}).$promise
 			$scope.getControllers = search => Controllers.query({search: search}).$promise
 			$scope.getMounts      = search => Mounts.query({search: search}).$promise
 			$scope.vendors        = Vendors.query()
+			$scope.files          = Files.query({projectId: $scope.item._id})
 		}])
