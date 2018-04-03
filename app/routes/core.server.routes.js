@@ -10,7 +10,7 @@ module.exports = function (app) {
 	app.route('/privacy.html').get(core.privacy)
 	app.route('/terms.html').get(core.terms)
 
-  app.del('/projects/:projectId/files', function(req, res) {
+  app.delete('/projects/:projectId/files', function(req, res) {
     console.log('deleting', path.join('./../../public/usermedia/', req.params.projectId, req.query.file))
     fs.unlinkSync(path.join(__dirname, './../../public/usermedia/', req.params.projectId, req.query.file))
     res.send('Deleted')
