@@ -47,7 +47,7 @@
 
 							<div class="panel-body">
 								<div ng-hide="pp_edit.personnel">
-									<table class="settings">
+									<table class="settings" ng-if="item.details.personnel">
 										<tr class="header">
 											<td>Name</td>
 											<td>Email</td>
@@ -103,7 +103,7 @@
 
 							<div class="panel-body">
 								<div ng-hide="pp_edit.contact">
-									<table class="settings">
+									<table class="settings" ng-if="item.details.contacts">
 										<tr class="header">
 											<td>Name</td>
 											<td>Position</td>
@@ -192,7 +192,7 @@
 
 							<div class="panel-body">
 								<div>
-									<table class="settings">
+									<table class="settings" ng-if="files.length">
 										<tr class="header">
 											<td>File Name</td>
 											<td>Date Added</td>

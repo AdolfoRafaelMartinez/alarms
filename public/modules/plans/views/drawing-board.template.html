@@ -14,302 +14,499 @@
 
 <!-- plan properties -->
 <div class="panel-body overlay-sheet sheet-bg" ng-show="plan_properties">
-	<button class="btn btn-secondary" ng-click="togglePlanProperties()"><i class="glyphicon glyphicon-backward"></i> Back</button>
-    <div class="row">
-        <div class="panel-group col-lg-12" id="pp_accordion" role="tablist" aria-multiselectable="true">
-            <div class="panel panel-default">
-                <div class="panel-heading" role="tab" id="pp_client">
-                    <h4 class="panel-title">
-                        <a role="button" data-toggle="collapse" data-parent="#pp_accordion" href="#collapseClient" aria-expanded="true" aria-controls="collapseClient">
-                            Site properties
-                        </a>
-                    </h4>
-                </div>
-                <div id="collapseClient" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="pp_client">
-                    <div class="panel-body">
-                        <div class="form-group client" ng-if="!pp_edit['client']">
-                            <div class="clickable list-group-item" ng-click="toggleEdit('client')">
-								<div class="topright text-right"><i class="glyphicon glyphicon-edit"></i></div>
-                                <div><span>Client:</span> <em ng-bind="plan.details.client.name"></em></div>
-                                <div ng-if="plan.details.client.logo" class="small-logo">
-                                    <img ng-src="{{ plan.details.client.logo }}" />
-                                </div>
-                                <div><span>Project:</span> <em ng-bind="plan.details.project"></em></div>
-                                <div><span>Site:</span> <em ng-bind="plan.details.site"></em></div>
-                                <div><span>Building:</span> <em ng-bind="plan.details.building"></em></div>
-                                <div><span>Floor:</span> <em ng-bind="plan.floor"></em></div>
-                                <div>
-                                    <span>Address:</span> <em ng-bind="plan.details.address"></em>
-                                    <em ng-bind="plan.details.city"></em> <em ng-bind="plan.details.state"></em> <em ng-bind="plan.details.zipcode"></em>
-                                </div>
-                                <div>
-                                    <span>MSP:</span> <em ng-bind="plan.details.msp.name"></em>
-                                    <div ng-if="plan.details.msp.logo">
-                                        <img ng-src="{{ plan.details.msp.logo }}" class="small-logo" />
-                                    </div>
-                                </div>
-                                <div>
-                                    <span>Designer:</span> <em ng-bind="plan.details.designer.name"></em>
-                                    <span ng-if="plan.details.designer.position">, <em ng-bind="plan.details.designer.position"></em> </span>
-                                </div>
-                            </div>
-                        </div>
-                        <form ng-show="pp_edit['client']" class="plan-property-item">
-                            <div class="form-group row">
-                                <label class="col-sm-2 ptop5 text-right form-control-label">Client</label>
-                                <div class="col-sm-10"><input type="text" ng-model="plan.details.client.name" class="form-control" placeholder="client name ..." /></div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-sm-2 ptop5 text-right form-control-label">Client Logo</label>
-                                <div class="col-sm-10"><input type="text" ng-model="plan.details.client.logo" class="form-control" placeholder="Client logo URL ..." /></div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-sm-2 ptop5 text-right form-control-label">Project</label>
-                                <div class="col-sm-10"><input type="text" readonly ng-model="plan.details.project" class="form-control" placeholder="project ..." /></div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-sm-2 ptop5 text-right form-control-label">Site</label>
-                                <div class="col-sm-10"><input type="text" readonly ng-model="plan.details.site" class="form-control" placeholder="site ..." /></div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-sm-2 ptop5 text-right form-control-label">Building</label>
-                                <div class="col-sm-10"><input type="text" readonly ng-model="plan.details.building" class="form-control" placeholder="building ..." /></div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-sm-2 ptop5 text-right form-control-label">Floor</label>
-                                <div class="col-sm-10"><input type="text" ng-model="plan.floor" class="form-control" placeholder="##" /></div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-sm-2 ptop5 text-right form-control-label">Address</label>
-                                <div class="col-sm-10"><input type="text" ng-model="plan.details.address" class="form-control" placeholder="address"/></div>
-                            </div>
-                            <div class="form-group row">
-                                <div class="col-sm-offset-2 col-sm-4"><input type="text" ng-model="plan.details.city" class="form-control" placeholder="city" /></div>
-                                <div class="col-sm-3"><input type="text" ng-model="plan.details.state" class="form-control" placeholder="state" /></div>
-                                <div class="col-sm-3"><input type="text" ng-model="plan.details.zipcode" class="form-control" placeholder="zipcode" /></div>
-                            </div>
-
-                            <div class="form-group row">
-                                <label class="col-sm-2 ptop5 text-right form-control-label">MSP</label>
-                                <div class="col-sm-10"><input type="text" ng-model="plan.details.msp.name" class="form-control" placeholder="MSP name"/></div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-sm-2 ptop5 text-right form-control-label">MSP logo</label>
-                                <div class="col-sm-10"><input type="text" ng-model="plan.details.msp.logo" class="form-control" placeholder="MSP logo URL (gif, jpg, png)"/></div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-sm-2 ptop5 text-right form-control-label">Designer</label>
-                                <div class="col-sm-10"><input type="text" ng-model="plan.details.designer.name" class="form-control" placeholder="Designer name"/></div>
-                            </div>
-                            <div class="form-group row">
-                                <label class="col-sm-2 ptop5 text-right form-control-label">Designer position</label>
-                                <div class="col-sm-10"><input type="text" ng-model="plan.details.designer.position" class="form-control" placeholder="Designer position"/></div>
-                            </div>
-
-                            <div class="col-lg-12">
-                                <div class="form-group row">
-                                    <div class="col-sm-offset-2 col-sm-10">
-                                        <button type="submit" class="btn btn-primary" ng-click="savePlanProperties();">Save</button>
-                                        <button type="submit" class="btn btn-default pull-right" ng-click="toggleEdit('client')">Cancel</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <div class="panel panel-default">
-                <div class="panel-heading" role="tab" id="pp_contacts">
-                    <h4 class="panel-title">
-                        <a role="button" data-toggle="collapse" data-parent="#pp_accordion" href="#collapseContacts" aria-expanded="true" aria-controls="collapseContacts">
-                            Contacts
-                        </a>
-						<a href ng-click="addContact()"> <i class="glyphicon glyphicon-plus-sign"></i> </a>
-                    </h4>
-                </div>
-                <div id="collapseContacts" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="pp_contacts">
-                    <div class="panel-body">
-                        <div class="form-group row" ng-hide="pp_edit['contacts']">
-                            <div class="col-lg-12">
-                                <div class="col-lg-3 clickable list-group-item" ng-repeat="(contactIndex, contact) in plan.details.contacts" ng-click="toggleEdit('contacts', contact)">
-									<div class="topright text-right">
-										<a href ng-click="removeContact(contactIndex)">
-											<i class="glyphicon glyphicon-remove" ng-click="removeContact(contactIndex)"></i>
-										</a>
-									</div>
-                                    <div class="form-group">
-                                        <div>
-                                            <span>Type:</span> <em ng-bind="contact.type"></em>
-                                        </div>
-                                        <div><span>Name:</span> <em ng-bind="contact.name"></em></div>
-                                        <div><span>Position:</span> <em ng-bind="contact.position"></em></div>
-                                        <div><span>Phone:</span> <em ng-bind="contact.phone"></em></div>
-                                        <div><span>Email:</span> <em ng-bind="contact.email"></em></div>
-                                    </div>
-                                </div>
-                                <div class="form-group col-log-12" ng-if="!plan.details.contacts.length">
-                                    <i>Please add some contacts for this plan.</i>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group edit-contact" ng-show="pp_edit['contacts']">
-                            <form>
-                                <div class="col-lg-12 plan-property-item">
-                                    <div class="form-group row">
-                                        <label class="col-sm-2 ptop5 text-right form-control-label">Type</label>
-                                        <div class="col-sm-10"><input type="text" ng-model="edit_prop.type" class="form-control" placeholder="site contact, installer, etc..."/></div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <label class="col-sm-2 ptop5 text-right form-control-label">Contact</label>
-                                        <div class="col-sm-10"><input type="text" ng-model="edit_prop.name" class="form-control" placeholder="Name"/></div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <label class="col-sm-2 ptop5 text-right form-control-label">Position</label>
-                                        <div class="col-sm-10"><input type="text" ng-model="edit_prop.position" class="form-control" placeholder="Position"/></div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <label class="col-sm-2 ptop5 text-right form-control-label">Phone</label>
-                                        <div class="col-sm-10"><input type="text" ng-model="edit_prop.phone" class="form-control" placeholder="Phone"/></div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <label class="col-sm-2 ptop5 text-right form-control-label">Email</label>
-                                        <div class="col-sm-10"><input type="text" ng-model="edit_prop.email" class="form-control" placeholder="Email"/></div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <div class="col-sm-offset-2 col-sm-10">
-                                            <button type="submit" class="btn btn-primary" ng-click="saveContact();">Save</button>
-                                            <button class="btn btn-default pull-right" ng-click="toggleEdit('contacts')">Cancel</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-
-            <div class="panel panel-default">
-                <div class="panel-heading" role="tab" id="pp_controllers">
-                    <h4 class="panel-title">
-                        <a role="button" data-toggle="collapse" data-parent="#pp_accordion" href="#collapseControllers" aria-expanded="true" aria-controls="collapseControllers">
-                            Controllers
-                        </a>
-                    </h4>
-                </div>
-                <div id="collapseControllers" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="pp_controllers">
-                    <div class="panel-body">
-                        <div class="form-group row" ng-hide="pp_edit['controllers']">
-                            <div class="col-lg-12">
-                                <div class="form-group">
-                                    <div>
-                                        <label class="form-control-label">Controller Present?</label>
-                                        <md-switch aria-label="controller present" ng-change="checkController()" ng-model="plan.details.ctrlPresent">
-                                            {{ plan.details.ctrlPresent ? 'YES' : 'Not on this floor' }}
-                                        </md-switch>
-                                    </div>
-                                </div>
-                                <div class="col-lg-3 clickable list-group-item" ng-repeat="(ctrlIndex, ctrl) in plan.details.controllers" ng-if="plan.details.ctrlPresent" ng-click="toggleEdit('controllers', ctrl)">
-									<div class="topright text-right">
-										<!-- a href ng-click="removeController(ctrlIndex)" style="padding-left: 1em;">
-											<i class="glyphicon glyphicon-remove"></i>
-										</a -->
-									</div>
-                                    <div class="form-group">
-                                        <div>
-                                            <span>Country Code:</span> <em ng-bind="ctrl.country"></em>
-                                        </div>
-
-                                        <div><span>Model:</span> <em ng-bind="ctrl.sku"></em></div>
-                                        <div><span>Description:</span> <em ng-bind="ctrl.description"></em></div>
-                                        <div><span>HA:</span>
-                                            <span ng-if="ctrl.ha"><i class="glyphicon glyphicon-ok-circle green"></i></span>
-                                            <span ng-if="!ctrl.ha"><i class="glyphicon glyphicon-remove-circle red"></i></span>
-                                        </div>
-                                        <div><span>AP/AM Licenses:</span> <span ng-bind="ctrl.lic.ap.qty"></span></div>
-                                        <div ng-if="plan.details.vendor === 'Aruba HPE'">
-                                            <span>PEFNG License:</span>
-                                            <span ng-if="plan.details.lic.pefng"><i class="glyphicon glyphicon-ok-circle green"></i></span>
-                                            <span ng-if="!plan.details.lic.pefng"><i class="glyphicon glyphicon-remove-circle red"></i></span>
-                                        </div>
-                                        <div ng-if="plan.details.vendor === 'Aruba HPE'">
-                                            <span>RFP License:</span>
-                                            <span ng-if="plan.details.lic.rfp"><i class="glyphicon glyphicon-ok-circle green"></i></span>
-                                            <span ng-if="!plan.details.lic.rfp"><i class="glyphicon glyphicon-remove-circle red"></i></span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group edit-contact" ng-show="pp_edit['controllers']">
-                            <form>
-                                <div class="col-lg-12 plan-property-item">
-                                    <div class="form-group row">
-                                        <label class="col-sm-6 ptop5 text-right form-control-label">Country Code</label>
-                                        <div class="col-sm-6"><input type="text" ng-model="edit_prop.country" class="form-control" placeholder="US / CA / JP etc..."/></div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <label class="col-sm-6 ptop5 text-right form-control-label">Model</label>
-                                        <div class="col-sm-6">
-                                            <input type="text" ng-model="edit_prop.sku" placeholder="Controller part number" 
-                                                uib-typeahead="ap.sku for ap in getControllers($viewValue)" 
-                                                typeahead-loading="loadingControllers" typeahead-no-results="noControllerResults" class="form-control">
-                                            <i ng-show="loadingControllers" class="glyphicon glyphicon-refresh"></i>
-                                            <div ng-show="noControllerResults">
-                                                <i class="glyphicon glyphicon-remove"></i> No Results Found
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <label class="col-sm-6 ptop5 text-right form-control-label">Description</label>
-                                        <div class="col-sm-6"><input type="text" ng-model="edit_prop.description" class="form-control" placeholder="Description..."/></div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <div class="col-sm-6 text-right"><label class="form-control-label">HA</label></div>
-                                        <div class="col-sm-6">
-                                            <md-switch aria-label="HA" ng-model="edit_prop.ha">HA</md-switch>
-                                        </div>
-                                    </div>
-                                    <div class="form-group row" ng-if="plan.details.vendor === 'Aruba HPE'">
-                                        <label class="col-sm-6 text-right form-control-label">AP/AM spares</label>
-                                        <div class="col-sm-6"><input type="number" ng-model="edit_prop.lic.ap.spares" class="form-control tight" placeholder="qty" /></div>
-                                    </div>
-                                    <div class="form-group row" ng-if="plan.details.vendor === 'Aruba HPE'">
-                                        <div class="col-sm-6 text-right"><label class="form-control-label">PEFNG License?</label></div>
-                                        <div class="col-sm-6">
-                                            <md-switch aria-label="PEFNG licences" ng-model="plan.details.lic.pefng">
-                                                {{ plan.details.lic.pefng ? 'Yes' : 'No' }}
-                                            </md-switch>
-                                        </div>
-                                    </div>
-                                    <div class="form-group row" ng-if="plan.details.vendor === 'Aruba HPE'">
-                                        <div class="col-sm-6 text-right"><label class="form-control-label">RFP License?</label></div>
-                                        <div class="col-sm-6">
-                                            <md-switch aria-label="RFP licences" ng-model="plan.details.lic.rfp">
-                                                {{ plan.details.lic.rfp ? 'Yes' : 'No' }}
-                                            </md-switch>
-                                        </div>
-                                    </div>
-                                    <div class="form-group row">
-                                        <div class="col-sm-offset-2 col-sm-10">
-                                            <button type="submit" class="btn btn-primary" ng-click="updateLicenses(); savePlanProperties();">Save</button>
-                                            <button class="btn btn-default pull-right" ng-click="toggleEdit('controllers')">Cancel</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  <button class="btn btn-secondary" ng-click="togglePlanProperties()"><i class="glyphicon glyphicon-backward"></i> Back</button>
+  <div class="row">
+    <div class="panel-group col-lg-12" id="pp_accordion" role="tablist" aria-multiselectable="true">
+      <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="pp_client">
+          <h4 class="panel-title">
+            <a role="button" data-toggle="collapse" data-parent="#pp_accordion" href="#collapseClient" aria-expanded="true" aria-controls="collapseClient">
+              Floor properties
+            </a>
+          </h4>
         </div>
+        <div id="collapseClient" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="pp_client">
+          <div class="panel-body">
+            <div class="form-group client" ng-if="!pp_edit['client']">
+              <div class="clickable list-group-item" ng-click="toggleEdit('client')">
+                <div class="topright text-right"><i class="glyphicon glyphicon-edit"></i></div>
+                <div><span>Client:</span> <em ng-bind="plan.details.client.name"></em></div>
+                <div ng-if="plan.details.client.logo" class="small-logo">
+                  <img ng-src="{{ plan.details.client.logo }}" />
+                </div>
+                <div><span>Project:</span> <em ng-bind="plan.details.project"></em></div>
+                <div><span>Site:</span> <em ng-bind="plan.details.site"></em></div>
+                <div><span>Building:</span> <em ng-bind="plan.details.building"></em></div>
+                <div><span>Floor:</span> <em ng-bind="plan.floor"></em></div>
+                <div>
+                  <span>Address:</span> <em ng-bind="plan.details.address"></em>
+                  <em ng-bind="plan.details.city"></em> <em ng-bind="plan.details.state"></em> <em ng-bind="plan.details.zipcode"></em>
+                </div>
+                <div>
+                  <span>MSP:</span> <em ng-bind="plan.details.msp.name"></em>
+                  <div ng-if="plan.details.msp.logo">
+                    <img ng-src="{{ plan.details.msp.logo }}" class="small-logo" />
+                  </div>
+                </div>
+                <div>
+                  <span>Designer:</span> <em ng-bind="plan.details.designer.name"></em>
+                  <span ng-if="plan.details.designer.position">, <em ng-bind="plan.details.designer.position"></em> </span>
+                </div>
+              </div>
+            </div>
+            <form ng-show="pp_edit['client']" class="plan-property-item">
+              <div class="form-group row">
+                <label class="col-sm-2 ptop5 text-right form-control-label">Client</label>
+                <div class="col-sm-10"><input type="text" ng-model="plan.details.client.name" class="form-control" placeholder="client name ..." /></div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-2 ptop5 text-right form-control-label">Client Logo</label>
+                <div class="col-sm-10"><input type="text" ng-model="plan.details.client.logo" class="form-control" placeholder="Client logo URL ..." /></div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-2 ptop5 text-right form-control-label">Project</label>
+                <div class="col-sm-10"><input type="text" readonly ng-model="plan.details.project" class="form-control" placeholder="project ..." /></div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-2 ptop5 text-right form-control-label">Site</label>
+                <div class="col-sm-10"><input type="text" readonly ng-model="plan.details.site" class="form-control" placeholder="site ..." /></div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-2 ptop5 text-right form-control-label">Building</label>
+                <div class="col-sm-10"><input type="text" readonly ng-model="plan.details.building" class="form-control" placeholder="building ..." /></div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-2 ptop5 text-right form-control-label">Floor</label>
+                <div class="col-sm-10"><input type="text" ng-model="plan.floor" class="form-control" placeholder="##" /></div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-2 ptop5 text-right form-control-label">Address</label>
+                <div class="col-sm-10"><input type="text" ng-model="plan.details.address" class="form-control" placeholder="address"/></div>
+              </div>
+              <div class="form-group row">
+                <div class="col-sm-offset-2 col-sm-4"><input type="text" ng-model="plan.details.city" class="form-control" placeholder="city" /></div>
+                <div class="col-sm-3"><input type="text" ng-model="plan.details.state" class="form-control" placeholder="state" /></div>
+                <div class="col-sm-3"><input type="text" ng-model="plan.details.zipcode" class="form-control" placeholder="zipcode" /></div>
+              </div>
+
+              <div class="form-group row">
+                <label class="col-sm-2 ptop5 text-right form-control-label">MSP</label>
+                <div class="col-sm-10"><input type="text" ng-model="plan.details.msp.name" class="form-control" placeholder="MSP name"/></div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-2 ptop5 text-right form-control-label">MSP logo</label>
+                <div class="col-sm-10"><input type="text" ng-model="plan.details.msp.logo" class="form-control" placeholder="MSP logo URL (gif, jpg, png)"/></div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-2 ptop5 text-right form-control-label">Designer</label>
+                <div class="col-sm-10"><input type="text" ng-model="plan.details.designer.name" class="form-control" placeholder="Designer name"/></div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-2 ptop5 text-right form-control-label">Designer position</label>
+                <div class="col-sm-10"><input type="text" ng-model="plan.details.designer.position" class="form-control" placeholder="Designer position"/></div>
+              </div>
+
+              <div class="col-lg-12">
+                <div class="form-group row">
+                  <div class="col-sm-offset-2 col-sm-10">
+                    <button type="submit" class="btn btn-primary" ng-click="savePlanProperties();">Save</button>
+                    <button type="submit" class="btn btn-default pull-right" ng-click="toggleEdit('client')">Cancel</button>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="pp_contacts">
+          <h4 class="panel-title">
+            <a role="button" data-toggle="collapse" data-parent="#pp_accordion" href="#collapseContacts" aria-expanded="true" aria-controls="collapseContacts">
+              Contacts
+            </a>
+            <a href ng-click="addContact()"> <i class="glyphicon glyphicon-plus-sign"></i> </a>
+          </h4>
+        </div>
+        <div id="collapseContacts" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="pp_contacts">
+          <div class="panel-body">
+            <div class="form-group row" ng-hide="pp_edit['contacts']">
+              <div class="col-lg-12">
+                <div class="col-lg-3 clickable list-group-item" ng-repeat="(contactIndex, contact) in plan.details.contacts" ng-click="toggleEdit('contacts', contact)">
+                  <div class="topright text-right">
+                    <a href ng-click="removeContact(contactIndex)">
+                      <i class="glyphicon glyphicon-remove" ng-click="removeContact(contactIndex)"></i>
+                    </a>
+                  </div>
+                  <div class="form-group">
+                    <div>
+                      <span>Type:</span> <em ng-bind="contact.type"></em>
+                    </div>
+                    <div><span>Name:</span> <em ng-bind="contact.name"></em></div>
+                    <div><span>Position:</span> <em ng-bind="contact.position"></em></div>
+                    <div><span>Phone:</span> <em ng-bind="contact.phone"></em></div>
+                    <div><span>Email:</span> <em ng-bind="contact.email"></em></div>
+                  </div>
+                </div>
+                <div class="form-group col-log-12" ng-if="!plan.details.contacts.length">
+                  <i>No contacts for this plan.</i>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group edit-contact" ng-show="pp_edit['contacts']">
+              <form>
+                <div class="col-lg-12 plan-property-item">
+                  <div class="form-group row">
+                    <label class="col-sm-2 ptop5 text-right form-control-label">Type</label>
+                    <div class="col-sm-10"><input type="text" ng-model="edit_prop.type" class="form-control" placeholder="site contact, installer, etc..."/></div>
+                  </div>
+                  <div class="form-group row">
+                    <label class="col-sm-2 ptop5 text-right form-control-label">Contact</label>
+                    <div class="col-sm-10"><input type="text" ng-model="edit_prop.name" class="form-control" placeholder="Name"/></div>
+                  </div>
+                  <div class="form-group row">
+                    <label class="col-sm-2 ptop5 text-right form-control-label">Position</label>
+                    <div class="col-sm-10"><input type="text" ng-model="edit_prop.position" class="form-control" placeholder="Position"/></div>
+                  </div>
+                  <div class="form-group row">
+                    <label class="col-sm-2 ptop5 text-right form-control-label">Phone</label>
+                    <div class="col-sm-10"><input type="text" ng-model="edit_prop.phone" class="form-control" placeholder="Phone"/></div>
+                  </div>
+                  <div class="form-group row">
+                    <label class="col-sm-2 ptop5 text-right form-control-label">Email</label>
+                    <div class="col-sm-10"><input type="text" ng-model="edit_prop.email" class="form-control" placeholder="Email"/></div>
+                  </div>
+                  <div class="form-group row">
+                    <div class="col-sm-offset-2 col-sm-10">
+                      <button type="submit" class="btn btn-primary" ng-click="saveContact();">Save</button>
+                      <button class="btn btn-default pull-right" ng-click="toggleEdit('contacts')">Cancel</button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="pp_controllers">
+          <h4 class="panel-title">
+            <a role="button" data-toggle="collapse" data-parent="#pp_accordion" href="#collapseControllers" aria-expanded="true" aria-controls="collapseControllers">
+              Controllers
+            </a>
+          </h4>
+        </div>
+        <div id="collapseControllers" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="pp_controllers">
+          <div class="panel-body">
+            <div class="form-group row" ng-hide="pp_edit['controllers']">
+              <div class="col-lg-12">
+                <div class="form-group">
+                  <div>
+                    <label class="form-control-label">Controller Present?</label>
+                    <md-switch aria-label="controller present" ng-change="checkController()" ng-model="plan.details.ctrlPresent">
+                      {{ plan.details.ctrlPresent ? 'YES' : 'Not on this floor' }}
+                    </md-switch>
+                  </div>
+                </div>
+                <div class="col-lg-3 clickable list-group-item" ng-repeat="(ctrlIndex, ctrl) in plan.details.controllers" ng-if="plan.details.ctrlPresent" ng-click="toggleEdit('controllers', ctrl)">
+                  <div class="topright text-right">
+                    <!-- a href ng-click="removeController(ctrlIndex)" style="padding-left: 1em;">
+                      <i class="glyphicon glyphicon-remove"></i>
+                      </a -->
+                  </div>
+                  <div class="form-group">
+                    <div>
+                      <span>Country Code:</span> <em ng-bind="ctrl.country"></em>
+                    </div>
+
+                    <div><span>Model:</span> <em ng-bind="ctrl.sku"></em></div>
+                    <div><span>Description:</span> <em ng-bind="ctrl.description"></em></div>
+                    <div><span>HA:</span>
+                      <span ng-if="ctrl.ha"><i class="glyphicon glyphicon-ok-circle green"></i></span>
+                      <span ng-if="!ctrl.ha"><i class="glyphicon glyphicon-remove-circle red"></i></span>
+                    </div>
+                    <div><span>AP/AM Licenses:</span> <span ng-bind="ctrl.lic.ap.qty"></span></div>
+                    <div ng-if="plan.details.vendor === 'Aruba HPE'">
+                      <span>PEFNG License:</span>
+                      <span ng-if="plan.details.lic.pefng"><i class="glyphicon glyphicon-ok-circle green"></i></span>
+                      <span ng-if="!plan.details.lic.pefng"><i class="glyphicon glyphicon-remove-circle red"></i></span>
+                    </div>
+                    <div ng-if="plan.details.vendor === 'Aruba HPE'">
+                      <span>RFP License:</span>
+                      <span ng-if="plan.details.lic.rfp"><i class="glyphicon glyphicon-ok-circle green"></i></span>
+                      <span ng-if="!plan.details.lic.rfp"><i class="glyphicon glyphicon-remove-circle red"></i></span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group edit-contact" ng-show="pp_edit['controllers']">
+              <form>
+                <div class="col-lg-12 plan-property-item">
+                  <div class="form-group row">
+                    <label class="col-sm-6 ptop5 text-right form-control-label">Country Code</label>
+                    <div class="col-sm-6"><input type="text" ng-model="edit_prop.country" class="form-control" placeholder="US / CA / JP etc..."/></div>
+                  </div>
+                  <div class="form-group row">
+                    <label class="col-sm-6 ptop5 text-right form-control-label">Model</label>
+                    <div class="col-sm-6">
+                      <input type="text" ng-model="edit_prop.sku" placeholder="Controller part number" 
+                                                                  uib-typeahead="ap.sku for ap in getControllers($viewValue)" 
+                                                                  typeahead-loading="loadingControllers" typeahead-no-results="noControllerResults" class="form-control">
+                      <i ng-show="loadingControllers" class="glyphicon glyphicon-refresh"></i>
+                      <div ng-show="noControllerResults">
+                        <i class="glyphicon glyphicon-remove"></i> No Results Found
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label class="col-sm-6 ptop5 text-right form-control-label">Description</label>
+                    <div class="col-sm-6"><input type="text" ng-model="edit_prop.description" class="form-control" placeholder="Description..."/></div>
+                  </div>
+                  <div class="form-group row">
+                    <div class="col-sm-6 text-right"><label class="form-control-label">HA</label></div>
+                    <div class="col-sm-6">
+                      <md-switch aria-label="HA" ng-model="edit_prop.ha">HA</md-switch>
+                    </div>
+                  </div>
+                  <div class="form-group row" ng-if="plan.details.vendor === 'Aruba HPE'">
+                    <label class="col-sm-6 text-right form-control-label">AP/AM spares</label>
+                    <div class="col-sm-6"><input type="number" ng-model="edit_prop.lic.ap.spares" class="form-control tight" placeholder="qty" /></div>
+                  </div>
+                  <div class="form-group row" ng-if="plan.details.vendor === 'Aruba HPE'">
+                    <div class="col-sm-6 text-right"><label class="form-control-label">PEFNG License?</label></div>
+                    <div class="col-sm-6">
+                      <md-switch aria-label="PEFNG licences" ng-model="plan.details.lic.pefng">
+                        {{ plan.details.lic.pefng ? 'Yes' : 'No' }}
+                      </md-switch>
+                    </div>
+                  </div>
+                  <div class="form-group row" ng-if="plan.details.vendor === 'Aruba HPE'">
+                    <div class="col-sm-6 text-right"><label class="form-control-label">RFP License?</label></div>
+                    <div class="col-sm-6">
+                      <md-switch aria-label="RFP licences" ng-model="plan.details.lic.rfp">
+                        {{ plan.details.lic.rfp ? 'Yes' : 'No' }}
+                      </md-switch>
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <div class="col-sm-offset-2 col-sm-10">
+                      <button type="submit" class="btn btn-primary" ng-click="updateLicenses(); savePlanProperties();">Save</button>
+                      <button class="btn btn-default pull-right" ng-click="toggleEdit('controllers')">Cancel</button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+  </div>
+</div>
+
+<!-- Build Report -->
+<div class="panel-body overlay-sheet sheet-bg" ng-show="build_report">
+
+  <div class="row">
+    <div class="col-lg-12">
+      <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <ul class="nav">
+          <li class="nav-item">
+						<a class="nav-link" ng-click="buildReport()"><i class="glyphicon glyphicon-backward"></i> Back</a>
+					</li>
+          <li class="nav-item">
+            <a class="nav-link" ng-class="{'active': !br_stage}" href>Cover</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href>Floors</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href>BOM</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href>Notes</a>
+          </li>
+        </ul>
+      </nav>
     </div>
 
-    <div class="row">
+    <div class="panel-group col-lg-12" id="br_cover" role="tablist" aria-multiselectable="true">
+      <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="br_cover">
+          <h4 class="panel-title">
+            <a role="button" data-toggle="collapse" data-parent="#br_cover" href="#collapseBRProject" aria-expanded="true" aria-controls="collapseBRProject">
+              Project Details
+            </a>
+          </h4>
+        </div>
+        <div id="collapseBRProject" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="br_cover">
+          <div class="panel-body">
+            <div class="col-lg-8">
+              <div class="form-group row">
+                <label class="col-sm-4 ptop5 text-right form-control-label">Client Name</label>
+                <div class="col-sm-8"><input type="text" ng-model="project.details.client.name" readonly class="form-control" placeholder="Client Name" tabindex="0" aria-invalid="false"></div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-4 ptop5 text-right form-control-label">Project Name</label>
+                <div class="col-sm-8"><input type="text" ng-model="project.title" readonly class="form-control" placeholder="Project Name" tabindex="0" aria-invalid="false"></div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-4 ptop5 text-right form-control-label">Site Name</label>
+                <div class="col-sm-8"><input type="text" ng-model="site.name" readonly class="form-control" placeholder="Site Name" tabindex="0" aria-invalid="false"></div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-4 ptop5 text-right form-control-label">Building Address</label>
+                <div class="col-sm-8"><input type="text" ng-model="building.details.address" class="form-control" placeholder="Building Address Line 1" tabindex="0" aria-invalid="false"></div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-4 ptop5 text-right form-control-label">Building City</label>
+                <div class="col-sm-8"><input type="text" ng-model="building.details.city" class="form-control" placeholder="City" tabindex="0" aria-invalid="false"></div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-4 ptop5 text-right form-control-label">Building State</label>
+                <div class="col-sm-8"><input type="text" ng-model="building.details.state" class="form-control" placeholder="State" tabindex="0" aria-invalid="false"></div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-4 ptop5 text-right form-control-label">Building Zipcode</label>
+                <div class="col-sm-8"><input type="text" ng-model="building.details.zipcode" class="form-control" placeholder="Zip" tabindex="0" aria-invalid="false"></div>
+              </div>
+            </div>
+            <div class="col-sm-1 center">
+              <div class="form-group row">
+                <input type="checkbox" class="check" checked>
+              </div>
+              <div class="form-group row">
+                <input type="checkbox" class="check" checked>
+              </div>
+              <div class="form-group row">
+                <input type="checkbox" class="check" checked>
+              </div>
+              <div class="form-group row">
+                <input type="checkbox" class="check" checked>
+              </div>
+              <div class="form-group row">
+                <input type="checkbox" class="check" checked>
+              </div>
+              <div class="form-group row">
+                <input type="checkbox" class="check" checked>
+              </div>
+              <div class="form-group row">
+                <input type="checkbox" class="check" checked>
+              </div>
+              <div class="form-group row">
+                <input type="checkbox" class="check" checked>
+              </div>
+            </div>
+            <div class="col-sm-3">
+              <img class="logoselect" ng-src="{{ project.details.client.logo }}" alt="Client Logo">
+              <img class="logoselect" ng-src="{{ project.details.msp.logo }}" alt="Partner Logo">
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <div class="panel-group col-lg-12" id="br_location" role="tablist" aria-multiselectable="true">
+      <div class="panel-default panel panel-open" is-open="sma.details">
+        <div class="panel-heading" role="tab" id="br_location">
+          <h4 class="panel-title">
+            <span class="ng-binding">
+              <a role="button" data-toggle="collapse" data-parent="#br_location" href="#collapseBRLocation" aria-expanded="true" aria-controls="collapseBRLocation">
+                Location Contacts
+              </a>
+            </span>
+          </h4>
+        </div>
+        <div id="collapseBRLocation" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="br_location">
+          <div class="panel-body">
+            <table class="pjtable">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Position</th>
+                  <th>Phone</th>
+                  <th>Email</th>
+                  <th class="center icon">Remove</th>
+                </tr>
+              </thead>
+              <tr>
+                <td><input type="text" ng-model="" class="form-control input-sm" placeholder="{value}" tabindex="0" aria-invalid="false"></td>
+                <td><input type="text" ng-model="" class="form-control input-sm" placeholder="{value}" tabindex="0" aria-invalid="false"></td>
+                <td><input type="text" ng-model="" class="form-control input-sm" placeholder="{value}" tabindex="0" aria-invalid="false"></td>
+                <td><input type="text" ng-model="" class="form-control input-sm" placeholder="{value}" tabindex="0" aria-invalid="false"></td>
+                <td class="center "><i class="glyphicon glyphicon-remove"></td>
+              </tr>
+              <tr>
+                <td><input type="text" ng-model="" class="form-control input-sm" placeholder="{value}" tabindex="0" aria-invalid="false"></td>
+                <td><input type="text" ng-model="" class="form-control input-sm" placeholder="{value}" tabindex="0" aria-invalid="false"></td>
+                <td><input type="text" ng-model="" class="form-control input-sm" placeholder="{value}" tabindex="0" aria-invalid="false"></td>
+                <td><input type="text" ng-model="" class="form-control input-sm" placeholder="{value}" tabindex="0" aria-invalid="false"></td>
+                <td class="center "><i class="glyphicon glyphicon-remove"></td>
+              </tr>
+            </table>
+            <button type="button" class="btn btn-primary btn-sm" ng-click="addrow(needs.to.be.scripted);" tabindex="0">Add Contact</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-group col-lg-12" id="br_author" role="tablist" aria-multiselectable="true">
+      <div class="panel-default panel panel-open" is-open="sma.details">
+        <div class="panel-heading" role="tab" id="br_author">
+          <h4 class="panel-title">
+            <a role="button" data-toggle="collapse" data-parent="#br_author" href="#collapseBRAuthor" aria-expanded="true" aria-controls="collapseBRAuthor">
+              Prepared by
+            </a>
+          </h4>
+        </div>
+        <div id="collapseBRLocation" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="br_author">
+          <div class="panel-body">
+            <table class="pjtable">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Title</th>
+                  <th class="center icon">Remove</th>
+                </tr>
+              </thead>
+              <tr>
+                <td><input type="text" ng-model="" class="form-control input-sm" placeholder="{value}" tabindex="0" aria-invalid="false"></td>
+                <td><input type="text" ng-model="" class="form-control input-sm" placeholder="{value}" tabindex="0" aria-invalid="false"></td>
+                <td><input type="text" ng-model="" class="form-control input-sm" placeholder="{value}" tabindex="0" aria-invalid="false"></td>
+                <td class="center "><i class="glyphicon glyphicon-remove"></td>
+              </tr>
+              <tr>
+                <td><input type="text" ng-model="" class="form-control input-sm" placeholder="{value}" tabindex="0" aria-invalid="false"></td>
+                <td><input type="text" ng-model="" class="form-control input-sm" placeholder="{value}" tabindex="0" aria-invalid="false"></td>
+                <td><input type="text" ng-model="" class="form-control input-sm" placeholder="{value}" tabindex="0" aria-invalid="false"></td>
+                <td class="center "><i class="glyphicon glyphicon-remove"></td>
+              </tr>
+              <tr>
+                <td><input type="text" ng-model="" class="form-control input-sm" placeholder="{value}" tabindex="0" aria-invalid="false"></td>
+                <td><input type="text" ng-model="" class="form-control input-sm" placeholder="{value}" tabindex="0" aria-invalid="false"></td>
+                <td><input type="text" ng-model="" class="form-control input-sm" placeholder="{value}" tabindex="0" aria-invalid="false"></td>
+                <td class="center "><i class="glyphicon glyphicon-remove"></td>
+              </tr>
+            </table>
+            <button type="button" class="btn btn-primary btn-sm" ng-click="addrow(needs.to.be.scripted);" tabindex="0">Add Personnel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-12 text-right">
+      <button type="button" class="btn btn-primary" ng-click="brPage('floors')">Next</button>
+    </div>
+  </div>
 </div>
 
 <!-- context menu -->

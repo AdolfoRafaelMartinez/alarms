@@ -463,7 +463,80 @@ table.settings td {
 	padding: 5px 0px 0px 5px;
 }
 
-table.settings tr:hover {
-	background: #cccccc;
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  background: black;
 }
+
+.nav > li > a {
+  color: gray;
+  font-size: large;
+}
+
+.nav > li > a.active {
+	color: white;
+}
+
+.nav > li > a:hover, .nav > li > a:focus {
+  background-image: linear-gradient(to bottom, #5cb85c 0%, #419641 100%);
+	background-repeat: repeat-x;
+	border-color: #3e8f3e;
+	color: white;
+}
+
+.logoselect {
+	max-width: 200px;
+	max-height: 200px;
+}
+
+.floors .ctrlIcon {
+  color: #11a04c;
+  position: absolute;
+  left: 2px;
+  top: 0;
+  z-index: 2;
+  zoom: 2;
+}
+
+table.pjtable {
+  background-color: #FFFFFF;
+  border: 1px solid #cccccc;
+  width: 100%;
+  text-align: left;
+  border-collapse: collapse;
+  margin-bottom: 5px;
+  border-radius: 4px; /* This won't work on tables in bootstrap, but maybe in future versions? */
+}
+table.pjtable td, table.pjtable th {
+  padding: 3px 5px;
+}
+table.pjtable tbody td {
+  font-size: 13px;
+  color: #333333;
+}
+table.pjtable tr:nth-child(even) {
+  background: #EEEEEE;
+}
+
+table.pjtable thead {
+  background: #CCCCCC;
+  background: -moz-linear-gradient(top, #d9d9d9 0%, #d1d1d1 66%, #CCCCCC 100%);
+  background: -webkit-linear-gradient(top, #d9d9d9 0%, #d1d1d1 66%, #CCCCCC 100%);
+  background: linear-gradient(to bottom, #d9d9d9 0%, #d1d1d1 66%, #CCCCCC 100%);
+}
+table.pjtable thead th {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333333;
+}
+
+.center {
+  text-align: center;
+}
+
+.icon {
+	width: 75px;
+}
+
 

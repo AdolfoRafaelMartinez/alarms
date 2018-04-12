@@ -26,10 +26,13 @@
 			{{ plan.details.city }}, {{ plan.details.zipcode }}<br />
 		</div>
 
-		<span>Floor:</span> {{ plan.floor || 'N/A' }}<br />
-		<span> Vendor: {{ plan.details.vendor }}</span><br />
-		<span>AP count:</span> {{ getTotalAPs() }}<br />
-		<span>AM count:</span> {{ getTotalAMs() }}
+    <div>
+      <span>Floor:</span> {{ plan.floor || 'N/A' }}<br />
+      <span> Vendor: {{ plan.details.vendor }}</span><br />
+      <span>AP count:</span> {{ getTotalAPs() }}<br />
+      <span>AM count:</span> {{ getTotalAMs() }}</span>
+    </div>
+    <div class="col-sm-8">Controller:</div><div class="col-sm-4"><md-switch aria-label="HA" ng-model="plan.details.ctrlPresent"></md-switch></div>
 
 		<!-- uib-accordion-group class="panel-inner" is-open="apgroups.open">
 			<uib-accordion-heading>
@@ -130,7 +133,7 @@
 					<img src="modules/plans/images/icons/MDFIDF-W.png">
 				</md-button>
 				<md-button ng-click="show_walls=false; selectTool('ap')" aria-label="ap-placement-tool" ng-class="{'selected': mouse_mode === 'ap'}">
-					<button class="btn btn-view btn-success full text-justify" ng-disabled="!planReady" ng-click="report()">View</button>
+					<button class="btn btn-view btn-success full text-justify" ng-disabled="!planReady" ng-click="selectView('walls')">View</button>
 				</md-button>
 			</div>
 			<div ng-show="show_walls">
@@ -147,7 +150,7 @@
 		<uib-accordion-heading>
 			Reporting <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': sma.reporting, 'glyphicon-chevron-right': !sma.reporting}"></i>
 		</uib-accordion-heading>
-		<button class="btn btn-success full text-justify" ng-disabled="!planReady" ng-click="report()"><i class="glyphicon glyphicon-save-file"></i> Generate Report</button>
+		<button class="btn btn-success full text-justify" ng-disabled="!planReady" ng-click="buildReport()"><i class="glyphicon glyphicon-save-file"></i> Build Report</button>
 		<!--button class="btn btn-success full text-justify" ng-disabled="!planReady" ng-click="signal()"><i class="glyphicon glyphicon-save-file"></i> Signal</button -->
 	</uib-accordion-group>
 </uib-accordion>

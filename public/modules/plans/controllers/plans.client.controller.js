@@ -231,6 +231,7 @@ angular.module('plans')
       $scope.togglePlanProperties = function () {
         contextMenu.close()
         $scope.plan_properties = !$scope.plan_properties
+        $scope.build_report = false
       }
 
       $scope.savePlan = function () {
@@ -907,6 +908,12 @@ angular.module('plans')
       $scope.selectBuilding = bldg => {
         $scope.selected.building = _.find(_.get($scope.selected, 'site.buildings'), b => b._id === bldg._id)
         return $scope.selected.building
+      }
+
+      $scope.buildReport = function() {
+        contextMenu.close()
+        $scope.build_report = !$scope.build_report
+        $scope.plan_properties = false
       }
 
       $scope.report = function () {
