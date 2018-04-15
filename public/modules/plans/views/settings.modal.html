@@ -1,69 +1,104 @@
 <div class="modal fade" style="display: block;">
-	<div class="modal-dialog settings">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" ng-click="close('Cancel')" data-dismiss="modal" id="closeSettings" aria-hidden="true" tabindex="0">
-					<i class="glyphicon glyphicon-remove"></i>
-				</button>
-				<input type="text" ng-model="item.title" class="form-control" placeholder="Project Name" tabindex="0">
-			</div>
-			<div class="modal-body">
-				<form>
-					<!-- Project Details -->
-					<div class="panel-group">
-						<div class="panel-default panel panel-open">
-							<div class="panel-heading">
-								<h4 class="panel-title">
-									<span> <strong>Project Details</strong> </span>
-								</h4>
-							</div>
+  <div class="modal-dialog settings">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" ng-click="close('Cancel')" data-dismiss="modal" id="closeSettings" aria-hidden="true" tabindex="0">
+          <i class="glyphicon glyphicon-remove"></i>
+        </button>
+        <input type="text" ng-model="item.title" class="form-control" placeholder="Project Name" tabindex="0" ng-if="getType()=='project'">
+        <input type="text" ng-model="item.name" class="form-control" placeholder="Site Name" tabindex="0" ng-if="getType()=='site'">
+        <input type="text" ng-model="item.name" class="form-control" placeholder="Building Name" tabindex="0" ng-if="getType()=='bldg'">
+      </div>
+      <div class="modal-body">
+        <form>
+          <!-- Project Details -->
+          <div class="panel-group" ng-if="getType()=='project'">
+            <div class="panel-default panel panel-open">
+              <div class="panel-heading">
+                <h4 class="panel-title">
+                  <span> <strong>Project Details</strong> </span>
+                </h4>
+              </div>
 
-							<div class="panel-body">
-								<div>
-									<div class="form-group row">
-										<div class="col-sm-12">
+              <div class="panel-body">
+                <div>
+                  <div class="form-group row">
+                    <div class="col-sm-12">
                       <label for="client_name">Client Name</label>
-											<input type="text" ng-model="item.details.client.name" class="form-control" id="client_name" placeholder="Client Name" tabindex="0">
-										</div>
-									</div>
-									<div class="form-group row">
-										<div class="col-sm-12">
+                      <input type="text" ng-model="item.details.client.name" class="form-control" id="client_name" placeholder="Client Name" tabindex="0">
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <div class="col-sm-12">
                       <label for="partner_name">Partner (MSP)</label>
-											<input type="text" ng-model="item.details.msp.name" class="form-control" id="partner_name" placeholder="Partner Name" tabindex="0">
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<!-- Team Details -->
-					<div class="panel-group">
-						<div class="panel-default panel panel-open">
-							<div class="panel-heading">
-								<h4 class="panel-title">
-                  <span class=""><strong>Team Details</strong></span>
-								</h4>
-							</div>
+                      <input type="text" ng-model="item.details.msp.name" class="form-control" id="partner_name" placeholder="Partner Name" tabindex="0">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Building Details -->
+          <div class="panel-group" ng-if="getType()=='bldg'">
+            <div class="panel-default panel panel-open">
+              <div class="panel-heading">
+                <h4 class="panel-title">
+                  <span> <strong>Building Details</strong> </span>
+                </h4>
+              </div>
 
-							<div class="panel-body">
-								<div ng-hide="pp_edit.personnel">
-									<table class="settings" ng-if="item.details.personnel">
-										<tr class="header">
-											<td>Name</td>
-											<td>Email</td>
-											<td>Title</td>
-											<td class="center icon">Remove</td>
-										</tr>
+              <div class="panel-body">
+                <div>
+                  <div class="form-group row">
+                    <div class="col-sm-12">
+                      <label for="building_address">Building Address</label>
+                      <input type="text" ng-model="item.details.address" class="form-control" id="building_address" placeholder="Building Address" tabindex="0">
+                    </div>
+                    <div class="col-sm-8">
+                      <label for="building_city">City</label>
+                      <input type="text" ng-model="item.details.city" class="form-control" id="building_city" placeholder="City" tabindex="0">
+                    </div>
+                    <div class="col-sm-2">
+                      <label for="building_state">State</label>
+                      <input type="text" ng-model="item.details.state" class="form-control" id="building_state" placeholder="State" tabindex="0">
+                    </div>
+                    <div class="col-sm-2">
+                      <label for="building_zipcode">Zipcode</label>
+                      <input type="text" ng-model="item.details.zipcode" class="form-control" id="building_zipcode" placeholder="Zipcode" tabindex="0">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Team Details -->
+          <div class="panel-group" ng-if="type='project'">
+            <div class="panel-default panel panel-open">
+              <div class="panel-heading">
+                <h4 class="panel-title">
+                  <span class=""><strong>Team Details</strong></span>
+                </h4>
+              </div>
+
+              <div class="panel-body">
+                <div ng-hide="pp_edit.personnel">
+                  <table class="settings" ng-if="item.details.personnel">
+                    <tr class="header">
+                      <td>Name</td>
+                      <td>Email</td>
+                      <td>Title</td>
+                      <td class="center icon">Remove</td>
+                    </tr>
                     <tr ng-repeat="(personnelIndex, personnel) in item.details.personnel track by $index" ng-click="editPersonnel(personnel)">
-											<td><em ng-bind="personnel.name"></em></td>
-											<td><em ng-bind="personnel.email"></em></td>
-											<td><em ng-bind="personnel.title"></em></td>
+                      <td><em ng-bind="personnel.name"></em></td>
+                      <td><em ng-bind="personnel.email"></em></td>
+                      <td><em ng-bind="personnel.title"></em></td>
                       <td class="center">
                         <a href ng-click="askDeletePersonnel(personnelIndex, $event)"> <i class="glyphicon glyphicon-remove"></i> </a>
                       </td>
                     </tr>
-									</table>
-								</div>
+                  </table>
+                </div>
                 <button type="button" class="btn btn-primary btn-sm" ng-click="addPersonnel($event)" tabindex="0">Add Personnel</button>
                 <div class="form-group edit-contact" ng-show="pp_edit.personnel">
                   <form>
@@ -89,40 +124,40 @@
                     </div>
                   </form>
                 </div>
-							</div>
+              </div>
             </div>
-					</div>
-					<!-- Contact Details -->
-					<div class="panel-group">
-						<div class="panel-default panel panel-open">
-							<div class="panel-heading">
-								<h4 class="panel-title">
+          </div>
+          <!-- Contact Details -->
+          <div class="panel-group">
+            <div class="panel-default panel panel-open">
+              <div class="panel-heading">
+                <h4 class="panel-title">
                   <span class=""><strong>Contact Details</strong></span>
-								</h4>
-							</div>
+                </h4>
+              </div>
 
-							<div class="panel-body">
-								<div ng-hide="pp_edit.contact">
-									<table class="settings" ng-if="item.details.contacts">
-										<tr class="header">
-											<td>Name</td>
-											<td>Position</td>
-											<td>Phone</td>
-											<td>Email</td>
-											<td class="center icon">Remove</td>
-										</tr>
+              <div class="panel-body">
+                <div ng-hide="pp_edit.contact">
+                  <table class="settings" ng-if="item.details.contacts">
+                    <tr class="header">
+                      <td>Name</td>
+                      <td>Position</td>
+                      <td>Phone</td>
+                      <td>Email</td>
+                      <td class="center icon">Remove</td>
+                    </tr>
                     <tr ng-repeat="(contactIndex, contact) in item.details.contacts track by $index" ng-click="editContact(contact)">
-											<td><em ng-bind="contact.name"></em></td>
-											<td><em ng-bind="contact.position"></em></td>
-											<td><em ng-bind="contact.phone"></em></td>
-											<td><em ng-bind="contact.email"></em></td>
+                      <td><em ng-bind="contact.name"></em></td>
+                      <td><em ng-bind="contact.position"></em></td>
+                      <td><em ng-bind="contact.phone"></em></td>
+                      <td><em ng-bind="contact.email"></em></td>
                       <td class="center">
                         <a href ng-click="askDeleteContact(contactIndex, $event)"> <i class="glyphicon glyphicon-remove"></i> </a>
                       </td>
                     </tr>
-									</table>
-									<button type="button" class="btn btn-primary btn-sm" ng-click="addContact($event)" tabindex="0">Add Contact</button>
-								</div>
+                  </table>
+                  <button type="button" class="btn btn-primary btn-sm" ng-click="addContact($event)" tabindex="0">Add Contact</button>
+                </div>
                 <div class="form-group edit-contact" ng-show="pp_edit.contact">
                   <form>
                     <div class="col-lg-12 plan-property-item">
@@ -151,24 +186,34 @@
                     </div>
                   </form>
                 </div>
-							</div>
-						</div>
-					</div>
-					<!-- Attachments -->
-					<div class="panel-group">
-						<div class="panel-default panel panel-open">
-							<div class="panel-heading">
-								<h4 class="panel-title">
+              </div>
+            </div>
+          </div>
+          <!-- Building Controller -->
+
+          <!-- Building Licenses -->
+
+          <!-- Building Licenses -->
+
+          <!-- Attachments -->
+          <div class="panel-group" ng-if="type='project'">
+            <div class="panel-default panel panel-open">
+              <div class="panel-heading">
+                <h4 class="panel-title">
                   <span class=""><strong>Attachments</strong></span>
-								</h4>
-							</div>
+                </h4>
+              </div>
 
               <div class="actionf">
                 <div class="pull-right" style="padding: 20px"><input type="search" ng-model="fileSearch" placeholder="search..." /></div>
-                <form id="fileupload" data-ng-controller="pjFileUploadController"
+                <form id="fileupload" data-ng-controller="pjFileUploadController" 
+                    data-item-type="{{ getType() }}" data-accept-extensions="{{ getExtensions() }}"
                     action="/upload" method="POST" enctype="multipart/form-data" data-file-upload="options" 
                     ng-class="{'fileupload-processing': processing() || loadingFiles}" style="padding: 20px 20px 0;">
-                  <input type="hidden" name="project" value="{{ item._id }}">
+
+                  <input type="hidden" name="project" value="{{ getProjectId() }}">
+                  <input type="hidden" name="site" value="{{ getSiteId() }}">
+                  <input type="hidden" name="bldg" value="{{ getBldgId() }}">
 
                   <button class="fileinput-button" ng-class="{disabled: disabled}">
                     <i class="glyphicon large glyphicon-cloud-upload"></i>
@@ -187,36 +232,37 @@
                     </div>
                     <strong data-ng-show="file.error" class="error text-danger">{{file.error}}</strong>
                   </div>
+
                 </form>
               </div>
 
-							<div class="panel-body">
-								<div>
-									<table class="settings" ng-if="files.length">
-										<tr class="header">
-											<td>File Name</td>
-											<td>Date Added</td>
-											<td class="center icon">Remove</td>
-										</tr>
-										<tr ng-repeat="file in files | filter: fileSearch">
+              <div class="panel-body">
+                <div>
+                  <table class="settings" ng-if="files.length">
+                    <tr class="header">
+                      <td>File Name</td>
+                      <td>Date Added</td>
+                      <td class="center icon">Remove</td>
+                    </tr>
+                    <tr ng-repeat="file in files | filter: fileSearch">
                       <td><a target="_blank" href="/usermedia/{{ item._id }}/{{ file.name }}">{{ file.name }}</a></td>
-                      <td>{{ file.time }}</td>
+                      <td>{{ file.time | date : 'M/dd/yy, HH:mm'}}</td>
                       <td class="pull-right">
                         <a href ng-click="askDeleteFile(file, $event)"> <i class="glyphicon glyphicon-remove"></i> </a>
                       </td>
-										</tr>
-									</table>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="form-group">
-						<div class="text-right">
-							<button type="submit" class="btn btn-primary" ng-click="save(true)" tabindex="0">Save</button>
-						</div>
-					</div>
-				</form>
-			</div>
-		</div>
-	</div>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="text-right">
+              <button type="submit" class="btn btn-primary" ng-click="save(true)" tabindex="0">Save</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>

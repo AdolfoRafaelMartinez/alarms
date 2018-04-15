@@ -8,19 +8,6 @@
 		</div>
 	</div>
 
-	<div class="orphan-plans" ng-if="show_orphans">
-		<div data-ng-repeat="plan in plans" class="list-group-item" data-drag="true" jqyoui-draggable="{animate: true}" data-jqyoui-options="{helper: 'clone', revert: 'invalid'}" ng-click="gotoPlan(plan)">
-			<small class="list-group-item-text">
-				<span data-ng-bind="plan.created | date:'mediumDate'"></span>
-			</small>
-			<img ng-src="/uploads/{{ plan.thumb }}" /><br />
-			<span class="list-group-item-heading" data-ng-bind="plan.title"></span>
-		</div>
-		<div class="alert alert-warning text-center" data-ng-if="plans.$resolved && !plans.length">
-			No orphan plans.
-		</div>
-	</div>
-
 	<div class="list-group projects" ng-class="{'v1': show_orphans}">
 		<h2>Projects <span ng-show="projects.length">({{ projects.length }})</span></h2>
 		<div>

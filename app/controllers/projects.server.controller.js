@@ -72,13 +72,21 @@ exports.read = function (req, res) {
 }
 
 exports.files = function(req, res) {
-  var path = __dirname + '/../../public/usermedia/' + req.project._id
+  var path = Path.join(__dirname, '/../../public/usermedia/', req.project._id.toString(), req.query.siteId || '', req.query.bldgId || '')
+  var files
 
-  var files = fs
-    .readdirSync(path)
-    .map(v => Object({ name: v, time: fs.statSync(Path.join(path, v)).mtime.toISOString() }))
+  try {
+    files = fs
+      .readdirSync(path)
+      .map(v => {
+        let fstat = fs.statSync(Path.join(path, v))
+        return fstat.isDirectory() ? '' : { name: v, time: fstat.mtime.toISOString() }
+      })
+  } catch (err) {
+    files = []
+  }
 
-  res.json(files)
+  res.json(_.filter(files))
 }
 
 /**

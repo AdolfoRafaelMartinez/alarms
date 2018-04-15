@@ -1,17 +1,25 @@
 'use strict'
 
 angular.module('plans')
-	.controller('settingsModalController', ['$scope', 'close', 'item', 'type', 'ModalService', 'Vendors', 'APs', 'Mounts', 'Controllers', 'Files',
-		function ($scope, close, item, type, ModalService, Vendors, APs, Mounts, Controllers, Files) {
+  .controller('settingsModalController', ['$scope', 'close', 'item', 'type', 'projectId', 'siteId', 'bldgId',
+              'ModalService', 'Vendors', 'APs', 'Mounts', 'Controllers', 'Files',
+    function ($scope, close, item, type, projectId, siteId, bldgId, 
+              ModalService, Vendors, APs, Mounts, Controllers, Files) {
+
 			$scope.type = type
 			$scope.item = _.cloneDeep(item)
 			$scope.original = item
+      console.log('start settingsModalController', type, bldgId)
 
 			$scope.pp_edit = {}
 
 			$scope.getItem = function() {
 				return $scope.item
 			}
+
+      $scope.getType = function() {
+        return type
+      }
 
 			$scope.addContact = function ($event) {
 				$event.stopPropagation()
@@ -144,14 +152,41 @@ angular.module('plans')
         })
 			}
 
+      $scope.getProjectId = function() {
+        return projectId
+      }
+
+      $scope.getSiteId = function() {
+        return siteId
+      }
+
+      $scope.getBldgId = function() {
+        return bldgId
+      }
+
+      function buildQuery() {
+        return { projectId: projectId, siteId: siteId, bldgId: bldgId }
+      }
+
+      $scope.getExtensions = function() {
+        let map = {
+          project: '',
+          site: '',
+          bldg: '(\.|\/)(gif|jpe?g|png|ibw|svp|esx)$'
+        }
+
+        return map[ type ]
+      }
+
+      $scope.acceptExtensions = $scope.getExtensions()
+
       $scope.uploadComplete = function(file) {
-        console.log('uploadComplete', file)
-        $scope.files = Files.query({projectId: $scope.item._id})
+        $scope.files = Files.query(buildQuery())
       }
 
 			$scope.getAPs         = search => APs.query({search: search}).$promise
 			$scope.getControllers = search => Controllers.query({search: search}).$promise
 			$scope.getMounts      = search => Mounts.query({search: search}).$promise
 			$scope.vendors        = Vendors.query()
-			$scope.files          = Files.query({projectId: $scope.item._id})
+			$scope.files          = Files.query(buildQuery())
 		}])

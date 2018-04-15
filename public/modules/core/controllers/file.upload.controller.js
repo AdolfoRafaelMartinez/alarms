@@ -19,10 +19,21 @@ angular.module('core')
 .controller('pjFileUploadController', ['$scope', '$attrs', 'Drawing', '$timeout', '$http', '$filter', '$window',
 function($scope, $attrs, Drawing, $timeout, $http, $filter, $window) {
   const url = '/upload';
-  $scope.options = {
-    url: url
-  };
+  $timeout(function() { 
+    $scope.options = {
+      url: url,
+      acceptFileTypes: new RegExp($attrs.acceptExtensions, 'i')
+    };
+  })
+
 	$scope.percentDone = 0;
+
+  $scope.$on('fileuploadprocessfail', function(fu, data) {
+    if (data.files.error) {
+      alert(data.files[0].error)
+    }
+    return true
+  })
 
   $scope.$on('fileuploaddone', function(files, data){
     var url = data._response.result.files[0].url;

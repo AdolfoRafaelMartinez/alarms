@@ -539,10 +539,12 @@ angular.module('plans')
             item = $scope.selectBuilding(item)
             break
         }
+        let siteId = _.get($scope.selected, 'site._id')
+        let bldgId = _.get($scope.selected, 'building._id')
         ModalService.showModal({
           templateUrl: 'modules/plans/views/settings.modal.html',
           controller: 'settingsModalController',
-          inputs: { item: item, type: type }
+          inputs: { item: item, type: type, projectId: $scope.selected.project._id, siteId: siteId, bldgId: bldgId }
         })
           .then(function (modal) {
             modal.element.modal()
