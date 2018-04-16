@@ -1095,14 +1095,14 @@ angular.module("core").service("Drawing", ["contextMenu", "$q", "$http", "$timeo
         const img = new Image();
         img.src = relURL;
         img.setAttribute("crossOrigin", "anonymous");
-        img.onload = (event) => {
+        img.onload = function(event) {
           const t = event.target;
           const f = new createjs.Bitmap(t);
           f.x = 0;
           f.y = 0;
           f.regX = 0;
           f.regY = 0;
-          plan.floor_width_px = this.width;
+          plan.floor_width_px = this.width || canvas.width;
           const scaleX = canvas.width / this.width;
           const scaleY = canvas.height / this.height;
           if (scaleX > scaleY) {

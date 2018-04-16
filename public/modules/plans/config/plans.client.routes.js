@@ -17,5 +17,13 @@ angular.module('plans').config(['$stateProvider',
         url: '/building/:bldgID',
         templateUrl: 'modules/plans/views/view-plan.client.view.html'
       })
+      .state('listPlansSiteSelect', {
+        url: '/:projectName/:siteName',
+        templateUrl: 'modules/plans/views/list-plans.client.view.html'
+      })
+      .state('listPlansProjectSelect', {
+        url: '/:projectName',
+        templateUrl: 'modules/plans/views/list-plans.client.view.html'
+      })
   }
 ])

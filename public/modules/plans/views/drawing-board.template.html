@@ -437,22 +437,15 @@
                   <th class="center icon">Remove</th>
                 </tr>
               </thead>
-              <tr>
-                <td><input type="text" ng-model="" class="form-control input-sm" placeholder="{value}" tabindex="0" aria-invalid="false"></td>
-                <td><input type="text" ng-model="" class="form-control input-sm" placeholder="{value}" tabindex="0" aria-invalid="false"></td>
-                <td><input type="text" ng-model="" class="form-control input-sm" placeholder="{value}" tabindex="0" aria-invalid="false"></td>
-                <td><input type="text" ng-model="" class="form-control input-sm" placeholder="{value}" tabindex="0" aria-invalid="false"></td>
-                <td class="center "><i class="glyphicon glyphicon-remove"></td>
-              </tr>
-              <tr>
-                <td><input type="text" ng-model="" class="form-control input-sm" placeholder="{value}" tabindex="0" aria-invalid="false"></td>
-                <td><input type="text" ng-model="" class="form-control input-sm" placeholder="{value}" tabindex="0" aria-invalid="false"></td>
-                <td><input type="text" ng-model="" class="form-control input-sm" placeholder="{value}" tabindex="0" aria-invalid="false"></td>
-                <td><input type="text" ng-model="" class="form-control input-sm" placeholder="{value}" tabindex="0" aria-invalid="false"></td>
+              <tr ng-repeat="contact in building.details.contacts">
+                <td><input type="text" ng-model="contact.name" class="form-control input-sm" placeholder="John Smith" tabindex="0" aria-invalid="false"></td>
+                <td><input type="text" ng-model="contact.position" class="form-control input-sm" placeholder="Engineer" tabindex="0" aria-invalid="false"></td>
+                <td><input type="text" ng-model="contact.phone" class="form-control input-sm" placeholder="123-123-1234" tabindex="0" aria-invalid="false"></td>
+                <td><input type="text" ng-model="contact.email" class="form-control input-sm" placeholder="email@domain.com" tabindex="0" aria-invalid="false"></td>
                 <td class="center "><i class="glyphicon glyphicon-remove"></td>
               </tr>
             </table>
-            <button type="button" class="btn btn-primary btn-sm" ng-click="addrow(needs.to.be.scripted);" tabindex="0">Add Contact</button>
+            <button type="button" class="btn btn-primary btn-sm" ng-click="addContact()" tabindex="0">Add Contact</button>
           </div>
         </div>
       </div>

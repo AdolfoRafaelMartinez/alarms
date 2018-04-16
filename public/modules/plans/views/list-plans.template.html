@@ -21,7 +21,7 @@
 					</form>
 				</div>
 			</div>
-			<div data-ng-repeat="project in projects | filter: search | orderBy: sort.projects" ng-click="selectProject(project)" class="list-group-item" role="button"
+      <div data-ng-repeat="project in projects | filter: search | orderBy: sort.projects" ng-click="selectProject(project)" class="list-group-item" role="button" id="{{ project._id }}"
 				 ng-class="{'shadowItem': selected.project && project != selected.project, 'selectedItem': project == selected.project}">
 
 				<div class="topright text-right">
@@ -57,7 +57,7 @@
 					</form>
 				</div>
 			</div>
-			<div data-ng-repeat="site in selected.project.sites | filter: search | orderBy: sort.sites" ng-click="selectSite(site)" class="list-group-item"
+      <div data-ng-repeat="site in selected.project.sites | filter: search | orderBy: sort.sites" ng-click="selectSite(site)" class="list-group-item" id="{{ site._id }}"
 				   ng-class="{'shadowItem': selected.site && site._id != selected.site._id, 'selectedItem': site._id == selected.site._id}" >
 
 			   <div class="topright text-right">
@@ -92,7 +92,7 @@
 					</form>
 				</div>
 			</div>
-			<div data-ng-repeat="bldg in selected.site.buildings | filter: search | orderBy: sort.buildings" class="list-group-item" ng-click="showBuilding(bldg)" data-drop="true" jqyoui-droppable="{onDrop: 'onOrphanDrop'}">
+      <div data-ng-repeat="bldg in selected.site.buildings | filter: search | orderBy: sort.buildings" class="list-group-item" ng-click="showBuilding(bldg)" data-drop="true" jqyoui-droppable="{onDrop: 'onOrphanDrop'}" id="{{ bldg._id }}">
 
 				<div class="topright text-right">
 					<a href ng-click="askDeleteBuilding(bldg, $event)"><i class="glyphicon glyphicon-remove"></i></a>

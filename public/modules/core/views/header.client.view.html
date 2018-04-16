@@ -6,7 +6,17 @@
 			<span class="icon-bar"></span>
 			<span class="icon-bar"></span>
 		</button>
+      <div ng-if="!breadcrumbs[2]" class="breadcrumbs">
         <a href="/#!/" class="navbar-brand"><img src="/modules/core/img/brand/pJlogo@4x.png" /></a>
+      </div>
+      <div ng-if="breadcrumbs[2]" class="breadcrumbs">
+        <div><a href="/#!/" class="navbar-brand"><img src="/modules/core/img/brand/pJlogoFrog@4x.png" /></a></div>
+        <div ng-repeat="crumb in breadcrumbs">
+          <a ng-if="crumb.href" href="/#!/{{ crumb.href }}" class="navbar-brand">{{ crumb.title }}</a>
+          <span ng-if="!crumb.href" class="navbar-brand">{{ crumb.title }}</span>
+          <span ng-if="crumb.href" class="navbar-brand grey"><i class="glyphicon glyphicon-triangle-right"></i></span>
+        </div>
+      </div>
 	</div>
 	<nav class="collapse navbar-collapse" collapse="!isCollapsed" role="navigation">
 		<ul class="nav navbar-nav" data-ng-if="menu.shouldRender(authentication.user);">

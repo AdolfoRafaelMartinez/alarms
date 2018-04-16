@@ -13,6 +13,28 @@ header {
 	padding-right: 20px;
 }
 
+header .breadcrumbs div {
+  display: inline-block;
+  color: white;
+}
+
+header .breadcrumbs span.navbar-brand {
+  color: white;
+}
+
+header .breadcrumbs span.navbar-brand.grey {
+  color: #9d9d9d;
+}
+
+header .breadcrumbs a.navbar-brand {
+  color: ##9d9d9d;
+  text-decoration: none;
+}
+
+header .breadcrumbs div a:active {
+  color: white;
+}
+
 ::-webkit-scrollbar-track
 {
 	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);

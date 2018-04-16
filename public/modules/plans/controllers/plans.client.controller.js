@@ -24,6 +24,7 @@ angular.module('plans')
       $scope.isActive[IDF_NODE_TYPE] = true;
 
       $scope.authentication = Authentication
+      $rootScope.breadcrumbs = []
 
       $scope.UNITS_STEP_FEET = 8
       $scope.UNITS_STEP_METERS = 3
@@ -514,6 +515,25 @@ angular.module('plans')
 
       $scope.findProjects = function () {
         $scope.projects = Projects.query({search: $scope.search})
+        $scope.projects.$promise
+          .then(function(projects) {
+            let projectName = $stateParams.projectName ? $stateParams.projectName.replace(/ˆ/g, '/') : ''
+            let siteName = $stateParams.siteName ? $stateParams.siteName.replace(/ˆ/g, '/') : ''
+            if ($stateParams.projectName) $scope.selectProject(_.find($scope.projects, p => p.title === projectName))
+            if ($stateParams.siteName) $scope.selectSite(_.find($scope.selected.project.sites, s => s.name === siteName))
+            $timeout(function() {
+              let projectsDiv = $('.projects > div')
+              let sitesDiv = $('.sites > div')
+              let projectElem = $(`#${$scope.selected.project._id}`)
+              let siteElem = $(`#${$scope.selected.site._id}`)
+              $(projectsDiv).animate({
+                scrollTop: projectElem.position().top - 220 + 'px'
+              }, 'fast')
+              $(sitesDiv).animate({
+                scrollTop: siteElem.position().top - 220 + 'px'
+              }, 'fast')
+            }, 100)
+          })
       }
 
       $scope.findOneProject = function () {
@@ -647,6 +667,17 @@ angular.module('plans')
           updateWifiDetails(plan)
           if (!$scope.settings) $scope.showPlan(plan)
         }))
+        setupBreadcrumbs()
+      }
+
+      function setupBreadcrumbs() {
+        let projectCrumb = `${$scope.project.title.replace(/\//g , 'ˆ')}`
+        let siteCrumb = `${projectCrumb}/${$scope.site.name.replace(/\//g , 'ˆ')}`
+        $rootScope.breadcrumbs = [
+          { title : $scope.project.title , href : projectCrumb },
+          { title : $scope.site.name     , href : siteCrumb },
+          { title : $scope.building.name , href : '' }
+        ]
       }
 
       $scope.getFloorCount = project => {
@@ -1055,6 +1086,10 @@ angular.module('plans')
       }
 
       $scope.getControllers = search => Controllers.query({search: search}).$promise
+
+      $scope.addContact = function() {
+        $scope.building.details.contacts.push({})
+      }
 
       function updateProject () {
         var deferred = $q.defer()

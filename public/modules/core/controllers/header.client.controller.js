@@ -1,18 +1,22 @@
 'use strict';
 
-angular.module('core').controller('HeaderController', ['$scope', 'Authentication', 'Menus',
-	function($scope, Authentication, Menus) {
-		$scope.authentication = Authentication;
-		$scope.isCollapsed = false;
-		$scope.menu = Menus.getMenu('topbar');
+angular.module('core').controller('HeaderController', ['$scope', '$rootScope', 'Authentication', 'Menus',
+	function($scope, $rootScope, Authentication, Menus) {
+		$scope.authentication = Authentication
+		$scope.isCollapsed = false
+		$scope.menu = Menus.getMenu('topbar')
+
+    $rootScope.$watch('breadcrumbs', breadcrumbs => {
+      $scope.breadcrumbs = $rootScope.breadcrumbs
+    })
 
 		$scope.toggleCollapsibleMenu = function() {
-			$scope.isCollapsed = !$scope.isCollapsed;
-		};
+			$scope.isCollapsed = !$scope.isCollapsed
+		}
 
 		// Collapsing the menu after navigation
 		$scope.$on('$stateChangeSuccess', function() {
-			$scope.isCollapsed = false;
-		});
+			$scope.isCollapsed = false
+		})
 	}
 ]);
