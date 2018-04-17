@@ -578,7 +578,7 @@ angular.module("core").service("Drawing", ["contextMenu", "$q", "$http", "$timeo
 							} else if (calibration_step === 2) {
 								this.calibrationLine(x, y, 1);
 								this.calibrationDone();
-                                calibration_step = 0;
+                calibration_step = 0;
 							}
 							break;
 
@@ -664,7 +664,7 @@ angular.module("core").service("Drawing", ["contextMenu", "$q", "$http", "$timeo
 				plan.floor_width = 200; // m or ft
 				plan.floor_width_px = canvas.width;
 			}
-			plan.stage_ppm = plan.floor_width_px / plan.floor_width;
+      if (!plan.stage_ppm) plan.stage_ppm = plan.floor_width_px / plan.floor_width;
 
 			// add default layers
 			layers = [new createjs.Container()];
@@ -1232,12 +1232,11 @@ angular.module("core").service("Drawing", ["contextMenu", "$q", "$http", "$timeo
 			$timeout(() => {
 				if (data.plan) { plan = data.plan; }
 				plan._id = this.plan.id;
-				const stage_scale = _.get(plan, "stage.stage_scale");
+				const stage_scale = plan.stage_scale;
 				this.initBoard(signal_radius);
 				if (data.floorplan) {
 					this.addFloorPlan(data.floorplan)
 						.then(() => {
-              console.log('DEBUG: floorplan added. Scaling.');
 							if (data.plan && data.plan.stage_scale) { this.scale(stage_scale); }
 							else { this.scale(100); }
 						});

@@ -494,7 +494,7 @@ table.settings td {
   color: #11a04c;
   position: absolute;
   left: 2px;
-  top: 0;
+  bottom: 0;
   z-index: 2;
   zoom: 2;
 }

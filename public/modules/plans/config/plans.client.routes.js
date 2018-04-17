@@ -18,11 +18,11 @@ angular.module('plans').config(['$stateProvider',
         templateUrl: 'modules/plans/views/view-plan.client.view.html'
       })
       .state('listPlansSiteSelect', {
-        url: '/:projectName/:siteName',
+        url: '/dashboard/:projectName/:siteName',
         templateUrl: 'modules/plans/views/list-plans.client.view.html'
       })
       .state('listPlansProjectSelect', {
-        url: '/:projectName',
+        url: '/dashboard/:projectName',
         templateUrl: 'modules/plans/views/list-plans.client.view.html'
       })
   }

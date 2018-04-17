@@ -522,16 +522,23 @@ angular.module('plans')
             if ($stateParams.projectName) $scope.selectProject(_.find($scope.projects, p => p.title === projectName))
             if ($stateParams.siteName) $scope.selectSite(_.find($scope.selected.project.sites, s => s.name === siteName))
             $timeout(function() {
-              let projectsDiv = $('.projects > div')
-              let sitesDiv = $('.sites > div')
-              let projectElem = $(`#${$scope.selected.project._id}`)
-              let siteElem = $(`#${$scope.selected.site._id}`)
-              $(projectsDiv).animate({
-                scrollTop: projectElem.position().top - 220 + 'px'
-              }, 'fast')
-              $(sitesDiv).animate({
-                scrollTop: siteElem.position().top - 220 + 'px'
-              }, 'fast')
+              if (!$scope.selected) return
+              let pid = _.get($scope.selected, 'project._id')
+              let sid = _.get($scope.selected, 'site._id')
+              if (pid) {
+                let projectsDiv = $('.projects > div')
+                let projectElem = $(`#${pid}`)
+                  $(projectsDiv).animate({
+                    scrollTop: projectElem.position().top - 220 + 'px'
+                  }, 'fast')
+              }
+              if (sid) {
+                let sitesDiv = $('.sites > div')
+                let siteElem = $(`#${sid}`)
+                $(sitesDiv).animate({
+                  scrollTop: siteElem.position().top - 220 + 'px'
+                }, 'fast')
+              }
             }, 100)
           })
       }
@@ -671,7 +678,7 @@ angular.module('plans')
       }
 
       function setupBreadcrumbs() {
-        let projectCrumb = `${$scope.project.title.replace(/\//g , 'ˆ')}`
+        let projectCrumb = `dashboard/${$scope.project.title.replace(/\//g , 'ˆ')}`
         let siteCrumb = `${projectCrumb}/${$scope.site.name.replace(/\//g , 'ˆ')}`
         $rootScope.breadcrumbs = [
           { title : $scope.project.title , href : projectCrumb },
