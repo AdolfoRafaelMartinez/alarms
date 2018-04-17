@@ -320,184 +320,268 @@
       <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <ul class="nav">
           <li class="nav-item">
-						<a class="nav-link" ng-click="buildReport()"><i class="glyphicon glyphicon-backward"></i> Back</a>
+						<a class="nav-link" ng-click="toggleBuildReport()"><i class="glyphicon glyphicon-backward"></i> Back</a>
 					</li>
           <li class="nav-item">
-            <a class="nav-link" ng-class="{'active': !br_stage}" href>Cover</a>
+            <a class="nav-link" href ng-click="brPage('cover')" ng-class="{'active': br_page=='cover'}" href>Cover</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href>Floors</a>
+            <a class="nav-link" href ng-click="brPage('floors')" ng-class="{'active': br_page=='floors'}">Floors</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href>BOM</a>
+            <a class="nav-link" href ng-click="brPage('bom')" ng-class="{'active': br_page=='bom'}">BOM</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href>Notes</a>
+            <a class="nav-link" href ng-click="brPage('notes')" ng-class="{'active': br_page=='notes'}">Notes</a>
           </li>
         </ul>
       </nav>
     </div>
 
-    <div class="panel-group col-lg-12" id="br_cover" role="tablist" aria-multiselectable="true">
-      <div class="panel panel-default">
-        <div class="panel-heading" role="tab" id="br_cover">
-          <h4 class="panel-title">
-            <a role="button" data-toggle="collapse" data-parent="#br_cover" href="#collapseBRProject" aria-expanded="true" aria-controls="collapseBRProject">
-              Project Details
-            </a>
-          </h4>
-        </div>
-        <div id="collapseBRProject" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="br_cover">
-          <div class="panel-body">
-            <div class="col-lg-8">
-              <div class="form-group row">
-                <label class="col-sm-4 ptop5 text-right form-control-label">Client Name</label>
-                <div class="col-sm-8"><input type="text" ng-model="project.details.client.name" readonly class="form-control" placeholder="Client Name" tabindex="0" aria-invalid="false"></div>
-              </div>
-              <div class="form-group row">
-                <label class="col-sm-4 ptop5 text-right form-control-label">Project Name</label>
-                <div class="col-sm-8"><input type="text" ng-model="project.title" readonly class="form-control" placeholder="Project Name" tabindex="0" aria-invalid="false"></div>
-              </div>
-              <div class="form-group row">
-                <label class="col-sm-4 ptop5 text-right form-control-label">Site Name</label>
-                <div class="col-sm-8"><input type="text" ng-model="site.name" readonly class="form-control" placeholder="Site Name" tabindex="0" aria-invalid="false"></div>
-              </div>
-              <div class="form-group row">
-                <label class="col-sm-4 ptop5 text-right form-control-label">Building Address</label>
-                <div class="col-sm-8"><input type="text" ng-model="building.details.address" class="form-control" placeholder="Building Address Line 1" tabindex="0" aria-invalid="false"></div>
-              </div>
-              <div class="form-group row">
-                <label class="col-sm-4 ptop5 text-right form-control-label">Building City</label>
-                <div class="col-sm-8"><input type="text" ng-model="building.details.city" class="form-control" placeholder="City" tabindex="0" aria-invalid="false"></div>
-              </div>
-              <div class="form-group row">
-                <label class="col-sm-4 ptop5 text-right form-control-label">Building State</label>
-                <div class="col-sm-8"><input type="text" ng-model="building.details.state" class="form-control" placeholder="State" tabindex="0" aria-invalid="false"></div>
-              </div>
-              <div class="form-group row">
-                <label class="col-sm-4 ptop5 text-right form-control-label">Building Zipcode</label>
-                <div class="col-sm-8"><input type="text" ng-model="building.details.zipcode" class="form-control" placeholder="Zip" tabindex="0" aria-invalid="false"></div>
-              </div>
-            </div>
-            <div class="col-sm-1 center">
-              <div class="form-group row">
-                <input type="checkbox" class="check" checked>
-              </div>
-              <div class="form-group row">
-                <input type="checkbox" class="check" checked>
-              </div>
-              <div class="form-group row">
-                <input type="checkbox" class="check" checked>
-              </div>
-              <div class="form-group row">
-                <input type="checkbox" class="check" checked>
-              </div>
-              <div class="form-group row">
-                <input type="checkbox" class="check" checked>
-              </div>
-              <div class="form-group row">
-                <input type="checkbox" class="check" checked>
-              </div>
-              <div class="form-group row">
-                <input type="checkbox" class="check" checked>
-              </div>
-              <div class="form-group row">
-                <input type="checkbox" class="check" checked>
-              </div>
-            </div>
-            <div class="col-sm-3">
-              <img class="logoselect" ng-src="{{ project.details.client.logo }}" alt="Client Logo">
-              <img class="logoselect" ng-src="{{ project.details.msp.logo }}" alt="Partner Logo">
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="panel-group col-lg-12" id="br_location" role="tablist" aria-multiselectable="true">
-      <div class="panel-default panel panel-open" is-open="sma.details">
-        <div class="panel-heading" role="tab" id="br_location">
-          <h4 class="panel-title">
-            <span class="ng-binding">
-              <a role="button" data-toggle="collapse" data-parent="#br_location" href="#collapseBRLocation" aria-expanded="true" aria-controls="collapseBRLocation">
-                Location Contacts
+    <div class="col-row" ng-if="br_page=='cover'">
+      <div class="panel-group col-lg-12" id="br_cover" role="tablist" aria-multiselectable="true">
+        <div class="panel panel-default">
+          <div class="panel-heading" role="tab" id="br_cover">
+            <h4 class="panel-title">
+              <a role="button" data-toggle="collapse" data-parent="#br_cover" href="#collapseBRProject" aria-expanded="true" aria-controls="collapseBRProject">
+                Project Details
               </a>
-            </span>
-          </h4>
+            </h4>
+          </div>
+          <div id="collapseBRProject" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="br_cover">
+            <div class="panel-body">
+              <div class="col-lg-8">
+                <div class="form-group row">
+                  <label class="col-sm-4 ptop5 text-right form-control-label">Client Name</label>
+                  <div class="col-sm-8"><input type="text" ng-model="project.details.client.name" readonly class="form-control" placeholder="Client Name" tabindex="0" aria-invalid="false"></div>
+                </div>
+                <div class="form-group row">
+                  <label class="col-sm-4 ptop5 text-right form-control-label">Project Name</label>
+                  <div class="col-sm-8"><input type="text" ng-model="project.title" readonly class="form-control" placeholder="Project Name" tabindex="0" aria-invalid="false"></div>
+                </div>
+                <div class="form-group row">
+                  <label class="col-sm-4 ptop5 text-right form-control-label">Site Name</label>
+                  <div class="col-sm-8"><input type="text" ng-model="site.name" readonly class="form-control" placeholder="Site Name" tabindex="0" aria-invalid="false"></div>
+                </div>
+                <div class="form-group row">
+                  <label class="col-sm-4 ptop5 text-right form-control-label">Building Address</label>
+                  <div class="col-sm-8"><input type="text" ng-model="building.details.address" class="form-control" placeholder="Building Address Line 1" tabindex="0" aria-invalid="false"></div>
+                </div>
+                <div class="form-group row">
+                  <label class="col-sm-4 ptop5 text-right form-control-label">Building City</label>
+                  <div class="col-sm-8"><input type="text" ng-model="building.details.city" class="form-control" placeholder="City" tabindex="0" aria-invalid="false"></div>
+                </div>
+                <div class="form-group row">
+                  <label class="col-sm-4 ptop5 text-right form-control-label">Building State</label>
+                  <div class="col-sm-8"><input type="text" ng-model="building.details.state" class="form-control" placeholder="State" tabindex="0" aria-invalid="false"></div>
+                </div>
+                <div class="form-group row">
+                  <label class="col-sm-4 ptop5 text-right form-control-label">Building Zipcode</label>
+                  <div class="col-sm-8"><input type="text" ng-model="building.details.zipcode" class="form-control" placeholder="Zip" tabindex="0" aria-invalid="false"></div>
+                </div>
+              </div>
+              <div class="col-sm-1 center">
+                <div class="form-group row">
+                  <input type="checkbox" class="check" checked>
+                </div>
+                <div class="form-group row">
+                  <input type="checkbox" class="check" checked>
+                </div>
+                <div class="form-group row">
+                  <input type="checkbox" class="check" checked>
+                </div>
+                <div class="form-group row">
+                  <input type="checkbox" class="check" checked>
+                </div>
+                <div class="form-group row">
+                  <input type="checkbox" class="check" checked>
+                </div>
+                <div class="form-group row">
+                  <input type="checkbox" class="check" checked>
+                </div>
+                <div class="form-group row">
+                  <input type="checkbox" class="check" checked>
+                </div>
+                <div class="form-group row">
+                  <input type="checkbox" class="check" checked>
+                </div>
+                <div class="form-group row">
+                  <input type="checkbox" class="check" checked>
+                </div>
+              </div>
+              <div class="col-sm-3">
+                <img class="logoselect" ng-src="{{ project.details.client.logo }}" alt="Client Logo">
+                <img class="logoselect" ng-src="{{ project.details.msp.logo }}" alt="Partner Logo">
+              </div>
+            </div>
+          </div>
         </div>
-        <div id="collapseBRLocation" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="br_location">
-          <div class="panel-body">
-            <table class="pjtable">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Position</th>
-                  <th>Phone</th>
-                  <th>Email</th>
-                  <th class="center icon">Remove</th>
+      </div>
+
+      <div class="panel-group col-lg-12" id="br_location" role="tablist" aria-multiselectable="true">
+        <div class="panel-default panel panel-open" is-open="sma.details">
+          <div class="panel-heading" role="tab" id="br_location">
+            <h4 class="panel-title">
+              <span class="ng-binding">
+                <a role="button" data-toggle="collapse" data-parent="#br_location" href="#collapseBRLocation" aria-expanded="true" aria-controls="collapseBRLocation">
+                  Location Contacts
+                </a>
+              </span>
+            </h4>
+          </div>
+          <div id="collapseBRLocation" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="br_location">
+            <div class="panel-body">
+              <table class="pjtable">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Position</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th class="center icon">Remove</th>
+                  </tr>
+                </thead>
+                <tr ng-repeat="(contactIndex, contact) in building.details.contacts track by $index">
+                  <td><input type="text" ng-model="contact.name" class="form-control input-sm" placeholder="John Smith" tabindex="0" aria-invalid="false"></td>
+                  <td><input type="text" ng-model="contact.position" class="form-control input-sm" placeholder="Engineer" tabindex="0" aria-invalid="false"></td>
+                  <td><input type="text" ng-model="contact.phone" class="form-control input-sm" placeholder="123-123-1234" tabindex="0" aria-invalid="false"></td>
+                  <td><input type="text" ng-model="contact.email" class="form-control input-sm" placeholder="email@domain.com" tabindex="0" aria-invalid="false"></td>
+                  <td class="center ">
+                    <a href ng-click="askDeleteContact(contactIndex, $event, building)"> <i class="glyphicon glyphicon-remove"></i> </a>
+                  </td>
                 </tr>
-              </thead>
-              <tr ng-repeat="contact in building.details.contacts">
-                <td><input type="text" ng-model="contact.name" class="form-control input-sm" placeholder="John Smith" tabindex="0" aria-invalid="false"></td>
-                <td><input type="text" ng-model="contact.position" class="form-control input-sm" placeholder="Engineer" tabindex="0" aria-invalid="false"></td>
-                <td><input type="text" ng-model="contact.phone" class="form-control input-sm" placeholder="123-123-1234" tabindex="0" aria-invalid="false"></td>
-                <td><input type="text" ng-model="contact.email" class="form-control input-sm" placeholder="email@domain.com" tabindex="0" aria-invalid="false"></td>
-                <td class="center "><i class="glyphicon glyphicon-remove"></td>
-              </tr>
-            </table>
-            <button type="button" class="btn btn-primary btn-sm" ng-click="addContact()" tabindex="0">Add Contact</button>
+              </table>
+              <button type="button" class="btn btn-primary btn-sm" ng-click="addContact()" tabindex="0">Add Contact</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-group col-lg-12" id="br_author" role="tablist" aria-multiselectable="true">
+        <div class="panel-default panel panel-open" is-open="sma.details">
+          <div class="panel-heading" role="tab" id="br_author">
+            <h4 class="panel-title">
+              <a role="button" data-toggle="collapse" data-parent="#br_author" href="#collapseBRAuthor" aria-expanded="true" aria-controls="collapseBRAuthor">
+                Prepared by
+              </a>
+            </h4>
+          </div>
+          <div id="collapseBRLocation" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="br_author">
+            <div class="panel-body">
+              <table class="pjtable">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Title</th>
+                    <th class="center icon">Remove</th>
+                  </tr>
+                </thead>
+                <tr ng-repeat="(prepIndex, prep) in building.details.reportAuthor track by $index">
+                  <td><input type="text" ng-model="prep.name" class="form-control input-sm" placeholder="John Smith" tabindex="0" aria-invalid="false"></td>
+                  <td><input type="text" ng-model="prep.email" class="form-control input-sm" placeholder="email@domain.com" tabindex="0" aria-invalid="false"></td>
+                  <td><input type="text" ng-model="prep.title" class="form-control input-sm" placeholder="Engineer" tabindex="0" aria-invalid="false"></td>
+                  <td class="center ">
+                    <a href ng-click="askDeleteAuthor(prepIndex, $event, building)"> <i class="glyphicon glyphicon-remove"></i> </a>
+                  </td>
+                </tr>
+              </table>
+              <button type="button" class="btn btn-primary btn-sm" ng-click="addPrep()" tabindex="0">Add Author</button>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="panel-group col-lg-12" id="br_author" role="tablist" aria-multiselectable="true">
-      <div class="panel-default panel panel-open" is-open="sma.details">
-        <div class="panel-heading" role="tab" id="br_author">
-          <h4 class="panel-title">
-            <a role="button" data-toggle="collapse" data-parent="#br_author" href="#collapseBRAuthor" aria-expanded="true" aria-controls="collapseBRAuthor">
-              Prepared by
-            </a>
-          </h4>
+    <div class="col-row" ng-if="br_page=='floors'">
+      <div class="panel-group col-lg-12" id="br_floors" role="tablist" aria-multiselectable="true">
+        <div class="panel panel-default">
+          <div class="panel-heading" role="tab" id="br_floors">
+            <h4 class="panel-title">
+              Select floors to include in the report
+              <div class="pull-right"><button type="button" class="btn btn-primary btn-sm" style="margin-top: -6px;" ng-click="brSelectAllFloors()"><span ng-if="brToggleSelect">Deselect All</span><span ng-if="!brToggleSelect">Select All</span></button></div>
+            </h4>
+          </div>
+          <div role="tabpanel" aria-labelledby="br_floors">
+            <div class="panel-body">
+              <div class="floors">
+                <div ng-repeat="p in plans" ng-class="{'shadowItem': !p.brSelected}" ng-click="brToggleFloor(p)">
+                  <div class="ctrlIcon">
+                    <i class="fas fa-gamepad"></i>
+                  </div>
+                  <a href>
+                    <img ng-src="/ss/{{ p.thumb }}" />
+                    <small ng-if="p.floor">Floor {{ p.floor }}</small>
+                    <small ng-if="!p.floor">Floor {{ p.title }}</small>
+                  </a>
+                  <div class="topright text-right sel">
+                    <a href ng-if="p.brSelected"><i class="fas fa-check"></i></a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div id="collapseBRLocation" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="br_author">
-          <div class="panel-body">
-            <table class="pjtable">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Title</th>
-                  <th class="center icon">Remove</th>
+      </div>
+    </div>
+
+    <div class="col-row" ng-if="br_page=='bom'">
+      <div class="panel-group col-lg-12" id="br_bom" role="tablist" aria-multiselectable="true">
+        <div class="panel panel-default">
+          <div class="panel-heading" role="tab" id="br_bom">
+            <h4 class="panel-title">
+              Bill of Materials
+            </h4>
+          </div>
+          <div id="collapseBRProject" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="br_bom">
+            <div class="panel-body">
+              <table class="pjtable">
+                <thead>
+                  <tr>
+                    <th>Part No.</th>
+                    <th>Description</th>
+                    <th>Quantity</th>
+                    <th class="center icon">Remove</th>
+                  </tr>
+                </thead>
+                <tr ng-repeat="(partIndex, part) in building.details.bom track by $index">
+                  <td><input type="text" ng-model="part.sku" class="form-control input-sm" placeholder="SKU 123..." tabindex="0" aria-invalid="false"></td>
+                  <td><input type="text" ng-model="part.desc" class="form-control input-sm" placeholder="AP-205..." tabindex="0" aria-invalid="false"></td>
+                  <td><input type="text" ng-model="part.qty" class="form-control input-sm" placeholder="12.." tabindex="0" aria-invalid="false"></td>
+                  <td class="center ">
+                    <a href ng-click="askDeletePart(partIndex, $event, building)"> <i class="glyphicon glyphicon-remove"></i> </a>
+                  </td>
                 </tr>
-              </thead>
-              <tr>
-                <td><input type="text" ng-model="" class="form-control input-sm" placeholder="{value}" tabindex="0" aria-invalid="false"></td>
-                <td><input type="text" ng-model="" class="form-control input-sm" placeholder="{value}" tabindex="0" aria-invalid="false"></td>
-                <td><input type="text" ng-model="" class="form-control input-sm" placeholder="{value}" tabindex="0" aria-invalid="false"></td>
-                <td class="center "><i class="glyphicon glyphicon-remove"></td>
-              </tr>
-              <tr>
-                <td><input type="text" ng-model="" class="form-control input-sm" placeholder="{value}" tabindex="0" aria-invalid="false"></td>
-                <td><input type="text" ng-model="" class="form-control input-sm" placeholder="{value}" tabindex="0" aria-invalid="false"></td>
-                <td><input type="text" ng-model="" class="form-control input-sm" placeholder="{value}" tabindex="0" aria-invalid="false"></td>
-                <td class="center "><i class="glyphicon glyphicon-remove"></td>
-              </tr>
-              <tr>
-                <td><input type="text" ng-model="" class="form-control input-sm" placeholder="{value}" tabindex="0" aria-invalid="false"></td>
-                <td><input type="text" ng-model="" class="form-control input-sm" placeholder="{value}" tabindex="0" aria-invalid="false"></td>
-                <td><input type="text" ng-model="" class="form-control input-sm" placeholder="{value}" tabindex="0" aria-invalid="false"></td>
-                <td class="center "><i class="glyphicon glyphicon-remove"></td>
-              </tr>
-            </table>
-            <button type="button" class="btn btn-primary btn-sm" ng-click="addrow(needs.to.be.scripted);" tabindex="0">Add Personnel</button>
+              </table>
+              <button type="button" class="btn btn-primary btn-sm" ng-click="addPart()" tabindex="0">Add Hardware</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-row" ng-if="br_page=='notes'">
+      <div class="panel-group col-lg-12" id="br_notes" role="tablist" aria-multiselectable="true">
+        <div class="panel panel-default">
+          <div class="panel-heading" role="tab" id="br_notes">
+            <h4 class="panel-title">
+              Building / Report Notes
+            </h4>
+          </div>
+          <div id="collapseBRProject" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="br_notes">
+            <div class="panel-body">
+              <textarea class="pjnotes" ng-model="building.details.notes"></textarea>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
     <div class="col-lg-12 text-right">
-      <button type="button" class="btn btn-primary" ng-click="brPage('floors')">Next</button>
+      <button type="button" class="btn btn-primary" ng-click="brPagePrev()" ng-if="br_page!='cover'">Previous</button>
+      <button type="button" class="btn btn-primary" ng-click="brPageNext()" ng-if="br_page!='notes'">Next</button>
+      <button type="button" class="btn btn-info" ng-click="brSaveDraft()">Save Draft</button>
+      <button type="button" class="btn btn-danger" ng-disabled="!brValid()" ng-click="brGenerateReport()">PDF Report</button>
     </div>
   </div>
 </div>

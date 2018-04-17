@@ -378,6 +378,7 @@ angular.module('plans')
         created: new Date(),
         details: {
           contacts: [],
+          reportAuthor: [],
           stage: {
             aps: []
           },
@@ -451,6 +452,7 @@ angular.module('plans')
         _.set(plan, 'details.building', bldg.name)
         _.set(plan, 'details.client', project.details.client)
         _.set(plan, 'details.contacts', _.get(bldg, 'details.contacts'))
+        _.set(plan, 'details.reportAuthor', _.get(bldg, 'details.reportAuthor'))
         _.set(plan, 'details.vendor', _.get(bldg, 'details.inventory.vendor'))
         _.each(plan.stage.items, ap => {
           if (['ap', 'am', undefined].includes(ap.itemType)) {
@@ -648,6 +650,7 @@ angular.module('plans')
             $scope.flooplan_name = plan.title
             if (typeof plan.details !== 'object') plan.details = {}
             if (!plan.details.contacts) plan.details.contacts = []
+            if (!plan.details.reportAuthor) plan.details.reportAuthor = []
             updateWifiDetails(plan)
             Drawing.loadPlan(plan, $scope.settings.signal_radius, $scope.updateControls, $scope.uploadProgress, $scope.setDirty)
             $timeout(() => {
@@ -668,9 +671,12 @@ angular.module('plans')
         $scope.plans.push(Plans.get({planId: bplan._id}, plan => {
           plan.stage.floorplan = plan.stage.floorplan.replace('http://pj.signalforest.com', '')
           _.set(plan, 'details.project', $scope.project.title)
-          _.set(plan, 'details.site', $scope.site.name)
-          _.set(plan, 'details.building', $scope.building.name)
-          _.set(plan, 'details.contacts', _.get($scope.building, 'details.contacts'))
+          plan.details.site = $scope.site.name
+          plan.details.building = $scope.building.name
+          plan.details.contacts = _.get($scope.building, 'details.contacts') || []
+          plan.details.reportAuthor = _.get($scope.building, 'details.reportAuthor') || []
+          _.set($scope.building, 'details.contacts', plan.details.contacts)
+          _.set($scope.building, 'details.reportAuthor', plan.details.reportAuthor)
           updateWifiDetails(plan)
           if (!$scope.settings) $scope.showPlan(plan)
         }))
@@ -933,6 +939,31 @@ angular.module('plans')
           })
       }
 
+			$scope.askDeleteContact = function (contactIndex, $event, item) {
+				$event.stopPropagation()
+				var contact = item.details.contacts[contactIndex]
+
+				ModalService.showModal({
+					templateUrl: 'deleteModal.html',
+					controller: 'deleteModalController',
+					inputs: { item: `contact: ${contact.name}` }
+				})
+					.then(function (modal) {
+						modal.element.modal()
+						modal.close.then(function (answer) {
+							if (answer) {
+								$scope.removeContact(item, contactIndex)
+							}
+						})
+					})
+			}
+
+			$scope.removeContact = function (item, index) {
+				item.details.contacts.splice(index, 1)
+				$scope.save()
+			}
+
+
       $scope.selectProject = project => {
         $scope.selected = {project: project}
         $scope.sort.sites = 'name'
@@ -950,10 +981,68 @@ angular.module('plans')
         return $scope.selected.building
       }
 
-      $scope.buildReport = function() {
+      function buildBOM() {
+        let bom = {}
+        let aps = []
+        let ams = []
+        let ctrls = []
+        _.each($scope.plans, plan => {
+          _.each(plan.stage.items, item => {
+            console.log('adding item', item.sku)
+            if (!item.sku) return
+            bom[item.sku] = bom[item.sku] ? bom[item.sku]+1 : 1
+            if (item.itemType === 'ap') aps[item.sku] = {sku: item.sku, desc: item.desc || item.vendor}
+            if (item.itemType === 'am') ams[item.sku] = {sku: item.sku, desc: item.desc || item.vendor}
+          })
+          if (plan.details.ctrlPresent) {
+            let ctrl = plan.details.controllers[0]
+            if (!ctrl.sku) return
+            bom[ctrl.sku] = bom[ctrl.sku] ? bom[ctrl.sku]++ : 1
+            ctrls[ctrl.sku] = {sku: ctrl.sku, desc: ctrl.description}
+          }
+        })
+
+        return _.map(bom, (qty, sku) => {
+          let item = (aps[sku] || ams[sku] || ctrls[sku])
+          return {sku: item.sku, desc: item.desc, qty: qty}
+        })
+      }
+
+      $scope.toggleBuildReport = function() {
+        if (!$scope.br_page) $scope.br_page = 'cover'
+        $scope.building.details.bom = buildBOM()
         contextMenu.close()
         $scope.build_report = !$scope.build_report
         $scope.plan_properties = false
+      }
+
+      var brPages = ['cover', 'floors', 'bom', 'notes']
+      var brCurrentPage = 0
+
+      $scope.brPage = function(page) {
+        $scope.br_page = page
+      }
+
+      $scope.brPagePrev = function() {
+        $scope.br_page = brPages[--brCurrentPage]
+      }
+
+      $scope.brPageNext = function() {
+        $scope.br_page = brPages[++brCurrentPage]
+      }
+
+      $scope.brToggleFloor = function(plan) {
+        plan.brSelected = !plan.brSelected
+      }
+
+      $scope.brSelectAllFloors = function() {
+        if (!_.filter($scope.plans.filter(p => !p.brSelected)).length) {
+          $scope.plans.map(p => p.brSelected = false)
+          $scope.brToggleSelect = false
+        } else {
+          $scope.plans.map(p => p.brSelected = true)
+          $scope.brToggleSelect = true
+        }
       }
 
       $scope.report = function () {
@@ -1096,6 +1185,14 @@ angular.module('plans')
 
       $scope.addContact = function() {
         $scope.building.details.contacts.push({})
+      }
+
+      $scope.addPrep = function() {
+        $scope.building.details.reportAuthor.push({})
+      }
+
+      $scope.addPart = function() {
+        $scope.building.details.bom.push({})
       }
 
       function updateProject () {

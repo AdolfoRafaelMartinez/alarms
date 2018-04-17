@@ -317,22 +317,6 @@ button.selected {
     overflow: auto;
 }
 
-.floors > div:last-child {
-	padding: 24px 30px;
-	background: #222;
-}
-
-.floors > div:last-child a {
-	font-size: 32px;
-	color: #aaa;
-	top: 25px;
-}
-
-.floors > div:last-child a small {
-	font-size: 12px;
-	display: block;
-}
-
 .floors > div:hover {
 	opacity: 1;
 }
@@ -376,6 +360,18 @@ button.selected {
 	max-height: 90px;
     margin-left: auto;
     margin-right: auto;
+}
+
+.floors .topright.sel {
+  border-radius: 50%;
+  background: #eee;
+  width: 120px;
+  height: 120px;
+  padding-top: 81px;
+  padding-right: 82px;
+  margin-top: -70px;
+  margin-right: -70px;
+  box-shadow: inset 1px 1px 6px rgba(0,0,80,0.4);
 }
 
 md-sidenav {
@@ -497,6 +493,12 @@ table.settings td {
   bottom: 0;
   z-index: 2;
   zoom: 2;
+}
+
+.pjnotes {
+  width: 100%;
+  height: 400px;
+  padding: 15px;
 }
 
 table.pjtable {
