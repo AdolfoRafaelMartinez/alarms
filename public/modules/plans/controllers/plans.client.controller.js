@@ -203,6 +203,7 @@ angular.module('plans')
       }
 
       $scope.uploadProgress = function(percentDone, floorplan) {
+        console.log('uploadProgress floorplan', floorplan)
         if ($scope.$$phase) {
           updateProgress(percentDone, floorplan)
         } else {
@@ -619,15 +620,16 @@ angular.module('plans')
       function refreshAPGroups (plan) {
         /* Setup / refresh AP Groups */
         $scope.bldgResource = _.find($scope.project.sites.map(site => site.buildings.map(b => (b._id === plan.building) && b)))[0]
-        let defaultAP = $scope.bldgResource.details.inventory.aps
-        if (defaultAP) {
-          var groups = {}
-          _.each(plan.stage.items, item => {
-            groups[item.sku] = groups[item.sku] ? groups[item.sku] + 1 : 1
-          })
-          plan.stage.apGroups = groups
-          for (let i=0; i<_.size(groups); i++) $scope.isActive[i+3] = 1
-          console.log($scope.isActive)
+        if (_.get($scope.bldgResource, 'details.inventory')) {
+          let defaultAP = $scope.bldgResource.details.inventory.aps
+          if (defaultAP) {
+            var groups = {}
+            _.each(plan.stage.items, item => {
+              groups[item.sku] = groups[item.sku] ? groups[item.sku] + 1 : 1
+            })
+            plan.stage.apGroups = groups
+            for (let i=0; i<_.size(groups); i++) $scope.isActive[i+3] = 1
+          }
         }
       }
 
@@ -680,7 +682,7 @@ angular.module('plans')
             if (!plan.details.reportAuthor) plan.details.reportAuthor = []
             updateWifiDetails(plan)
             refreshAPGroups(plan)
-            $scope.activeGroup = getFirst(plan.stage.apGroups)
+            if (plan.stage.apGroups) $scope.activeGroup = getFirst(plan.stage.apGroups)
             Drawing.loadPlan(plan, $scope.settings.signal_radius, $scope.updateControls, $scope.uploadProgress, $scope.setDirty)
             $timeout(() => {
               $scope.settings.show_heatmap = false

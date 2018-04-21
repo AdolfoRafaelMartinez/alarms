@@ -39,13 +39,13 @@ function($scope, $attrs, Drawing, $timeout, $http, $filter, $window) {
     var url = data._response.result.files[0].url;
     $timeout(function() {
       if (Drawing.uploadProgress) {
-        Drawing.uploadProgress($scope.percentDone);
-        Drawing.addFloorPlan(url, true);
+        Drawing.uploadProgress($scope.percentDone)
+        Drawing.addFloorPlan(url, true)
       }
       if ($scope.uploadComplete) {
         $scope.uploadComplete(url)
       }
-    }, 0);
+    }, 0)
   });
 
 	$scope.$on('fileuploadprogress', function(e, data) {

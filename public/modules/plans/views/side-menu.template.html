@@ -43,9 +43,13 @@
 			</div>
 
 			<div class="actionf">
-				<form id="fileupload" data-ng-controller="pjFileUploadController"
+				<form id="fileupload" data-ng-controller="pjFileUploadController" data-accept-extensions="jpe?g|png|gif"
 						  action="/upload" method="POST" enctype="multipart/form-data" data-file-upload="options" 
-																	 ng-class="{'fileupload-processing': processing() || loadingFiles}">
+              ng-class="{'fileupload-processing': processing() || loadingFiles}">
+
+          <input type="hidden" name="project" value="{{ project._id }}">
+          <input type="hidden" name="site" value="{{ site._id }}">
+          <input type="hidden" name="bldg" value="{{ building._id }}">
 
 					<button class="fileinput-button" ng-class="{disabled: disabled}">
 						<i class="glyphicon large glyphicon-cloud-upload"></i>

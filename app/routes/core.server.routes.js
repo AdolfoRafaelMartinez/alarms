@@ -22,7 +22,6 @@ module.exports = function (app) {
 	app.post('/upload', function (req, res) {
 		var form = new multiparty.Form()
 		form.parse(req, function (err, fields, files) {
-      if (!_.get(fields, 'project.0')) return res.error('Please specify project ID')
       let projectId = _.get(fields, 'project.0')
       let siteId = _.get(fields, 'site.0')
       let bldgId = _.get(fields, 'bldg.0')
@@ -33,6 +32,8 @@ module.exports = function (app) {
         let ppath = path.join('/usermedia/', projectId, siteId, bldgId)
         let relativePath = fields.project ? ppath : '/uploads/'
 				let destPath = path.join(__dirname, './../../public/' + relativePath)
+
+        // TODO: check if file with same name exists (if so, add a suffix
 
         try {
           fs.accessSync(destPath, fs.constants.R_OK)
@@ -53,11 +54,11 @@ module.exports = function (app) {
 
 					res.json({
 						files: [{
-							deleteType: 'DELETE',
-							deleteUrl: relativePath + filename,
-							thumbnailUrl: relativePath + filename,
-							url: relativePath + filename,
-							name: filename
+							deleteType   : 'DELETE',
+							deleteUrl    : path.join(relativePath, filename),
+							thumbnailUrl : path.join(relativePath, filename),
+							url          : path.join(relativePath, filename),
+							name         : filename
 						}]
 					})
 				} else {
