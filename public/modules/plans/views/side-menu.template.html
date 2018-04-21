@@ -17,34 +17,16 @@
 		<div class="pull-right">
 			<a href ng-click="togglePlanProperties()"><ng-md-icon icon="settings"></ng-md-icon></a><br />
 		</div>
-		{{ plan.details.client.name || '(project details not set)' }}<br />
-		<span>Project:</span> {{ plan.details.project }}<br />
-		<span>Site:</span> {{ plan.details.site }}<br />
-
-		<div ng-if="plan.details.address">
-			{{ plan.details.address }}<br />
-			{{ plan.details.city }}, {{ plan.details.zipcode }}<br />
-		</div>
 
     <div>
-      <span>Floor:</span> {{ plan.floor || 'N/A' }}<br />
-      <span> Vendor: {{ plan.details.vendor }}</span><br />
       <span>AP count:</span> {{ getTotalAPs() }}<br />
       <span>AM count:</span> {{ getTotalAMs() }}</span>
     </div>
-    <div class="col-sm-8">Controller:</div><div class="col-sm-4"><md-switch aria-label="Controller" ng-model="plan.details.ctrlPresent"></md-switch></div>
-
-		<!-- uib-accordion-group class="panel-inner" is-open="apgroups.open">
-			<uib-accordion-heading>
-				AP/AM Groups <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': apgroups.open, 'glyphicon-chevron-right': !apgroups.open}"></i>
-			</uib-accordion-heading>
-			<div>
-				AP Group 1: (APcount1)
-				<p />
-				<p /> AP Group 2: (APcount2)
-				<p /> AM Group 1: (AMcount1)
-			</div>
-		</uib-accordion-group -->
+    <div class="row">
+      <div class="col-sm-8">
+        <span>Controller:</span></div>
+      <div class="col-sm-4"><md-switch aria-label="Controller" ng-model="plan.details.ctrlPresent"></md-switch></div>
+    </div>
 
 	</uib-accordion-group>
 
@@ -56,7 +38,7 @@
 		<div class="tools">
 
 			<div class="actionf">
-				<input type="text" ng-model="plan.floor" class="elem elem-green input" value="1"><br>
+				<input type="text" ng-model="plan.floor" class="elem elem-green input"><br>
 				<div>Floor #</div>
 			</div>
 
@@ -112,28 +94,25 @@
 					<img src="modules/plans/images/icons/AP-W.png" />
 					AP
 				</md-button>
-				<button class="button" ng-class="{'active': isActive[0]}" ng-click="selectView('ap')" type="button">View</button> 
+				<button class="button" ng-class="{'active': isActive[0]}" ng-click="selectView(0)" type="button">View</button> 
 			</div>
 			<div class="action">
 				<md-button ng-click="show_walls=false; selectTool('am')" aria-label="am-placement-tool" ng-class="{'selected': mouse_mode === 'am'}">
 					<img src="modules/plans/images/icons/AM-W.png">
 					AM
 				</md-button>
-				<button class="button" ng-class="{'active': isActive[1]}" ng-click="selectView('am')" type="button">View</button> 
+				<button class="button" ng-class="{'active': isActive[1]}" ng-click="selectView(1)" type="button">View</button> 
 			</div>
 			<div class="action">
 				<md-button ng-click="show_walls=false; selectTool('idf')" aria-label="mdf-placement-tool" ng-class="{'selected': mouse_mode === 'idf'}">
 					<img src="modules/plans/images/icons/MDFIDF-W.png">
 					IDF
 				</md-button>
-				<button class="button" ng-class="{'active': isActive[2]}" ng-click="selectView('idf')" type="button">View</button> 
+				<button class="button" ng-class="{'active': isActive[2]}" ng-click="selectView(2)" type="button">View</button> 
 			</div>
 			<div class="action" ng-if="walls">
 				<md-button ng-click="show_walls= true; selectTool('wall')" aria-label="wall-placement-tool" ng-class="{'selected': mouse_mode === 'wall'}">
 					<img src="modules/plans/images/icons/MDFIDF-W.png">
-				</md-button>
-				<md-button ng-click="show_walls=false; selectTool('ap')" aria-label="ap-placement-tool" ng-class="{'selected': mouse_mode === 'ap'}">
-					<button class="btn btn-view btn-success full text-justify" ng-disabled="!planReady" ng-click="selectView('walls')">View</button>
 				</md-button>
 			</div>
 			<div ng-show="show_walls">
@@ -142,8 +121,64 @@
 					<md-option ng-value="wall_id" ng-repeat="(wall_id, wall_type) in wall_types">{{ wall_type.desc }}</md-option>
 				</md-select>
 			</div>
-		</div>
+      <div ng-if="mouse_mode=='ap'" class="row">
+        <div class="col-sm-12"><strong>AP Groups </strong><br /></div>
+        <div class="col-sm-12 apgroups">
+          <div class="row" ng-repeat="(ap, count) in plan.stage.apGroups">
+            <div class="col-sm-8">
+              <button class="button btn-block text-left" ng-class="{'active': activeGroup[ap]}" ng-click="selectDefaultAP(ap)">
+                <span>{{ ap }}:</span>
+                <span class="pull-right">{{ count }}</span>
+              </button>
+            </div>
+            <div class="col-sm-4">
+              <button class="button" ng-class="{'active': isActive[$index + 3]}" ng-click="selectView($index + 3)" type="button">View</button> 
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 	</uib-accordion-group>
+
+  <!-- Hardware -->
+  <uib-accordion-group class="panel-default" is-open="sma.hardware">
+    <uib-accordion-heading>
+      Hardware <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': sma.hardware, 'glyphicon-chevron-right': !sma.hardware}"></i>
+    </uib-accordion-heading>
+    <div class="row">
+      <div class="col-sm-3">AP:</div>
+      <div class="col-sm-8">
+        <input type="text" ng-model="bldgResource.details.inventory.aps" placeholder="Default AP model..." class="elem elem-green input"
+                           uib-typeahead="ap.sku for ap in getAps($viewValue)" 
+                           typeahead-loading="loadingAP" 
+                           typeahead-no-results="noResultsAP" />
+        <i ng-show="loadingAP" class="glyphicon glyphicon-refresh"></i>
+        <div ng-show="noResultsAP"> <i class="glyphicon glyphicon-remove"></i> No Results Found </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-3">AM:</div>
+      <div class="col-sm-8">
+        <input type="text" ng-model="bldgResource.details.inventory.ams" placeholder="Default AM model..." class="elem elem-green input"
+                           uib-typeahead="ap.sku for ap in getAps($viewValue)" 
+                           typeahead-loading="loadingAM" 
+                           typeahead-no-results="noResultsAM" />
+        <i ng-show="loadingAM" class="glyphicon glyphicon-refresh"></i>
+        <div ng-show="noResultsAM"> <i class="glyphicon glyphicon-remove"></i> No Results Found </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-3">MT:</div>
+      <div class="col-sm-8">
+        <input type="text" ng-model="bldgResource.details.inventory.mounts" placeholder="Default mounts..." class="elem elem-green input"
+                           uib-typeahead="mount.sku for mount in getMounts($viewValue)" 
+                           typeahead-loading="loadingMountsResults" 
+                           typeahead-no-results="noResultsMounts" />
+        <i ng-show="loadingResultsMounts" class="glyphicon glyphicon-refresh"></i>
+        <div ng-show="noMountsResults"> <i class="glyphicon glyphicon-remove"></i> No Results Found </div>
+      </div>
+    </div>
+  </uib-accordion-group>
 
 	<!-- Reporting -->
 	<uib-accordion-group class="panel-default" is-open="sma.reporting">

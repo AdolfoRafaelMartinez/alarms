@@ -13,15 +13,15 @@
 
 angular.module('plans')
   .controller('PlansController', [
-    '$scope', '$rootScope', '$state', '$stateParams', '$location', 'Authentication', 'Drawing', '$timeout', '$http', 'Projects', 'Plans', 'Buildings', 'Signal', 'contextMenu', '$q', 'ModalService', 'Controllers',
-    function ($scope, $rootScope, $state, $stateParams, $location, Authentication, Drawing, $timeout, $http, Projects, Plans, Buildings, Signal, contextMenu, $q, ModalService, Controllers) {
+    '$scope', '$rootScope', '$state', '$stateParams', '$location', 'Authentication', 'Drawing', '$timeout', '$http', 'Projects', 'Plans', 'Buildings', 'Signal', 'contextMenu', '$q', 'ModalService', 'Controllers', 'APs', 'Mounts', 'Vendors',
+    function ($scope, $rootScope, $state, $stateParams, $location, Authentication, Drawing, $timeout, $http, Projects, Plans, Buildings, Signal, contextMenu, $q, ModalService, Controllers, APs, Mounts, Vendors) {
       const AP_NODE_TYPE  = 0;
       const AM_NODE_TYPE  = 1;
       const IDF_NODE_TYPE = 2;
       $scope.isActive = [];
-      $scope.isActive[AP_NODE_TYPE]  = true;
-      $scope.isActive[AM_NODE_TYPE]  = true;
-      $scope.isActive[IDF_NODE_TYPE] = true;
+      $scope.isActive[AP_NODE_TYPE]  = 1;
+      $scope.isActive[AM_NODE_TYPE]  = 1;
+      $scope.isActive[IDF_NODE_TYPE] = 1;
 
       $scope.authentication = Authentication
       $rootScope.breadcrumbs = []
@@ -89,7 +89,8 @@ angular.module('plans')
         details: true,
         plan: true,
         tools: true,
-        reporting: true
+        hardware: true,
+        reporting: false
       }
 
       $scope.closeMenu = function () {
@@ -242,7 +243,6 @@ angular.module('plans')
         var plan = new Plans(_.cloneDeep($scope.plan))
         $scope.planReady = false;
         plan.thumb = Drawing.getThumb()
-        console.log('savePlan current', plan)
 
         Drawing.toggleOverlaps('off')
         Drawing.toggleDistances('off')
@@ -466,9 +466,7 @@ angular.module('plans')
           bldg.plans.push({
             _id: response._id
           })
-          updateProject().then(() => {
-            $location.path(`building/${building._id}`)
-          })
+          updateProject().then(() => $location.path(`building/${building._id}`))
         }, errorResponse => {
           $scope.error = errorResponse.data.message
         })
@@ -607,6 +605,7 @@ angular.module('plans')
           plan.details.controllers[0].country = plan.details.country
           plan.details.controllers[0].sku = plan.details.controller
         }
+        /* Backward compatibility -- remove after converting all plans to plan.stage.items */
         if (!plan.stage.items) plan.stage.items = plan.stage.aps
         _.each(plan.stage.items, item => {
           if (!item.sku) {
@@ -615,6 +614,21 @@ angular.module('plans')
             item.vendor = plan.details.vendor
           }
         })
+      }
+
+      function refreshAPGroups (plan) {
+        /* Setup / refresh AP Groups */
+        $scope.bldgResource = _.find($scope.project.sites.map(site => site.buildings.map(b => (b._id === plan.building) && b)))[0]
+        let defaultAP = $scope.bldgResource.details.inventory.aps
+        if (defaultAP) {
+          var groups = {}
+          _.each(plan.stage.items, item => {
+            groups[item.sku] = groups[item.sku] ? groups[item.sku] + 1 : 1
+          })
+          plan.stage.apGroups = groups
+          for (let i=0; i<_.size(groups); i++) $scope.isActive[i+3] = 1
+          console.log($scope.isActive)
+        }
       }
 
       $scope.checkSaveCurrent = function() {
@@ -639,7 +653,20 @@ angular.module('plans')
       }
 
       $scope.setDirty = () => {
+        console.log('setDirty')
+        $timeout(() => {
+          $scope.plan.stage.items = Drawing.toJSON().items
+          refreshAPGroups($scope.plan)
+        }, 100)
         $scope.dirty = true
+      }
+
+      function getFirst(obj) {
+        let key = Object.keys(obj)[0]
+        let first = {}
+        first[key] = true
+
+        return first
       }
 
       $scope.showPlan = (plan) => {
@@ -652,6 +679,8 @@ angular.module('plans')
             if (!plan.details.contacts) plan.details.contacts = []
             if (!plan.details.reportAuthor) plan.details.reportAuthor = []
             updateWifiDetails(plan)
+            refreshAPGroups(plan)
+            $scope.activeGroup = getFirst(plan.stage.apGroups)
             Drawing.loadPlan(plan, $scope.settings.signal_radius, $scope.updateControls, $scope.uploadProgress, $scope.setDirty)
             $timeout(() => {
               $scope.settings.show_heatmap = false
@@ -737,33 +766,25 @@ angular.module('plans')
 
       $scope.mouse_mode = 'ap'
       $scope.selectTool = function (mode) {
-        $scope.isActive[AP_NODE_TYPE]  = true;
-        $scope.isActive[AM_NODE_TYPE]  = true;
-        $scope.isActive[IDF_NODE_TYPE] = true;
+        $scope.isActive[AP_NODE_TYPE]  = 1
+        $scope.isActive[AM_NODE_TYPE]  = 1
+        $scope.isActive[IDF_NODE_TYPE] = 1
         var view_code = 7
-        Drawing.selectView(view_code);
+        Drawing.selectView(view_code)
         $scope.mouse_mode = mode
         Drawing.selectTool(mode)
-      }  
+      }
 
-      $scope.selectView = function (view_node_type) {
-        switch(view_node_type) {
-          case 'ap':
-            $scope.isActive[AP_NODE_TYPE]  = !$scope.isActive[AP_NODE_TYPE];
-            break;
-          case 'am':
-            $scope.isActive[AM_NODE_TYPE]  = !$scope.isActive[AM_NODE_TYPE];
-            break;
-          case 'idf':
-            $scope.isActive[IDF_NODE_TYPE] = !$scope.isActive[IDF_NODE_TYPE];
-            break;
-        }
-        var view_code = 0; 
-        for(var i = 0; i < 3; i++){
-          var bit = $scope.isActive[i] ? 1 : 0;
-          view_code = view_code + bit * Math.pow(2, i);
-        }
-        Drawing.selectView(view_code); 
+      $scope.selectView = function (index) {
+        $scope.isActive[index]  = 1 - $scope.isActive[index]
+        var view_code = $scope.isActive.reduce((sum, n, i) => sum + n * Math.pow(2,i))
+        Drawing.selectView(view_code, $scope.plan.stage.apGroups)
+      }
+
+      $scope.selectDefaultAP = function(ap) {
+        $scope.activeGroup = {}
+        $scope.activeGroup[ap] = true
+        Drawing.setDefaultAP(ap)
       }
 
       var newContact = {}
@@ -833,6 +854,7 @@ angular.module('plans')
 
       $scope.saveSelectedItem = function () {
         $scope.closeMenu()
+        $scope.setDirty()
       }
 
       $scope.savePlanProperties = function () {
@@ -1008,6 +1030,10 @@ angular.module('plans')
         })
       }
 
+      $scope.toggleSelectHardware = function() {
+        $scope.selectHardware = !$scope.selectHardware
+      }
+
       $scope.toggleBuildReport = function() {
         if (!$scope.br_page) $scope.br_page = 'cover'
         $scope.building.details.bom = buildBOM()
@@ -1033,45 +1059,44 @@ angular.module('plans')
 
       $scope.brToggleFloor = function(plan) {
         plan.brSelected = !plan.brSelected
+        _.map($scope.building.plans, p => {
+          if (p._id === plan._id) p.brSelected = plan.brSelected
+        })
       }
 
       $scope.brSelectAllFloors = function() {
         if (!_.filter($scope.plans.filter(p => !p.brSelected)).length) {
           $scope.plans.map(p => p.brSelected = false)
+          $scope.building.plans.map(p => p.brSelected = false)
           $scope.brToggleSelect = false
         } else {
           $scope.plans.map(p => p.brSelected = true)
+          $scope.building.plans.map(p => p.brSelected = true)
           $scope.brToggleSelect = true
         }
       }
 
-      $scope.report = function () {
-        if (!_.get($scope.building, 'details.client.name') ||
-          !_.get($scope.building, 'details.msp.name') ||
-          !_.get($scope.building, 'details.inventory.vendor') ||
-          !_.get($scope.building, 'details.address') ||
-          !_.get($scope.building, 'details.city')) {
+      $scope.brValid = function () {
+        let bldg = $scope.building
+        if (!bldg) return
+        let address = bldg.details.address && bldg.details.city && bldg.details.city
+        let msp = _.get(bldg, 'details.msp.name')
+        let floors = _.filter($scope.building.plans, p => p.brSelected).length
 
-          /* TODO: modal not showing, probably because of a different scope
-                console.log('showing modal')
-                ModalService.showModal({
-                    templateUrl: 'infoModal.html',
-                    controller: 'infoModalController',
-                    inputs: { info: 'Please fill out all the details of the building (client, MSP, address, vendor, etc' }
-                })
-                */
-          alert('Please fill out all the details of the building (client, MSP, address, vendor, etc')
-        } else {
-          $scope.savePlan().then(() => {
-            if ($scope.settings.show_heatmap) {
-              $scope.settings.show_heatmap = false
-              $scope.toggleHeatmap()
-            }
-            $timeout(() => {
-              window.open(`/buildings/${$scope.building._id}/pdf`, '_blank')
-            }, 1000)
-          })
-        }
+        return bldg && address && msp && floors
+      }
+
+      $scope.brGenerateReport = function () {
+        $scope.building.$save()
+        $scope.savePlan().then(() => {
+          if ($scope.settings.show_heatmap) {
+            $scope.settings.show_heatmap = false
+            $scope.toggleHeatmap()
+          }
+          $timeout(() => {
+            window.open(`/buildings/${$scope.building._id}/pdf`, '_blank')
+          }, 1000)
+        })
       }
 
       function render3d(signal) {
@@ -1181,7 +1206,10 @@ angular.module('plans')
           .then(render3d)
       }
 
+      $scope.getVendors = search => Vendors.query({search: search}).$promise
       $scope.getControllers = search => Controllers.query({search: search}).$promise
+      $scope.getAps = search => APs.query({search: search}).$promise
+      $scope.getMounts = search => Mounts.query({search: search}).$promise
 
       $scope.addContact = function() {
         $scope.building.details.contacts.push({})

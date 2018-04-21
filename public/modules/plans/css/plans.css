@@ -541,4 +541,9 @@ table.pjtable thead th {
 	width: 75px;
 }
 
-
+.apgroups button:not(.active) {
+  color: #ccc;
+  background-color: #222;
+  background-image: none;
+  border-color: #fff;
+}

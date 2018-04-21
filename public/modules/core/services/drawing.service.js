@@ -749,10 +749,13 @@ angular.module("core").service("Drawing", ["contextMenu", "$q", "$http", "$timeo
 			current_wall = false;
 		};
 
+    this.setDefaultAP = function(ap) {
+      this.defaultAP = ap
+    }
+
 		this.addAP = function (x, y, signal_radius, item) {
 			if (is_dragging) {
 				is_dragging = false;
-
 				return;
 			}
 
@@ -783,7 +786,7 @@ angular.module("core").service("Drawing", ["contextMenu", "$q", "$http", "$timeo
 
 			switch (itemType) {
 				case "ap":
-					item = _.defaults(item, { vendor: this.plan.details.vendor, sku: this.plan.details.aps });
+					item = _.defaults(item, { vendor: this.plan.details.vendor, sku: item.sku || this.defaultAP || this.plan.details.aps });
 					itemIndex = plan.item_index[itemType];
 					text = new createjs.Text(itemIndex, "12px Arial", TEXT_RGB[itemType]);
 					var overlaps = new createjs.Container();
@@ -875,6 +878,7 @@ angular.module("core").service("Drawing", ["contextMenu", "$q", "$http", "$timeo
 			if (itemType === "ap") { drawIntersections(container); }
 
 			update = true;
+      if (!item && this.setFloorplanDirty) this.setFloorplanDirty()
 		};
 
 		this.reindexItems = function () {
@@ -957,21 +961,26 @@ angular.module("core").service("Drawing", ["contextMenu", "$q", "$http", "$timeo
 			this.reindexItems();
 		};
 
-		this.selectView = function(view_mode) {
+		this.selectView = function(view_mode, groups) {
       self.setFloorplanDirty();
 
 			var link_count = distances.children.length;
 			for (var link_pointer = 0; link_pointer != link_count; (link_pointer++)) {
 				var item_type;
-				var view_code = { 'ap': 1, 'am': 2, 'idf': 4};
+				var view_code = { 'ap': 1, 'am': 2, 'idf': 4 };
+        var index = 0
+        let groupIfActive = (count, group) => (view_mode & Math.pow(2, index+++3)) && group
+        let activeGroups = _.mapKeys(_.map(groups, groupIfActive))
 
 				item_type = distances.children[link_pointer].ap_start.itemType;
+        let activeAPStart = activeGroups[distances.children[link_pointer].ap_start.inventory.sku]
 				var left_view_code = view_code[item_type];
-				var show_left = (view_mode & left_view_code) != 0 ? true : false;
+				var show_left = (activeAPStart && view_mode & left_view_code) ? true : false;
 
 				item_type = distances.children[link_pointer].ap_end.itemType;
+        let activeAPEnd = activeGroups[distances.children[link_pointer].ap_end.inventory.sku]
 				var right_view_code = view_code[item_type];
-				var show_right = (view_mode & right_view_code) != 0 ? true : false;
+				var show_right = (activeAPEnd && view_mode & right_view_code) ? true : false;
 
 				distances.children[link_pointer].ap_start.visible = show_left;
 				distances.children[link_pointer].ap_end.visible   = show_right;

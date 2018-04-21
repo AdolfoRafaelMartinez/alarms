@@ -19,7 +19,7 @@ exports.vendorByID = function (req, res, next, id) {
 }
 
 exports.list = function (req, res) {
-	Vendor.find().limit(200).sort('name').exec(function (err, vendors) {
+	Vendor.find({name: new RegExp(req.query.search, 'i')}).limit(200).sort('name').exec(function (err, vendors) {
 		if (err) {
 			return res.status(400).send({
 				message: errorHandler.getErrorMessage(err)

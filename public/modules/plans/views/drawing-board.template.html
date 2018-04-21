@@ -538,15 +538,15 @@
               <table class="pjtable">
                 <thead>
                   <tr>
+                    <th>Model / Description</th>
                     <th>Part No.</th>
-                    <th>Description</th>
                     <th>Quantity</th>
                     <th class="center icon">Remove</th>
                   </tr>
                 </thead>
                 <tr ng-repeat="(partIndex, part) in building.details.bom track by $index">
-                  <td><input type="text" ng-model="part.sku" class="form-control input-sm" placeholder="SKU 123..." tabindex="0" aria-invalid="false"></td>
                   <td><input type="text" ng-model="part.desc" class="form-control input-sm" placeholder="AP-205..." tabindex="0" aria-invalid="false"></td>
+                  <td><input type="text" ng-model="part.sku" class="form-control input-sm" placeholder="SKU 123..." tabindex="0" aria-invalid="false"></td>
                   <td><input type="text" ng-model="part.qty" class="form-control input-sm" placeholder="12.." tabindex="0" aria-invalid="false"></td>
                   <td class="center ">
                     <a href ng-click="askDeletePart(partIndex, $event, building)"> <i class="glyphicon glyphicon-remove"></i> </a>
@@ -580,7 +580,6 @@
     <div class="col-lg-12 text-right">
       <button type="button" class="btn btn-primary" ng-click="brPagePrev()" ng-if="br_page!='cover'">Previous</button>
       <button type="button" class="btn btn-primary" ng-click="brPageNext()" ng-if="br_page!='notes'">Next</button>
-      <button type="button" class="btn btn-info" ng-click="brSaveDraft()">Save Draft</button>
       <button type="button" class="btn btn-danger" ng-disabled="!brValid()" ng-click="brGenerateReport()">PDF Report</button>
     </div>
   </div>
@@ -618,43 +617,71 @@
                     <div class="col-sm-10"><input type="text" ng-model="selectedItem.inventory.name" class="form-control" placeholder="e.g. AP-hall-01..." /></div>
                 </div>
                 <div class="form-group row">
-                    <label class="col-sm-2 form-control-label">Vendor</label>
-                    <div class="col-sm-10"><input type="text" ng-model="selectedItem.inventory.vendor" class="form-control" placeholder="name..." /></div>
+                  <label class="col-sm-2 form-control-label">Vendor</label>
+                  <div class="col-sm-10">
+                    <input type="text" ng-model="selectedItem.inventory.vendor" class="form-control" placeholder="name..."
+                                        uib-typeahead="vendor.name for vendor in getVendors($viewValue)" 
+                                        typeahead-loading="loadingVendor" 
+                                        typeahead-no-results="noResultsVendor" />
+                <i ng-show="loadingVendor" class="glyphicon glyphicon-refresh"></i>
+                <div ng-show="noResultsVendor"> <i class="glyphicon glyphicon-remove"></i> No Results Found </div>
+                  </div>
                 </div>
                 <div class="form-group row">
-                    <label class="col-sm-2 form-control-label">Model</label>
-                    <div class="col-sm-10"><input type="text" ng-model="selectedItem.inventory.sku" class="form-control" placeholder="number..." /></div>
+                  <label class="col-sm-2 form-control-label">Model</label>
+                  <div class="col-sm-10">
+                    <input type="text" ng-model="selectedItem.inventory.sku" class="form-control" placeholder="number..."
+                                        uib-typeahead="ap.sku for ap in getAps($viewValue)" 
+                                        typeahead-loading="loadingAP" 
+                                        typeahead-no-results="noResultsAP" />
+                    <i ng-show="loadingAP" class="glyphicon glyphicon-refresh"></i>
+                    <div ng-show="noResultsAP"> <i class="glyphicon glyphicon-remove"></i> No Results Found </div>
+                  </div>
                 </div>
                 <div class="form-group row">
-                    <div class="col-sm-12">
-                        <button type="submit" class="btn btn-primary" ng-click="saveSelectedItem()">Save</button>
-                        <button class="btn btn-danger pull-right" role="menuitem" tabindex="1" ng-click="deleteSelectedItem()"> Delete AP </button>
-                    </div>
+                  <div class="col-sm-12">
+                    <button type="submit" class="btn btn-primary" ng-click="saveSelectedItem()">Save</button>
+                    <button class="btn btn-danger pull-right" role="menuitem" tabindex="1" ng-click="deleteSelectedItem()"> Delete AP </button>
+                  </div>
                 </div>
             </form>
         </div>
 
         <div class="panel-body" ng-show="menu.mode == 'am'">
-            <form>
-                <div class="form-group row">
-                    <label class="col-sm-2 form-control-label">Name</label>
-                    <div class="col-sm-10"><input type="text" ng-model="selectedItem.inventory.name" class="form-control" placeholder="e.g. AM-hall-01..." /></div>
-                </div>
-                <div class="form-group row">
-                    <label class="col-sm-2 form-control-label">Vendor</label>
-                    <div class="col-sm-10"><input type="text" ng-model="selectedItem.inventory.vendor" class="form-control" placeholder="name..." /></div>
-                </div>
-                <div class="form-group row">
-                    <label class="col-sm-2 form-control-label">Model</label>
-                    <div class="col-sm-10"><input type="text" ng-model="selectedItem.inventory.sku" class="form-control" placeholder="number..." /></div>
-                </div>
-                <div class="form-group row">
-                    <div class="col-sm-12">
-                        <button type="submit" class="btn btn-primary" ng-click="saveSelectedItem()">Save</button>
-                        <button class="btn btn-danger pull-right" role="menuitem" tabindex="1" ng-click="deleteSelectedItem()"> Delete AM </button>
-                    </div>
-                </div>
-            </form>
+          <form>
+            <div class="form-group row">
+              <label class="col-sm-2 form-control-label">Name</label>
+              <div class="col-sm-10"><input type="text" ng-model="selectedItem.inventory.name" class="form-control" placeholder="e.g. AM-hall-01..." /></div>
+            </div>
+            <div class="form-group row">
+              <label class="col-sm-2 form-control-label">Vendor</label>
+              <div class="col-sm-10">
+                <input type="text" ng-model="selectedItem.inventory.vendor" class="form-control" placeholder="name..."
+                                    uib-typeahead="vendor.name for vendors in getVendors($viewValue)" 
+                                    typeahead-loading="loadingVendor" 
+                                    typeahead-no-results="noResultsVendor" />
+                <i ng-show="loadingVendor" class="glyphicon glyphicon-refresh"></i>
+                <div ng-show="noResultsVendor"> <i class="glyphicon glyphicon-remove"></i> No Results Found </div>
+              </div>
+            </div>
+            <div class="form-group row">
+              <label class="col-sm-2 form-control-label">Model</label>
+              <div class="col-sm-10">
+                <input type="text" ng-model="selectedItem.inventory.sku" class="form-control" placeholder="number..."
+                                    uib-typeahead="ap.sku for ap in getAps($viewValue)" 
+                                    typeahead-loading="loadingAM" 
+                                    typeahead-no-results="noResultsAM" />
+                <i ng-show="loadingAM" class="glyphicon glyphicon-refresh"></i>
+                <div ng-show="noResultsAM"> <i class="glyphicon glyphicon-remove"></i> No Results Found </div>
+              </div>
+            </div>
+            <div class="form-group row">
+              <div class="col-sm-12">
+                <button type="submit" class="btn btn-primary" ng-click="saveSelectedItem()">Save</button>
+                <button class="btn btn-danger pull-right" role="menuitem" tabindex="1" ng-click="deleteSelectedItem()"> Delete AM </button>
+              </div>
+            </div>
+          </form>
         </div>
 
         <div class="panel-body" ng-show="menu.mode === 'idf' || menu.mode === 'mdf'">
@@ -664,7 +691,7 @@
                     <div class="col-sm-10"><input type="text" ng-model="selectedItem.inventory.name" class="form-control" placeholder="e.g. IDF-hall-01..." /></div>
                 </div>
                 <div class="form-group row">
-					<md-switch flex ng-model="selectedItem.inventory.mdf" ng-change="toggleMDF()" aria-label="This is the MDF">MDF</md-switch>
+                  <md-switch flex ng-model="selectedItem.inventory.mdf" ng-change="toggleMDF()" aria-label="This is the MDF">MDF</md-switch>
                 </div>
                 <div class="form-group row">
                     <div class="col-sm-12">

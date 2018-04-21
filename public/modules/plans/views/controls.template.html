@@ -52,7 +52,7 @@
 
 	<div class="floors">
 		<div ng-repeat="p in plans" ng-class="{'shadowItem': p != plan}" ng-click="showPlan(p)">
-      <div class="ctrlIcon">
+      <div class="ctrlIcon" ng-if="p.details.ctrlPresent">
         <i class="fas fa-gamepad"></i>
       </div>
 			<a href>
