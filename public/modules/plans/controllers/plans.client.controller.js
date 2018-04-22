@@ -630,15 +630,21 @@ angular.module('plans')
         $scope.bldgResource = getBuildingResource()
         if (_.get($scope.bldgResource, 'details.inventory')) {
           let defaultAP = $scope.bldgResource.details.inventory.aps
+          let defaultVendor = $scope.bldgResource.details.inventory.vendor
+          var uninitialized
           if (defaultAP) {
             var groups = {}
             _.each(plan.stage.items, item => {
-              if (!item.sku && defaultAP) item.sku = defaultAP
+              if (!item.sku && defaultAP) {
+                item.sku = defaultAP
+                uninitialized = true
+              }
               groups[item.sku] = groups[item.sku] ? groups[item.sku] + 1 : 1
             })
             plan.stage.apGroups = groups
             for (let i=0; i<_.size(groups); i++) $scope.isActive[i+3] = 1
           }
+          if (uninitialized) Drawing.updateInventory(defaultAP, defaultVendor)
         }
       }
 
@@ -664,6 +670,7 @@ angular.module('plans')
       }
 
       $scope.setDirty = () => {
+        console.log('setDirty')
         $timeout(() => {
           $scope.plan.stage.items = Drawing.toJSON().items
           refreshAPGroups($scope.plan)
@@ -801,6 +808,7 @@ angular.module('plans')
       $scope.selectView = function (index) {
         $scope.isActive[index]  = 1 - $scope.isActive[index]
         var view_code = $scope.isActive.reduce((sum, n, i) => sum + n * Math.pow(2,i))
+        console.log('view_code', view_code)
         Drawing.selectView(view_code, $scope.plan.stage.apGroups)
       }
 

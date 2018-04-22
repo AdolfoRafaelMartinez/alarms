@@ -777,6 +777,7 @@ angular.module("core").service("Drawing", ["contextMenu", "$q", "$http", "$timeo
 				item = { itemType: item || "ap" };
 			}
 			container.itemType = itemType = item.itemType;
+      if (!item.id) item.id = _.uniqueId();
 
 			addHandlers.call(this, container);
 
@@ -794,7 +795,7 @@ angular.module("core").service("Drawing", ["contextMenu", "$q", "$http", "$timeo
 					overlaps.mouseEnabled = false;
 
 					var circle = new createjs.Shape();
-					circle.id = _.uniqueId();
+					circle.id = item.id
 					circle.graphics.setStrokeStyle(1).beginFill(AP_CIRCLE_RGBA).beginStroke(AP_CIRCLE_STROKE_RGB).drawCircle(0, 0, plan.radius);
 					circle.puddleShape = "signal";
 					circle.regX = circle.regY = 0;
@@ -813,7 +814,7 @@ angular.module("core").service("Drawing", ["contextMenu", "$q", "$http", "$timeo
 					itemIndex = plan.item_index[itemType];
 					text = new createjs.Text(itemIndex, "12px Arial", TEXT_RGB[itemType]);
 					var circle = new createjs.Shape();
-					circle.id = _.uniqueId();
+					circle.id = item.id
 					circle.graphics.beginFill(BUBBLE_RGB.am).drawCircle(0, 0, AM_VISUAL_RADIUS - 5).endFill();
 					circle.graphics.beginStroke(BUBBLE_RGB.am).drawCircle(0, 0, AM_VISUAL_RADIUS).endStroke();
 					circle.graphics.beginStroke(BUBBLE_RGB.am).drawCircle(0, 0, AM_VISUAL_RADIUS + 10).endStroke();
@@ -830,7 +831,7 @@ angular.module("core").service("Drawing", ["contextMenu", "$q", "$http", "$timeo
 					itemIndex = plan.item_index[itemType];
 					text = new createjs.Text(`IDF ${itemIndex}`, "10px Arial", TEXT_RGB[itemType]);
 					var square = new createjs.Shape();
-					square.id = _.uniqueId();
+					square.id = item.id
 					// square.graphics.beginFill(BUBBLE_RGB.idf).drawRoundRect(0 - IDF_VISUAL_RADIUS, 0 - IDF_VISUAL_RADIUS / 2, IDF_VISUAL_RADIUS * 2, IDF_VISUAL_RADIUS).endFill()
 					square.puddleShape = "display";
 					square.regX = square.regY = 0;
@@ -845,7 +846,7 @@ angular.module("core").service("Drawing", ["contextMenu", "$q", "$http", "$timeo
 					itemIndex = 1;
 					text = new createjs.Text(`MDF ${itemIndex}`, "10px Arial", TEXT_RGB[itemType]);
 					var square = new createjs.Shape();
-					square.id = _.uniqueId();
+					square.id = item.id
 					// square.graphics.beginFill(BUBBLE_RGB.mdf).drawRoundRect(0 - MDF_VISUAL_RADIUS / 2, 0 - MDF_VISUAL_RADIUS / 2, MDF_VISUAL_RADIUS, MDF_VISUAL_RADIUS).endFill()
 					square.puddleShape = "display";
 					square.regX = square.regY = 0;
@@ -961,8 +962,21 @@ angular.module("core").service("Drawing", ["contextMenu", "$q", "$http", "$timeo
 			this.reindexItems();
 		};
 
+    this.updateInventory = function(defaultAP, defaultVendor) {
+      _.each(this.plan.stage.items, (item, index) => {
+        if (!item.inventory) item.inventory = {}
+        if (!item.inventory.sku) item.inventory.sku = defaultAP
+        if (!item.inventory.vendor) item.inventory.vendor = defaultVendor
+      })
+      _.each(distances.children, line => {
+        if (!_.get(line.ap_start, 'inventory.sku')) _.set(line.ap_start, 'inventory.sku', defaultAP)
+        if (!_.get(line.ap_start, 'inventory.vendor')) _.set(line.ap_start, 'inventory.vendor', defaultVendor)
+        if (!_.get(line.ap_end, 'inventory.sku')) _.set(line.ap_end, 'inventory.sku', defaultAP)
+        if (!_.get(line.ap_end, 'inventory.vendor')) _.set(line.ap_end, 'inventory.vendor', defaultVendor)
+      })
+    }
+
 		this.selectView = function(view_mode, groups) {
-      self.setFloorplanDirty();
 
 			var link_count = distances.children.length;
 			for (var link_pointer = 0; link_pointer != link_count; (link_pointer++)) {
@@ -1238,7 +1252,6 @@ angular.module("core").service("Drawing", ["contextMenu", "$q", "$http", "$timeo
 			this.plan = planResource;
 			this.updateControls = updateControls;
       this.setFloorplanDirty = setDirty;
-      console.log(signal_radius, plan.stage_scale)
 			$timeout(() => {
 				if (data.plan) { plan = data.plan; }
 				plan._id = this.plan.id;
