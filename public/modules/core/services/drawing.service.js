@@ -1238,6 +1238,7 @@ angular.module("core").service("Drawing", ["contextMenu", "$q", "$http", "$timeo
 			this.plan = planResource;
 			this.updateControls = updateControls;
       this.setFloorplanDirty = setDirty;
+      console.log(signal_radius, plan.stage_scale)
 			$timeout(() => {
 				if (data.plan) { plan = data.plan; }
 				plan._id = this.plan.id;

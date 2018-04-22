@@ -141,16 +141,16 @@ exports.update = function (req, res) {
  * Delete an plan
  */
 exports.delete = function (req, res) {
-	var plan = req.plan
-
-	plan.remove(function (err) {
-		if (err) {
-			return res.status(400).send({
-				message: errorHandler.getErrorMessage(err)
-			})
-		} else {
-			res.status(202).send()
-		}
+	let plan = Plan.findById(req.plan._id).exec(function (err, plan) {
+    plan.remove(function(err, plan) {
+      if (err) {
+        return res.status(400).send({
+          message: errorHandler.getErrorMessage(err)
+        })
+      } else {
+        res.status(202).send()
+      }
+    })
 	})
 }
 

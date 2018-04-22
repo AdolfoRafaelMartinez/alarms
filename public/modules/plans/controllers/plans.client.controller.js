@@ -244,6 +244,7 @@ angular.module('plans')
         var plan = new Plans(_.cloneDeep($scope.plan))
         $scope.planReady = false;
         plan.thumb = Drawing.getThumb()
+        updateProject()
 
         Drawing.toggleOverlaps('off')
         Drawing.toggleDistances('off')
@@ -260,6 +261,7 @@ angular.module('plans')
 
         plan.title = $scope.flooplan_name
         plan.stage = Drawing.toJSON()
+        refreshAPGroups(plan)
         plan.settings = $scope.settings
         /* TODO: update plan titles in building */
 
@@ -403,7 +405,13 @@ angular.module('plans')
           walls: [],
           aps: [],
           floorplan: '',
-          plan: {}
+          plan: {
+            stage_ppm: 10,
+            stage_scale: 40,
+            radius: 200,
+            real_radius: 25,
+            floor_width: 300
+          }
         }
       }
 
@@ -619,12 +627,13 @@ angular.module('plans')
 
       function refreshAPGroups (plan) {
         /* Setup / refresh AP Groups */
-        $scope.bldgResource = _.find($scope.project.sites.map(site => site.buildings.map(b => (b._id === plan.building) && b)))[0]
+        $scope.bldgResource = getBuildingResource()
         if (_.get($scope.bldgResource, 'details.inventory')) {
           let defaultAP = $scope.bldgResource.details.inventory.aps
           if (defaultAP) {
             var groups = {}
             _.each(plan.stage.items, item => {
+              if (!item.sku && defaultAP) item.sku = defaultAP
               groups[item.sku] = groups[item.sku] ? groups[item.sku] + 1 : 1
             })
             plan.stage.apGroups = groups
@@ -655,12 +664,24 @@ angular.module('plans')
       }
 
       $scope.setDirty = () => {
-        console.log('setDirty')
         $timeout(() => {
           $scope.plan.stage.items = Drawing.toJSON().items
           refreshAPGroups($scope.plan)
         }, 100)
         $scope.dirty = true
+      }
+
+      function getBuildingResource() {
+        var bldg
+        let bldgFiltered = _.find($scope.project.sites.map(site => site.buildings.map(b => (b._id === $state.params.bldgID) && b)))
+        _.each(bldgFiltered, b => bldg = b ? b : bldg)
+
+        return bldg
+      }
+
+      $scope.updateHardware = function() {
+        console.log('updateHardware')
+        $scope.setDirty()
       }
 
       function getFirst(obj) {
@@ -876,7 +897,6 @@ angular.module('plans')
         var b = new Buildings($scope.building)
         b.$update()
 
-        // $scope.savePlan() // save current plan
         $scope.pp_edit = {}
       }
 
