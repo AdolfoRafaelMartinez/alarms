@@ -140,9 +140,8 @@ exports.update = function (req, res) {
 						let deferred = Q.defer()
 						promises.push(deferred.promise)
 						Plan.findOne({_id: plan._id}, (err, plan) => {
-							if (err || !plan) {
-								return deferred.reject(err)
-							}
+							if (err) return deferred.reject(err)
+              if (!plan) return deferred.resolve()
 							_.set(plan, 'details.project', project.title)
 							_.set(plan, 'details.site', site.name)
 							_.set(plan, 'details.building', bldg.name)
@@ -180,7 +179,7 @@ exports.update = function (req, res) {
 								}
 							})
 							Plan.findOneAndUpdate({_id: plan._id}, plan).exec(() => {
-                                plan.save()
+                plan.save()
 								deferred.resolve()
 							})
 						})
@@ -203,13 +202,6 @@ exports.update = function (req, res) {
 					_.set(project, 'details.newsite', newsite)
 				}
 				res.json(project)
-			})
-		})
-		.catch(err => {
-			console.dir(err)
-			res.status(500).send({
-				message: errorHandler.getErrorMessage(err),
-				err: err
 			})
 		})
 }
