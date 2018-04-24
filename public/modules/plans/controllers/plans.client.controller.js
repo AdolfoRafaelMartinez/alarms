@@ -670,7 +670,6 @@ angular.module('plans')
       }
 
       $scope.setDirty = () => {
-        console.log('setDirty')
         $timeout(() => {
           $scope.plan.stage.items = Drawing.toJSON().items
           refreshAPGroups($scope.plan)
@@ -687,7 +686,6 @@ angular.module('plans')
       }
 
       $scope.updateHardware = function() {
-        console.log('updateHardware')
         $scope.setDirty()
       }
 
@@ -799,8 +797,10 @@ angular.module('plans')
         $scope.isActive[AP_NODE_TYPE]  = 1
         $scope.isActive[AM_NODE_TYPE]  = 1
         $scope.isActive[IDF_NODE_TYPE] = 1
+        /*
         var view_code = 7
         Drawing.selectView(view_code)
+        */
         $scope.mouse_mode = mode
         Drawing.selectTool(mode)
       }

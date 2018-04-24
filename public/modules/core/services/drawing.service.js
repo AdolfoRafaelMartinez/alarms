@@ -446,7 +446,7 @@ angular.module("core").service("Drawing", ["contextMenu", "$q", "$http", "$timeo
 
 					return;
 				}
-				if (!itemTypes.includes(mouse_mode)) { return; }
+				if (!itemTypes.includes(mouse_mode)) return;
 				ap_clicked = true;
 				evt.stopPropagation();
 				evt.preventDefault();
@@ -513,17 +513,19 @@ angular.module("core").service("Drawing", ["contextMenu", "$q", "$http", "$timeo
 						break;
 
 					case "am":
+              /*
 						graphics.clear().beginFill(color).drawCircle(0, 0, AM_VISUAL_RADIUS - 5).endFill();
 						graphics.beginStroke(color).drawCircle(0, 0, AM_VISUAL_RADIUS).endStroke();
 						graphics.beginStroke(color).drawCircle(0, 0, AM_VISUAL_RADIUS + 10).endStroke();
+            */
 						break;
 
 					case "idf":
-						graphics.clear().beginFill(color).drawRoundRect(0 - IDF_VISUAL_RADIUS / 2, 0 - IDF_VISUAL_RADIUS / 2, IDF_VISUAL_RADIUS, IDF_VISUAL_RADIUS, 5, 5);
+            // graphics.clear().beginFill(color).drawRoundRect(0 - IDF_VISUAL_RADIUS / 2, 0 - IDF_VISUAL_RADIUS / 2, IDF_VISUAL_RADIUS, IDF_VISUAL_RADIUS, 5, 5);
 						break;
 
 					case "mdf":
-						graphics.clear().beginFill(color).drawRoundRect(0 - MDF_VISUAL_RADIUS / 2, 0 - MDF_VISUAL_RADIUS / 2, MDF_VISUAL_RADIUS, MDF_VISUAL_RADIUS, 15, 15);
+            // graphics.clear().beginFill(color).drawRoundRect(0 - MDF_VISUAL_RADIUS / 2, 0 - MDF_VISUAL_RADIUS / 2, MDF_VISUAL_RADIUS, MDF_VISUAL_RADIUS, 15, 15);
 						break;
 				}
 				update = true;
@@ -541,17 +543,19 @@ angular.module("core").service("Drawing", ["contextMenu", "$q", "$http", "$timeo
 						break;
 
 					case "am":
+            /*
 						graphics.clear().beginFill(color).drawCircle(0, 0, AM_VISUAL_RADIUS - 5).endFill();
 						graphics.beginStroke(color).drawCircle(0, 0, AM_VISUAL_RADIUS).endStroke();
 						graphics.beginStroke(color).drawCircle(0, 0, AM_VISUAL_RADIUS + 10).endStroke();
+            */
 						break;
 
 					case "idf":
-						graphics.clear().beginFill(color).drawRoundRect(0 - IDF_VISUAL_RADIUS / 2, 0 - IDF_VISUAL_RADIUS / 2, IDF_VISUAL_RADIUS / 2, IDF_VISUAL_RADIUS / 2, 5, 5);
+            // graphics.clear().beginFill(color).drawRoundRect(0 - IDF_VISUAL_RADIUS / 2, 0 - IDF_VISUAL_RADIUS / 2, IDF_VISUAL_RADIUS / 2, IDF_VISUAL_RADIUS / 2, 5, 5);
 						break;
 
 					case "mdf":
-						graphics.clear().beginFill(color).drawRoundRect(0 - MDF_VISUAL_RADIUS / 2, 0 - MDF_VISUAL_RADIUS / 2, MDF_VISUAL_RADIUS / 2, MDF_VISUAL_RADIUS / 2, 15, 15);
+            // graphics.clear().beginFill(color).drawRoundRect(0 - MDF_VISUAL_RADIUS / 2, 0 - MDF_VISUAL_RADIUS / 2, MDF_VISUAL_RADIUS / 2, MDF_VISUAL_RADIUS / 2, 15, 15);
 						break;
 				}
 				update = true;
@@ -805,7 +809,10 @@ angular.module("core").service("Drawing", ["contextMenu", "$q", "$http", "$timeo
 					ap.overlaps = overlaps;
 					container.addChild(ap);
 					container.addChild(overlaps);
-					ap.graphics.beginFill("Blue").drawRect(-AP_SQUARE_CORNER, -AP_SQUARE_CORNER, 2 * AP_SQUARE_CORNER, 2 * AP_SQUARE_CORNER);
+					ap.graphics.beginFill("Blue").drawRect(-AP_SQUARE_CORNER, -AP_SQUARE_CORNER, 2 * AP_SQUARE_CORNER, 2 * AP_SQUARE_CORNER).endFill();
+          let ppmScaleFactor = this.plan.stage.plan.stage_ppm /2
+          ap.graphics.beginStroke("Blue").drawCircle(0, 0, 5 * ppmScaleFactor).endStroke();
+					ap.graphics.beginStroke("Blue").drawCircle(0, 0, 8 * ppmScaleFactor).endStroke();
 					ap.puddleShape = "ap";
 					break;
 
@@ -815,9 +822,11 @@ angular.module("core").service("Drawing", ["contextMenu", "$q", "$http", "$timeo
 					text = new createjs.Text(itemIndex, "12px Arial", TEXT_RGB[itemType]);
 					var circle = new createjs.Shape();
 					circle.id = item.id
+          /*
 					circle.graphics.beginFill(BUBBLE_RGB.am).drawCircle(0, 0, AM_VISUAL_RADIUS - 5).endFill();
 					circle.graphics.beginStroke(BUBBLE_RGB.am).drawCircle(0, 0, AM_VISUAL_RADIUS).endStroke();
 					circle.graphics.beginStroke(BUBBLE_RGB.am).drawCircle(0, 0, AM_VISUAL_RADIUS + 10).endStroke();
+          */
 					circle.puddleShape = "print";
 					circle.regX = circle.regY = 0;
 					circle.scaleX = circle.scaleY = circle.scale = 1;
@@ -879,7 +888,7 @@ angular.module("core").service("Drawing", ["contextMenu", "$q", "$http", "$timeo
 			if (itemType === "ap") { drawIntersections(container); }
 
 			update = true;
-      if (!item && this.setFloorplanDirty) this.setFloorplanDirty()
+      if (!item && this.setFloorplanDirty) $timeout(this.setFloorplanDirty, 500)
 		};
 
 		this.reindexItems = function () {
@@ -987,11 +996,13 @@ angular.module("core").service("Drawing", ["contextMenu", "$q", "$http", "$timeo
         let activeGroups = _.mapKeys(_.map(groups, groupIfActive))
 
 				item_type = distances.children[link_pointer].ap_start.itemType;
+        if (item_type == 'mdf') item_type = 'idf';
         let activeAPStart = activeGroups[distances.children[link_pointer].ap_start.inventory.sku]
 				var left_view_code = view_code[item_type];
 				var show_left = (activeAPStart && view_mode & left_view_code) ? true : false;
 
 				item_type = distances.children[link_pointer].ap_end.itemType;
+        if (item_type == 'mdf') item_type = 'idf';
         let activeAPEnd = activeGroups[distances.children[link_pointer].ap_end.inventory.sku]
 				var right_view_code = view_code[item_type];
 				var show_right = (activeAPEnd && view_mode & right_view_code) ? true : false;
