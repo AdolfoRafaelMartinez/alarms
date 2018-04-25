@@ -633,7 +633,7 @@ angular.module('plans')
           let defaultVendor = $scope.bldgResource.details.inventory.vendor
           var uninitialized
           if (defaultAP) {
-            var groups = {}
+            let groups = {}
             _.each(plan.stage.items, item => {
               if (!item.sku && defaultAP) {
                 item.sku = defaultAP
@@ -641,7 +641,10 @@ angular.module('plans')
               }
               groups[item.sku] = groups[item.sku] ? groups[item.sku] + 1 : 1
             })
-            plan.stage.apGroups = groups
+            let defaultCount = groups[defaultAP]
+            delete groups[defaultAP]
+            groups[defaultAP] = defaultCount
+            plan.stage.apGroups = groups // I know, weird yeah? (Mark V. 4/25/2018) -- this re-indexes the groups for angular to order them correctly
             for (let i=0; i<_.size(groups); i++) $scope.isActive[i+3] = 1
           }
           if (uninitialized) Drawing.updateInventory(defaultAP, defaultVendor)
@@ -732,6 +735,13 @@ angular.module('plans')
           plan.details.building = $scope.building.name
           plan.details.contacts = _.get($scope.building, 'details.contacts') || []
           plan.details.reportAuthor = _.get($scope.building, 'details.reportAuthor') || []
+          let currentUser = {
+            name: $scope.authentication.user.displayName,
+            email: $scope.authentication.user.email,
+            position: ''
+          }
+          let currentUserIncluded = _.filter(plan.details.reportAuthor, author => author.email === currentUser.email).length
+          if (!currentUserIncluded) plan.details.reportAuthor.unshift(currentUser)
           _.set($scope.building, 'details.contacts', plan.details.contacts)
           _.set($scope.building, 'details.reportAuthor', plan.details.reportAuthor)
           updateWifiDetails(plan)
@@ -797,10 +807,6 @@ angular.module('plans')
         $scope.isActive[AP_NODE_TYPE]  = 1
         $scope.isActive[AM_NODE_TYPE]  = 1
         $scope.isActive[IDF_NODE_TYPE] = 1
-        /*
-        var view_code = 7
-        Drawing.selectView(view_code)
-        */
         $scope.mouse_mode = mode
         Drawing.selectTool(mode)
       }
@@ -808,7 +814,6 @@ angular.module('plans')
       $scope.selectView = function (index) {
         $scope.isActive[index]  = 1 - $scope.isActive[index]
         var view_code = $scope.isActive.reduce((sum, n, i) => sum + n * Math.pow(2,i))
-        console.log('view_code', view_code)
         Drawing.selectView(view_code, $scope.plan.stage.apGroups)
       }
 
@@ -991,6 +996,25 @@ angular.module('plans')
           })
       }
 
+			$scope.askDeleteAuthor = function (contactIndex, $event, item) {
+				$event.stopPropagation()
+				var contact = item.details.reportAuthor[contactIndex]
+
+				ModalService.showModal({
+					templateUrl: 'deleteModal.html',
+					controller: 'deleteModalController',
+					inputs: { item: `contact: ${contact.name} (${contact.email})` }
+				})
+					.then(function (modal) {
+						modal.element.modal()
+						modal.close.then(function (answer) {
+							if (answer) {
+								$scope.removeAuthor(item, contactIndex)
+							}
+						})
+					})
+			}
+
 			$scope.askDeleteContact = function (contactIndex, $event, item) {
 				$event.stopPropagation()
 				var contact = item.details.contacts[contactIndex]
@@ -1015,6 +1039,10 @@ angular.module('plans')
 				$scope.save()
 			}
 
+			$scope.removeAuthor = function (item, index) {
+				item.details.reportAuthor.splice(index, 1)
+				$scope.save()
+			}
 
       $scope.selectProject = project => {
         $scope.selected = {project: project}

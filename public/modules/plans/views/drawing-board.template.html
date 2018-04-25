@@ -411,7 +411,7 @@
               </div>
               <div class="col-sm-3">
                 <img class="logoselect" ng-src="{{ project.details.client.logo }}" alt="Client Logo">
-                <img class="logoselect" ng-src="{{ project.details.msp.logo }}" alt="Partner Logo">
+                <img class="logoselect" ng-src="{{ project.details.msp.logo || 'modules/plans/images/nologo.jpg' }}" alt="Partner Logo">
               </div>
             </div>
           </div>
@@ -480,7 +480,7 @@
                 <tr ng-repeat="(prepIndex, prep) in building.details.reportAuthor track by $index">
                   <td><input type="text" ng-model="prep.name" class="form-control input-sm" placeholder="John Smith" tabindex="0" aria-invalid="false"></td>
                   <td><input type="text" ng-model="prep.email" class="form-control input-sm" placeholder="email@domain.com" tabindex="0" aria-invalid="false"></td>
-                  <td><input type="text" ng-model="prep.title" class="form-control input-sm" placeholder="Engineer" tabindex="0" aria-invalid="false"></td>
+                  <td><input type="text" ng-model="prep.position" class="form-control input-sm" placeholder="Engineer" tabindex="0" aria-invalid="false"></td>
                   <td class="center ">
                     <a href ng-click="askDeleteAuthor(prepIndex, $event, building)"> <i class="glyphicon glyphicon-remove"></i> </a>
                   </td>

@@ -128,7 +128,7 @@
       <div ng-if="mouse_mode=='ap'" class="row">
         <div class="col-sm-12"><strong>AP Groups </strong><br /></div>
         <div class="col-sm-12 apgroups">
-          <div class="row" ng-repeat="(ap, count) in plan.stage.apGroups">
+          <div class="row" ng-repeat="(ap, count) in plan.stage.apGroups track by $index">
             <div class="col-sm-8">
               <button class="button btn-block text-left" ng-class="{'active': activeGroup[ap]}" ng-click="selectDefaultAP(ap)">
                 <span>{{ ap }}:</span>
