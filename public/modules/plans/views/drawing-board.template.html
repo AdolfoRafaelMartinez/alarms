@@ -582,6 +582,9 @@
       <button type="button" class="btn btn-primary" ng-click="brPageNext()" ng-if="br_page!='notes'">Next</button>
       <button type="button" class="btn btn-danger" ng-disabled="!brValid()" ng-click="brGenerateReport()">PDF Report</button>
     </div>
+    <div class="col-lg-12 text-right">
+      <span ng-repeat="err in brErrors track by $index" class="bg-warning" ng-if="err">{{ err }}. </span>
+    </div>
   </div>
 </div>
 

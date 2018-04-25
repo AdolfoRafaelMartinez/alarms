@@ -90,7 +90,7 @@ angular.module('plans')
         plan: true,
         tools: true,
         hardware: true,
-        reporting: false
+        reporting: true
       }
 
       $scope.closeMenu = function () {
@@ -1071,8 +1071,8 @@ angular.module('plans')
             console.log('adding item', item.sku)
             if (!item.sku) return
             bom[item.sku] = bom[item.sku] ? bom[item.sku]+1 : 1
-            if (item.itemType === 'ap') aps[item.sku] = {sku: item.sku, desc: item.desc || item.vendor}
-            if (item.itemType === 'am') ams[item.sku] = {sku: item.sku, desc: item.desc || item.vendor}
+            if (item.itemType === 'ap') aps[item.sku] = {sku: item.sku, desc: item.sku || item.vendor}
+            if (item.itemType === 'am') ams[item.sku] = {sku: item.sku, desc: item.sku || item.vendor}
           })
           if (plan.details.ctrlPresent) {
             let ctrl = plan.details.controllers[0]
@@ -1095,6 +1095,7 @@ angular.module('plans')
       $scope.toggleBuildReport = function() {
         if (!$scope.br_page) $scope.br_page = 'cover'
         $scope.building.details.bom = buildBOM()
+        $scope.brSelectAllFloors()
         contextMenu.close()
         $scope.build_report = !$scope.build_report
         $scope.plan_properties = false
@@ -1105,6 +1106,7 @@ angular.module('plans')
 
       $scope.brPage = function(page) {
         $scope.br_page = page
+        brCurrentPage = brPages.indexOf(page)
       }
 
       $scope.brPagePrev = function() {
@@ -1134,12 +1136,25 @@ angular.module('plans')
         }
       }
 
+      let brErrors = {
+        bldg: 'Building information missing',
+        address: 'Building address missing',
+        msp: 'MSP name missing',
+        floors: 'No floors selected'
+      }
       $scope.brValid = function () {
         let bldg = $scope.building
         if (!bldg) return
         let address = bldg.details.address && bldg.details.city && bldg.details.city
         let msp = _.get(bldg, 'details.msp.name')
         let floors = _.filter($scope.building.plans, p => p.brSelected).length
+
+        $scope.brErrors = [
+          !bldg && brErrors.bldg,
+          !address && brErrors.address,
+          !msp && brErrors.msp,
+          !floors && brErrors.floors
+        ]
 
         return bldg && address && msp && floors
       }
