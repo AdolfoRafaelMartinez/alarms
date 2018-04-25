@@ -1160,16 +1160,17 @@ angular.module('plans')
       }
 
       $scope.brGenerateReport = function () {
-        $scope.building.$save()
-        $scope.savePlan().then(() => {
-          if ($scope.settings.show_heatmap) {
-            $scope.settings.show_heatmap = false
-            $scope.toggleHeatmap()
-          }
-          $timeout(() => {
-            window.open(`/buildings/${$scope.building._id}/pdf`, '_blank')
-          }, 1000)
-        })
+        updateProject()
+          .then($scope.savePlan)
+          .then(() => {
+            if ($scope.settings.show_heatmap) {
+              $scope.settings.show_heatmap = false
+              $scope.toggleHeatmap()
+            }
+            $timeout(() => {
+              window.open(`/buildings/${$scope.building._id}/pdf`, '_blank')
+            }, 1000)
+          })
       }
 
       function render3d(signal) {
