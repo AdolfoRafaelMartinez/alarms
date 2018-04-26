@@ -972,7 +972,8 @@ angular.module("core").service("Drawing", ["contextMenu", "$q", "$http", "$timeo
 		};
 
     this.updateInventory = function(defaultAP, defaultVendor) {
-      _.each(this.plan.stage.items, (item, index) => {
+      if (!this.plan) return
+      _.each(this.plan.stage.items, item => {
         if (!item.inventory) item.inventory = {}
         if (!item.inventory.sku) item.inventory.sku = defaultAP
         if (!item.inventory.vendor) item.inventory.vendor = defaultVendor

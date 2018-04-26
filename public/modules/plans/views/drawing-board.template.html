@@ -329,6 +329,9 @@
             <a class="nav-link" href ng-click="brPage('floors')" ng-class="{'active': br_page=='floors'}">Floors</a>
           </li>
           <li class="nav-item">
+            <a class="nav-link" href ng-click="brPage('loadout')" ng-class="{'active': br_page=='loadout'}">Loadout</a>
+          </li>
+          <li class="nav-item">
             <a class="nav-link" href ng-click="brPage('bom')" ng-class="{'active': br_page=='bom'}">BOM</a>
           </li>
           <li class="nav-item">
@@ -365,19 +368,19 @@
                 </div>
                 <div class="form-group row">
                   <label class="col-sm-4 ptop5 text-right form-control-label">Building Address</label>
-                  <div class="col-sm-8"><input type="text" ng-model="building.details.address" class="form-control" placeholder="Building Address Line 1" tabindex="0" aria-invalid="false"></div>
+                  <div class="col-sm-8"><input type="text" ng-model="bldgResource.details.address" class="form-control" placeholder="Building Address Line 1" tabindex="0" aria-invalid="false"></div>
                 </div>
                 <div class="form-group row">
                   <label class="col-sm-4 ptop5 text-right form-control-label">Building City</label>
-                  <div class="col-sm-8"><input type="text" ng-model="building.details.city" class="form-control" placeholder="City" tabindex="0" aria-invalid="false"></div>
+                  <div class="col-sm-8"><input type="text" ng-model="bldgResource.details.city" class="form-control" placeholder="City" tabindex="0" aria-invalid="false"></div>
                 </div>
                 <div class="form-group row">
                   <label class="col-sm-4 ptop5 text-right form-control-label">Building State</label>
-                  <div class="col-sm-8"><input type="text" ng-model="building.details.state" class="form-control" placeholder="State" tabindex="0" aria-invalid="false"></div>
+                  <div class="col-sm-8"><input type="text" ng-model="bldgResource.details.state" class="form-control" placeholder="State" tabindex="0" aria-invalid="false"></div>
                 </div>
                 <div class="form-group row">
                   <label class="col-sm-4 ptop5 text-right form-control-label">Building Zipcode</label>
-                  <div class="col-sm-8"><input type="text" ng-model="building.details.zipcode" class="form-control" placeholder="Zip" tabindex="0" aria-invalid="false"></div>
+                  <div class="col-sm-8"><input type="text" ng-model="bldgResource.details.zipcode" class="form-control" placeholder="Zip" tabindex="0" aria-invalid="false"></div>
                 </div>
               </div>
               <div class="col-sm-1 center">
@@ -441,13 +444,13 @@
                     <th class="center icon">Remove</th>
                   </tr>
                 </thead>
-                <tr ng-repeat="(contactIndex, contact) in building.details.contacts track by $index">
+                <tr ng-repeat="(contactIndex, contact) in bldgResource.details.contacts track by $index">
                   <td><input type="text" ng-model="contact.name" class="form-control input-sm" placeholder="John Smith" tabindex="0" aria-invalid="false"></td>
                   <td><input type="text" ng-model="contact.position" class="form-control input-sm" placeholder="Engineer" tabindex="0" aria-invalid="false"></td>
                   <td><input type="text" ng-model="contact.phone" class="form-control input-sm" placeholder="123-123-1234" tabindex="0" aria-invalid="false"></td>
                   <td><input type="text" ng-model="contact.email" class="form-control input-sm" placeholder="email@domain.com" tabindex="0" aria-invalid="false"></td>
                   <td class="center ">
-                    <a href ng-click="askDeleteContact(contactIndex, $event, building)"> <i class="glyphicon glyphicon-remove"></i> </a>
+                    <a href ng-click="askDeleteContact(contactIndex, $event, bldgResource)"> <i class="glyphicon glyphicon-remove"></i> </a>
                   </td>
                 </tr>
               </table>
@@ -477,12 +480,12 @@
                     <th class="center icon">Remove</th>
                   </tr>
                 </thead>
-                <tr ng-repeat="(prepIndex, prep) in building.details.reportAuthor track by $index">
+                <tr ng-repeat="(prepIndex, prep) in bldgResource.details.reportAuthor track by $index">
                   <td><input type="text" ng-model="prep.name" class="form-control input-sm" placeholder="John Smith" tabindex="0" aria-invalid="false"></td>
                   <td><input type="text" ng-model="prep.email" class="form-control input-sm" placeholder="email@domain.com" tabindex="0" aria-invalid="false"></td>
                   <td><input type="text" ng-model="prep.position" class="form-control input-sm" placeholder="Engineer" tabindex="0" aria-invalid="false"></td>
                   <td class="center ">
-                    <a href ng-click="askDeleteAuthor(prepIndex, $event, building)"> <i class="glyphicon glyphicon-remove"></i> </a>
+                    <a href ng-click="askDeleteAuthor(prepIndex, $event, bldgResource)"> <i class="glyphicon glyphicon-remove"></i> </a>
                   </td>
                 </tr>
               </table>
@@ -525,6 +528,118 @@
       </div>
     </div>
 
+    <div class="col-row" ng-if="br_page=='loadout'">
+      <div class="panel-group col-lg-12" id="br_loadout" role="tablist" aria-multiselectable="true">
+        <div class="panel panel-default">
+          <div class="panel-heading" role="tab" id="br_loadout">
+            <h4 class="panel-title">
+              Loadout
+            </h4>
+          </div>
+          <div id="collapseBRProject" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="br_loadout">
+            <div class="panel-body">
+              <div class="form-group edit-contact">
+                <form>
+                  <div class="col-lg-12 plan-property-item">
+                    <div class="form-group row">
+                      <label class="col-sm-6 text-right form-control-label">AP Count</label>
+                      <div class="col-sm-6"><input type="number" readonly ng-value="getTotalAPs()" class="form-control tight" /></div>
+                    </div>
+                    <div class="form-group row">
+                      <label class="col-sm-6 text-right form-control-label">AM Count</label>
+                      <div class="col-sm-6"><input type="number" readonly ng-value="getTotalAMs()" class="form-control tight" /></div>
+                    </div>
+                    <div class="form-group row">
+                      <label class="col-sm-6 text-right form-control-label">Total Device Count</label>
+                      <div class="col-sm-6"><input type="number" readonly ng-value="getTotalAMs() + getTotalAPs()" class="form-control tight" /></div>
+                    </div>
+                    <div class="form-group row">
+                      <label class="col-sm-6 text-right form-control-label">AP/AM spares</label>
+                      <div class="col-sm-6"><input type="number" ng-model="bldgResource.details.inventory.apspares" class="form-control tight" placeholder="qty" ng-change="updateBOM()" /></div>
+                    </div>
+                    <div class="form-group row" ng-if="bldgHasController()">
+                      <label class="col-sm-6 ptop5 text-right form-control-label">Country Code</label>
+                      <div class="col-sm-6">
+                        <select type="text" ng-model="bldgResource.details.inventory.country" class="form-control">
+                          <option value="US">US</option>
+                          <option value="JP">JP</option>
+                          <option value="IL">IL</option>
+                          <option value="RW">RW</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="form-group row" ng-if="bldgHasController()">
+                      <label class="col-sm-6 ptop5 text-right form-control-label">Model</label>
+                      <div class="col-sm-6">
+                        <input type="text" ng-model="bldgResource.details.inventory.controller" placeholder="Controller part number" class="form-control"
+                                          uib-typeahead="ctrl.sku for ctrl in getControllers($viewValue)"
+                                          typeahead-on-select="updateController()"
+                                          typeahead-loading="loadingControllers"
+                                          typeahead-no-results="noControllerResults">
+                        <i ng-show="loadingControllers" class="glyphicon glyphicon-refresh"></i>
+                        <div ng-show="noControllerResults">
+                          <i class="glyphicon glyphicon-remove"></i> No Results Found
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group row" ng-if="bldgHasController()">
+                      <div class="col-sm-6 text-right"><label class="form-control-label">HA</label></div>
+                      <div class="col-sm-6">
+                        <md-switch aria-label="HA" ng-model="bldgResource.details.inventory.ctrlha" ng-change="updateBOM()">HA</md-switch>
+                      </div>
+                    </div>
+                    <div class="form-group row" ng-if="plan.details.vendor === 'Aruba HPE' && bldgHasController()">
+                      <div class="col-sm-6 text-right"><label class="form-control-label">AP License?</label></div>
+                      <div class="col-sm-6">
+                        <md-switch aria-label="AP licences" ng-model="bldgResource.details.inventory.aplic" ng-disabled="bldgResource.details.inventory.enterprise">
+                          {{ bldgResource.details.inventory.aplic ? 'Yes' : 'No' }}
+                        </md-switch>
+                        <div class="bg-warning" ng-if="!bldgResource.details.inventory.enterprise && !bldgResource.details.inventory.aplic" style="position: absolute; top: 2px; left: 120px; right: -300px;">
+                          Please note that APs will not connect to the controller without AP Licences!
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group row" ng-if="plan.details.vendor === 'Aruba HPE' && bldgHasController()">
+                      <div class="col-sm-6 text-right"><label class="form-control-label">PEFNG License?</label></div>
+                      <div class="col-sm-6">
+                        <md-switch aria-label="PEFNG licences" ng-model="bldgResource.details.inventory.pefng" ng-disabled="bldgResource.details.inventory.enterprise">
+                          {{ bldgResource.details.inventory.pefng ? 'Yes' : 'No' }}
+                        </md-switch>
+                      </div>
+                    </div>
+                    <div class="form-group row" ng-if="plan.details.vendor === 'Aruba HPE' && bldgHasController()">
+                      <div class="col-sm-6 text-right"><label class="form-control-label">RFP License?</label></div>
+                      <div class="col-sm-6">
+                        <md-switch aria-label="RFP licences" ng-model="bldgResource.details.inventory.rfp" ng-disabled="bldgResource.details.inventory.enterprise">
+                          {{ bldgResource.details.inventory.rfp ? 'Yes' : 'No' }}
+                        </md-switch>
+                      </div>
+                    </div>
+                    <div class="form-group row" ng-if="plan.details.vendor === 'Aruba HPE' && bldgHasController()">
+                      <div class="col-sm-6 text-right"><label class="form-control-label">AW License?</label></div>
+                      <div class="col-sm-6">
+                        <md-switch aria-label="AW licences" ng-model="bldgResource.details.inventory.aw" ng-disabled="bldgResource.details.inventory.enterprise">
+                          {{ bldgResource.details.inventory.aw ? 'Yes' : 'No' }}
+                        </md-switch>
+                      </div>
+                    </div>
+                    <div class="form-group row" ng-if="plan.details.vendor === 'Aruba HPE' && bldgHasController()">
+                      <div class="col-sm-6 text-right"><label class="form-control-label">Enterprise License?</label></div>
+                      <div class="col-sm-6">
+                        <md-switch aria-label="Enterprise licences" ng-model="bldgResource.details.inventory.enterprise" ng-change="updateEnterprise()">
+                          {{ bldgResource.details.inventory.enterprise ? 'Yes' : 'No' }}
+                        </md-switch>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="col-row" ng-if="br_page=='bom'">
       <div class="panel-group col-lg-12" id="br_bom" role="tablist" aria-multiselectable="true">
         <div class="panel panel-default">
@@ -538,18 +653,18 @@
               <table class="pjtable">
                 <thead>
                   <tr>
-                    <th>Model / Description</th>
                     <th>Part No.</th>
+                    <th>Description</th>
                     <th>Quantity</th>
                     <th class="center icon">Remove</th>
                   </tr>
                 </thead>
-                <tr ng-repeat="(partIndex, part) in building.details.bom track by $index">
-                  <td><input type="text" ng-model="part.desc" class="form-control input-sm" placeholder="AP-205..." tabindex="0" aria-invalid="false"></td>
+                <tr ng-repeat="(partIndex, part) in bldgResource.details.bom track by $index">
                   <td><input type="text" ng-model="part.sku" class="form-control input-sm" placeholder="SKU 123..." tabindex="0" aria-invalid="false"></td>
+                  <td><input type="text" ng-model="part.desc" class="form-control input-sm" placeholder="AP-205..." tabindex="0" aria-invalid="false"></td>
                   <td><input type="text" ng-model="part.qty" class="form-control input-sm" placeholder="12.." tabindex="0" aria-invalid="false"></td>
                   <td class="center ">
-                    <a href ng-click="askDeletePart(partIndex, $event, building)"> <i class="glyphicon glyphicon-remove"></i> </a>
+                    <a href ng-click="askDeletePart(partIndex, $event, bldgResource)"> <i class="glyphicon glyphicon-remove"></i> </a>
                   </td>
                 </tr>
               </table>
@@ -570,7 +685,7 @@
           </div>
           <div id="collapseBRProject" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="br_notes">
             <div class="panel-body">
-              <textarea class="pjnotes" ng-model="building.details.notes"></textarea>
+              <textarea class="pjnotes" ng-model="bldgResource.details.notes"></textarea>
             </div>
           </div>
         </div>

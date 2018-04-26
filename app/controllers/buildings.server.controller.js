@@ -199,7 +199,10 @@ exports.pdfReport = function (req, res, next) {
 					let htmlFullPath = `${PUGDIR}/tmp/${htmlFilename}`
 					fs.writeFile(htmlFullPath, result, function (err) {
 						if (err) return next(err)
-						exec(`cd ${PUGDIR}/tmp && wkhtmltopdf --dpi 200 --zoom 0.35 --print-media-type ${htmlFilename} ${pdfFilename}`, function (err, stdout, stderr) {
+            var pdfCMD
+            if (process.env.NODE_ENV === 'production') pdfCMD = `cd ${PUGDIR}/tmp && wkhtmltopdf --dpi 200 --zoom 0.35 --print-media-type ${htmlFilename} ${pdfFilename}`
+            else pdfCMD = `cd ${PUGDIR}/tmp && wkhtmltopdf --dpi 200 --print-media-type ${htmlFilename} ${pdfFilename}`
+						exec(pdfCMD, function (err, stdout, stderr) {
 							if (err) console.log(`Error generating PDF file ${pdfFilename}`, err)
 							console.log(`serving PDF ${PUGDIR}/tmp/${pdfFilename}`)
 							let file = fs.readFileSync(`${PUGDIR}/tmp/${pdfFilename}`, 'binary')

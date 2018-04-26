@@ -1061,31 +1061,80 @@ angular.module('plans')
         return $scope.selected.building
       }
 
+      $scope.updateController = function() {
+        $scope.getControllers().then(controllers => {
+          let ctrl = _.find(controllers, c =>
+            c.sku === $scope.bldgResource.details.inventory.controller &&
+            $scope.bldgResource.details.inventory.vendor
+          )
+          $scope.bldgResource.details.inventory.ctrlDesc = ctrl.description
+          buildBOM()
+        })
+      }
+
+      $scope.updateBOM = function() {
+        buildBOM()
+      }
+
+      $scope.bldgHasController = function() {
+        return _.filter($scope.plans, plan => plan.details.ctrlPresent).length
+      }
+
       function buildBOM() {
         let bom = {}
         let aps = []
         let ams = []
         let ctrls = []
+
         _.each($scope.plans, plan => {
           _.each(plan.stage.items, item => {
-            console.log('adding item', item.sku)
             if (!item.sku) return
             bom[item.sku] = bom[item.sku] ? bom[item.sku]+1 : 1
             if (item.itemType === 'ap') aps[item.sku] = {sku: item.sku, desc: item.sku || item.vendor}
             if (item.itemType === 'am') ams[item.sku] = {sku: item.sku, desc: item.sku || item.vendor}
           })
-          if (plan.details.ctrlPresent) {
-            let ctrl = plan.details.controllers[0]
-            if (!ctrl.sku) return
-            bom[ctrl.sku] = bom[ctrl.sku] ? bom[ctrl.sku]++ : 1
-            ctrls[ctrl.sku] = {sku: ctrl.sku, desc: ctrl.description}
-          }
         })
 
-        return _.map(bom, (qty, sku) => {
+        if ($scope.bldgResource.details.inventory.apspares) {
+          let defaultAP = $scope.bldgResource.details.inventory.aps
+          bom[defaultAP] += $scope.bldgResource.details.inventory.apspares
+        }
+
+        if (_.filter($scope.plans, plan => plan.details.ctrlPresent).length) {
+          let ctrl = $scope.bldgResource.details.inventory.controller
+          bom[ctrl] = !!ctrl + ($scope.bldgResource.details.inventory.ctrlha ? 1 : 0)
+          ctrls[ctrl] = {sku: ctrl, desc: $scope.bldgResource.details.inventory.ctrlDesc}
+        }
+
+        _.map(bom, (qty, sku) => {
           let item = (aps[sku] || ams[sku] || ctrls[sku])
-          return {sku: item.sku, desc: item.desc, qty: qty}
+          let found = false
+          _.map($scope.bldgResource.details.bom, bitem => {
+            if (bitem.sku === item.sku) {
+              found = true
+              bitem.qty = bom[sku]
+              bitem.desc = item.desc
+            }
+          })
+          if (!found) bom = {sku: item.sku, desc: item.desc, qty: item.qty}
         })
+
+        $scope.bldgResource.details.bom = $scope.bldgResource.details.bom
+      }
+
+      function initLoadout() {
+        if (!$scope.bldgResource.details.inventory) $scope.bldgResource.details.inventory = {}
+        $scope.bldgResource.details.inventory.country = $scope.bldgResource.details.inventory.country || 'US'
+        if ($scope.bldgResource.details.inventory.aplic === undefined) $scope.bldgResource.details.inventory.aplic = true
+      }
+
+      $scope.updateEnterprise = function() {
+        let inventory = $scope.bldgResource.details.inventory
+        if (inventory.enterprise) {
+          inventory.pefng = inventory.aw = inventory.rfp = inventory.aplic = false
+        } else {
+          inventory.aplic = true
+        }
       }
 
       $scope.toggleSelectHardware = function() {
@@ -1094,14 +1143,20 @@ angular.module('plans')
 
       $scope.toggleBuildReport = function() {
         if (!$scope.br_page) $scope.br_page = 'cover'
-        $scope.building.details.bom = buildBOM()
-        $scope.brSelectAllFloors()
-        contextMenu.close()
-        $scope.build_report = !$scope.build_report
         $scope.plan_properties = false
+        $scope.build_report = !$scope.build_report
+        if ($scope.build_report) {
+          contextMenu.close()
+          $scope.savePlan()
+            .then(() => {
+              initLoadout()
+              buildBOM()
+              $scope.brSelectAllFloors()
+            })
+        }
       }
 
-      var brPages = ['cover', 'floors', 'bom', 'notes']
+      var brPages = ['cover', 'floors', 'loadout', 'bom', 'notes']
       var brCurrentPage = 0
 
       $scope.brPage = function(page) {
@@ -1160,14 +1215,15 @@ angular.module('plans')
       }
 
       $scope.brGenerateReport = function () {
+        $scope.planReady = false
         updateProject()
-          .then($scope.savePlan)
           .then(() => {
             if ($scope.settings.show_heatmap) {
               $scope.settings.show_heatmap = false
               $scope.toggleHeatmap()
             }
             $timeout(() => {
+              $scope.planReady = true
               window.open(`/buildings/${$scope.building._id}/pdf`, '_blank')
             }, 1000)
           })

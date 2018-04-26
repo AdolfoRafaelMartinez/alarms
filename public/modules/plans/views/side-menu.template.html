@@ -25,7 +25,7 @@
     <div class="row">
       <div class="col-sm-8">
         <span>Controller:</span></div>
-      <div class="col-sm-4"><md-switch aria-label="Controller" ng-model="plan.details.ctrlPresent"></md-switch></div>
+      <div class="col-sm-4"><md-switch aria-label="Controller" ng-change="updateController()" ng-model="plan.details.ctrlPresent"></md-switch></div>
     </div>
 
 	</uib-accordion-group>
